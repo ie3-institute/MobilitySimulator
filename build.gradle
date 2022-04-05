@@ -21,6 +21,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '0.9.997'
+  scapegoatVersion = '1.4.12'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -65,6 +66,12 @@ dependencies {
   implementation 'ch.qos.logback:logback-classic:1.2.11'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.4" // akka scala logging
 
+  /* Scala compiler plugin for static code analysis */
+  implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
+  scalaCompilerPlugins(
+      "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
+      )
+
   /* config */
   implementation 'com.typesafe:config:1.4.2'
   implementation "com.github.carueda:tscfg_2.13:$tscfgVersion"
@@ -81,4 +88,26 @@ description = 'MobilitySimulator'
 
 shadowJar {
   zip64 = true
+}
+
+// scapegoat hook configuration
+// https://github.com/sksamuel/scapegoat
+// using compileScala instead of tasks.withType(ScalaCompile) prevents applying scapegoat to scala test classes
+// see https://docs.gradle.org/current/userguide/scala_plugin.html#sec:configure_scala_classpath for details
+tasks.withType(ScalaCompile) {
+  scalaCompileOptions.additionalParameters = [
+    "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
+    "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/src/",
+    "-P:scapegoat:disabledInspections:VariableShadowing",
+    "-P:scapegoat:ignoredFiles:.*/SimonaConfig.scala" // see scapegoat-sbt page for this param
+  ]
+}
+
+// separate scapegoat report for test classes
+compileTestScala {
+  scalaCompileOptions.additionalParameters = [
+    "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
+    "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/testsrc/",
+    "-P:scapegoat:disabledInspections:VariableShadowing"
+  ]
 }
