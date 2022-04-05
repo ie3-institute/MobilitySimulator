@@ -1,0 +1,8 @@
+// pmd is a code check tool, working on source code
+
+pmd {
+  consoleOutput = true
+  toolVersion = "6.44.0"
+  rulesMinimumPriority = 2
+}
+

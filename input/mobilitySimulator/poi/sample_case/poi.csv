@@ -1,0 +1,14 @@
+uuid,id,size,lat,lon,categoricallocation
+245a03b9-25d9-4df3-80c5-f0fb7e826284,poi_home,1.5,51.4843281,7.4116482,home
+1e7726c9-0509-4895-b63d-0e67a79e8a6f,poi_work,1.2,51.4843281,7.4116482,work
+8170a77c-199c-4ec2-bd7c-a0f8c040f477,poi_supermarket,1.2,51.4843281,7.4116482,supermarket
+4fe5b5f0-b74e-445f-af65-95747464902c,poi_services,1.2,51.4843281,7.4116482,services
+481e363f-3199-490c-80e1-75149190cc1d,poi_othershop,1.2,51.4843281,7.4116482,othershop
+4c9dd354-b5be-4fa0-b2fc-3013cd707c40,poi_medicinal,1.2,51.4843281,7.4116482,medicinal
+ac666bdc-4505-4dfa-88fc-ae5905e81d65,poi_bbpg,1.2,51.4843281,7.4116482,bbpg
+a098c1cb-3827-4fb5-827e-95b301bdd9c2,poi_restaurant,1.2,51.4843281,7.4116482,restaurant
+6d005084-2fb8-4b05-891c-c6e1738a569f,poi_culture,1.2,51.4843281,7.4116482,culture
+b661af27-31da-4c3c-a3bd-a84145eef42,6poi_sports,1.2,51.4843281,7.4116482,sports
+e99deb06-c6da-42d8-827c-065bec703b1f,poi_religious,1.2,51.4843281,7.4116482,religious
+cdb531a1-06d7-49cf-930b-9235548efea3,poi_charginghubtown,1.2,51.4843281,7.4116482,charginghubtown
+ba602b85-e67b-4afc-9a83-f3ca79d56374,poi_charginghubhighway,1.2,51.4843281,7.4116482,charginghubhighway
