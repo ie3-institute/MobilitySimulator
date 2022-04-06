@@ -436,19 +436,19 @@ def gitCheckout(String relativeTargetDir, String baseUrl, String branch, String 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 def publishReports() {
   // publish test reports
-  publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/tests/test', reportFiles: 'index.html', reportName: "${relativeProjectDir}_java_tests_report", reportTitles: ''])
+  publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/tests/test', reportFiles: 'index.html', reportName: "${relativeProjectDir}_java_tests_report", reportTitles: ''])
 
   // publish pmd report for main project only
-  //   publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/pmd', reportFiles: 'main.html', reportName: "${relativeProjectDir}_pmd_report", reportTitles: ''])
+  //   publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/pmd', reportFiles: 'main.html', reportName: "${relativeProjectDir}_pmd_report", reportTitles: ''])
 
   // publish scalatest reports for main project only (currently the only one with scala sources!)
-  //  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/tests/scalatest', reportFiles: 'index.html', reportName: "${relativeProjectDir}_scala_tests_report", reportTitles: ''])
+  //  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/tests/scalatest', reportFiles: 'index.html', reportName: "${relativeProjectDir}_scala_tests_report", reportTitles: ''])
 
   // publish scapegoat src report for main project only
-  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/scapegoat/src', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_src_report", reportTitles: ''])
+  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/scapegoat/src', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_src_report", reportTitles: ''])
 
   // publish scapegoat testsrc report for main project only
-  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/scapegoat/testsrc', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_testsrc_report", reportTitles: ''])
+  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/scapegoat/testsrc', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_testsrc_report", reportTitles: ''])
 }
 
 
