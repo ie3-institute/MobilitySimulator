@@ -123,7 +123,7 @@ if (env.BRANCH_NAME == "main") {
           // publish report und coverage
           stage('publish reports + coverage') {
             // publish reports
-            publishReports()
+            publishReports(projects.get(0))
 
             // inform codecov.io
             withCredentials([
@@ -157,7 +157,7 @@ if (env.BRANCH_NAME == "main") {
           currentBuild.result = 'FAILURE'
 
           // publish reports even on failure
-          publishReports()
+          publishReports(projects.get(0))
 
           // print exception
           Date date = new Date()
@@ -230,7 +230,7 @@ if (env.BRANCH_NAME == "main") {
           // post processing
           stage('publish reports + coverage') {
             // publish reports
-            publishReports()
+            publishReports(projects.get(0))
 
             // inform codecov.io
             withCredentials([
@@ -265,7 +265,7 @@ if (env.BRANCH_NAME == "main") {
           currentBuild.result = 'FAILURE'
 
           // publish reports even on failure
-          publishReports()
+          publishReports(projects.get(0))
 
           // print exception
           Date date = new Date()
@@ -360,7 +360,7 @@ if (env.BRANCH_NAME == "main") {
         // post processing
         stage('post processing') {
           // publish reports
-          publishReports()
+          publishReports(projects.get(0))
 
           withCredentials([
             string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
@@ -374,7 +374,7 @@ if (env.BRANCH_NAME == "main") {
         currentBuild.result = 'FAILURE'
 
         // publish reports even on failure
-        publishReports()
+        publishReports(projects.get(0))
 
         // print exception
         Date date = new Date()
@@ -434,21 +434,21 @@ def gitCheckout(String relativeTargetDir, String baseUrl, String branch, String 
 // publish reports
 // IMPORTANT: has to be called inside the same node{} as where the build process (report generation) took place!
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-def publishReports() {
+def publishReports(String relativeProjectDir) {
   // publish test reports
-  publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/tests/test', reportFiles: 'index.html', reportName: "${relativeProjectDir}_java_tests_report", reportTitles: ''])
+  publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/tests/test', reportFiles: 'index.html', reportName: "${relativeProjectDir}_java_tests_report", reportTitles: ''])
 
   // publish pmd report for main project only
-  //   publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/pmd', reportFiles: 'main.html', reportName: "${relativeProjectDir}_pmd_report", reportTitles: ''])
+  //   publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/pmd', reportFiles: 'main.html', reportName: "${relativeProjectDir}_pmd_report", reportTitles: ''])
 
   // publish scalatest reports for main project only (currently the only one with scala sources!)
-  //  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/tests/scalatest', reportFiles: 'index.html', reportName: "${relativeProjectDir}_scala_tests_report", reportTitles: ''])
+  //  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/tests/scalatest', reportFiles: 'index.html', reportName: "${relativeProjectDir}_scala_tests_report", reportTitles: ''])
 
   // publish scapegoat src report for main project only
-  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/scapegoat/src', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_src_report", reportTitles: ''])
+  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/scapegoat/src', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_src_report", reportTitles: ''])
 
   // publish scapegoat testsrc report for main project only
-  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: buildDir + '/reports/scapegoat/testsrc', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_testsrc_report", reportTitles: ''])
+  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, escapeUnderscores: false, keepAll: true, reportDir: relativeProjectDir + '/build/reports/scapegoat/testsrc', reportFiles: 'scapegoat.html', reportName: "${relativeProjectDir}_scapegoat_testsrc_report", reportTitles: ''])
 }
 
 
