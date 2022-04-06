@@ -304,14 +304,9 @@ case object ElectricVehicle extends LazyLogging {
           cs: (ChargingStation, ComparableQuantity[Length])
       ) => {
         val evcsIsHomeType: Boolean =
-          if (
-            chargingStations
-              .find(_ == cs._1)
-              .get
-              .getEvcsLocationType == EvcsLocationType.HOME
-          )
-            true
-          else false
+          chargingStations
+            .find(_ == cs._1)
+            .exists(_.getEvcsLocationType == EvcsLocationType.HOME)
         chargeAtHome || evcsIsHomeType
       }
     )

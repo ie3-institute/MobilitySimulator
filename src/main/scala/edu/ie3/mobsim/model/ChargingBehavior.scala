@@ -258,10 +258,16 @@ object ChargingBehavior extends LazyLogging {
       currentPrices: Map[UUID, java.lang.Double]
   ): Double = currentPrices.get(cs.getUuid) match {
     case Some(price) =>
-      if (ev.getChargingPricesMemory.max == ev.getChargingPricesMemory.min)
-        0.5 // if all prices are the same; avoid dividing by 0
-      else
-        (ev.getChargingPricesMemory.max - price.toDouble) / (ev.getChargingPricesMemory.max - ev.getChargingPricesMemory.min)
+      ev.getChargingPricesMemory.maxOption.zip(
+        ev.getChargingPricesMemory.minOption
+      ) match {
+        case Some((maxPrice, minPrice)) =>
+          if (math.abs(maxPrice - minPrice) < 0.001)
+            0.5 // if all prices are the same; avoid dividing by 0
+          else
+            (maxPrice - price.toDouble) / (maxPrice - minPrice)
+        case None => 1
+      }
     case None => 1
   }
 }

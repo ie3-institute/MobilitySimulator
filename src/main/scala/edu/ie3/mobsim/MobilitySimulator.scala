@@ -548,9 +548,21 @@ final class MobilitySimulator(
     val nextEvent: ZonedDateTime = evs.foldLeft(currentTime.plusYears(1))(
       (earliestEvent: ZonedDateTime, ev: ElectricVehicle) => {
         val earlierEvent = if (ev.getParkingTimeStart.isAfter(currentTime)) {
-          Set(earliestEvent, ev.getParkingTimeStart, ev.getDepartureTime).min
+          Seq(
+            earliestEvent,
+            ev.getParkingTimeStart,
+            ev.getDepartureTime
+          ).minOption.getOrElse(
+            throw new IllegalArgumentException(
+              "Unable to determine the earlier time"
+            )
+          )
         } else {
-          Set(earliestEvent, ev.getDepartureTime).min
+          Seq(earliestEvent, ev.getDepartureTime).minOption.getOrElse(
+            throw new IllegalArgumentException(
+              "Unable to determine the earlier time"
+            )
+          )
         }
         earlierEvent
       }
