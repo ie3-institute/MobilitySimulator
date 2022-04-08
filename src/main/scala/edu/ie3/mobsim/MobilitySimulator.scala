@@ -619,8 +619,6 @@ object MobilitySimulator
     *   Time tick (as ArrayList) when simulation should be triggered again
     */
   protected def doActivity(tick: Long): java.util.ArrayList[java.lang.Long] = {
-    /* Initialize the simulation in the first step */
-    if (tick == -1L) setup()
     simulator
       .map(_.doActivity(tick))
       .getOrElse(
@@ -628,12 +626,12 @@ object MobilitySimulator
       )
   }
 
-  /** Setup the simulation using the args received from SIMONA. <p> Sets the
-    * paths for io with information received from SIMONA. Loads all necessary
-    * data such as probabilities, EV models, etc. and creates all objects such
-    * as EVs, POIs, and charging stations.
+  /** Initialize the simulation using the args received from SIMONA. <p> Sets
+    * the paths for io with information received from SIMONA. Loads all
+    * necessary data such as probabilities, EV models, etc. and creates all
+    * objects such as EVs, POIs, and charging stations.
     */
-  def setup(): Unit = {
+  protected def initialize(): java.util.ArrayList[java.lang.Long] = {
 
     val availableEvData = evData.getOrElse(
       throw InitializationException(
@@ -876,28 +874,29 @@ object MobilitySimulator
     }
     logger.debug("Done loading probabilities for trip distance")
 
-    simulator = Some(
-      new MobilitySimulator(
-        availableEvData,
-        chargingStations,
-        poisWithSizes,
-        startTime,
-        evs,
-        chargingHubTownIsPresent,
-        chargingHubHighwayIsPresent,
-        ioUtils,
-        categoricalLocation,
-        drivingSpeed,
-        firstDepartureOfDay,
-        lastTripOfDay,
-        parkingTime,
-        poiTransition,
-        tripDistance,
-        maxDistanceFromPoi,
-        thresholdChargingHubDistance
-      )
+    val mobSim = new MobilitySimulator(
+      availableEvData,
+      chargingStations,
+      poisWithSizes,
+      startTime,
+      evs,
+      chargingHubTownIsPresent,
+      chargingHubHighwayIsPresent,
+      ioUtils,
+      categoricalLocation,
+      drivingSpeed,
+      firstDepartureOfDay,
+      lastTripOfDay,
+      parkingTime,
+      poiTransition,
+      tripDistance,
+      maxDistanceFromPoi,
+      thresholdChargingHubDistance
     )
+    simulator = Some(mobSim)
 
     logger.info("Finished setup!")
+
+    mobSim.doActivity(-1L)
   }
 }
