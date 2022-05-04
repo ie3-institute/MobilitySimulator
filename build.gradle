@@ -10,7 +10,7 @@ plugins {
   id "com.github.maiflai.scalatest" version "0.32" // run scalatest without specific spec task
   id "com.jfrog.artifactory" version "4.21.0"
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
-  id "com.github.johnrengelman.shadow" version "7.0.0"
+  id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 ext {
