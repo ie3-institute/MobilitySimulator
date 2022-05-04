@@ -78,7 +78,7 @@ dependencies {
   implementation "com.github.scopt:scopt_${scalaVersion}:4.0.1" // cmd args parser
 
   /* Testing */
-  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.10"
+  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.12"
   testRuntimeClasspath 'com.vladsch.flexmark:flexmark-all:0.64.0'
 }
 
