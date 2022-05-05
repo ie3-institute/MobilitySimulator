@@ -84,7 +84,7 @@ object PathsAndSources extends LazyLogging {
     *   The path with harmonized file separators
     */
   private def harmonizeFileSeparators(path: String): String = {
-    val newSeparator = if(File.separator.equals("\\")) "\\\\" else "/"
+    val newSeparator = if (File.separator.equals("\\")) "\\\\" else "/"
 
     /* Use the local system's file separator */
     val harmonized = "[/\\\\]".r.replaceAllIn(path, newSeparator)
