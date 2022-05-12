@@ -7,14 +7,9 @@
 package edu.ie3.mobsim.io.probabilities.factories
 
 import edu.ie3.mobsim.exceptions.SourceException
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
-import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.TripDistance.TripDistanceKey
 import edu.ie3.mobsim.io.probabilities.{
-  CategoricalLocation,
   ProbabilityDensityFunction,
   TripDistance
 }
@@ -22,7 +17,6 @@ import edu.ie3.mobsim.utils.DayType
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
 
 import javax.measure.quantity.Length
 import scala.util.{Failure, Success, Try}

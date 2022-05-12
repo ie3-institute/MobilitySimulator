@@ -7,14 +7,9 @@
 package edu.ie3.mobsim.io.probabilities.factories
 
 import edu.ie3.mobsim.exceptions.SourceException
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
-import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.PoiTransition.PoiTransitionKey
 import edu.ie3.mobsim.io.probabilities.{
-  CategoricalLocation,
   PoiTransition,
   ProbabilityDensityFunction
 }

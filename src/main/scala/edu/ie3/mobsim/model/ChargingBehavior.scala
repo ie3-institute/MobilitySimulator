@@ -11,7 +11,6 @@ import edu.ie3.datamodel.models.ElectricCurrentType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
-import edu.ie3.simona.api.data.ev.ontology.ProvideCurrentPrices
 import tech.units.indriya.ComparableQuantity
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import tech.units.indriya.quantity.Quantities.getQuantity
@@ -131,8 +130,8 @@ object ChargingBehavior extends LazyLogging {
       val (lowerThreshold, upperThreshold) = {
         if (ev.isChargingAtHomePossible) {
           if (
-            ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.HOME.id
-            || ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.WORK.id
+            ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.HOME
+            || ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.WORK
           ) {
             (0.4, 0.85)
           } else {
@@ -140,8 +139,8 @@ object ChargingBehavior extends LazyLogging {
           }
         } else {
           if (
-            ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.HOME.id
-            || ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.WORK.id
+            ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.HOME
+            || ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.WORK
           ) {
             (0.4, 0.85)
           } else {

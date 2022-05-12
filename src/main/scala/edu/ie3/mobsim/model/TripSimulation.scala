@@ -47,7 +47,7 @@ import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
 
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import javax.measure.quantity.{Energy, Length, Power, Speed}
+import javax.measure.quantity.{Energy, Length, Speed}
 import scala.annotation.tailrec
 import scala.math.Ordering.Implicits.infixOrderingOps
 

@@ -14,7 +14,6 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
 import edu.ie3.mobsim.io.probabilities.{
   CategoricalLocation,
-  FirstDepartureOfDay,
   ProbabilityDensityFunction
 }
 import edu.ie3.mobsim.utils.DayType

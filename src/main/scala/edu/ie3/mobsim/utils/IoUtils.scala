@@ -8,7 +8,7 @@ package edu.ie3.mobsim.utils
 
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
-import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATT,

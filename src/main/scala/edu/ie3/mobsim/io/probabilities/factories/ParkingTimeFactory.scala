@@ -10,7 +10,6 @@ import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.ParkingTime.ParkingTimeKey
 import edu.ie3.mobsim.io.probabilities.{
-  FirstDepartureOfDay,
   ParkingTime,
   ProbabilityDensityFunction
 }
