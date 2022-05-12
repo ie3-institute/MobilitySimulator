@@ -9,10 +9,7 @@ package edu.ie3.mobsim.io.probabilities.factories
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.ParkingTime.ParkingTimeKey
-import edu.ie3.mobsim.io.probabilities.{
-  ParkingTime,
-  ProbabilityDensityFunction
-}
+import edu.ie3.mobsim.io.probabilities.{ParkingTime, ProbabilityDensityFunction}
 import edu.ie3.mobsim.utils.DayType
 
 import scala.util.{Failure, Success, Try}
