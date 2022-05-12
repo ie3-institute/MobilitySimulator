@@ -27,7 +27,7 @@ final case class ParkingTime(
     * @return
     *   sampled parking time
     */
-  def sample(time: ZonedDateTime, poiType: Int): Int = {
+  def sample(time: ZonedDateTime, poiType: PoiTypeDictionary.Value): Int = {
 
     /* Get current time on 15min basis */
     val timeQuarter = time.getHour * 4 + time.getMinute / 15
@@ -42,7 +42,7 @@ final case class ParkingTime(
 
     /* Sample parking time */
     val parkingTime = probabilities.get(
-      ParkingTimeKey(timeQuarter, PoiTypeDictionary(poiType).id)
+      ParkingTimeKey(timeQuarter, poiType)
     ) match {
       case Some(pdf) => pdf.sample()
       case _ =>
@@ -57,5 +57,5 @@ final case class ParkingTime(
 }
 
 case object ParkingTime {
-  final case class ParkingTimeKey(time: Int, poi: Int)
+  final case class ParkingTimeKey(time: Int, poi: PoiTypeDictionary.Value)
 }

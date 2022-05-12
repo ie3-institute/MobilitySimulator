@@ -437,8 +437,8 @@ final class MobilitySimulator(
         Some((cs, Movement(cs, ev)))
       } else {
         logger.debug(
-          s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi.id} " +
-            s"(${PoiTypeDictionary(ev.getDestinationPoiType)}) because all charging points " +
+          s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi} " +
+            s"(${ev.getDestinationPoiType}) because all charging points " +
             s"at $cs were taken."
         )
         None

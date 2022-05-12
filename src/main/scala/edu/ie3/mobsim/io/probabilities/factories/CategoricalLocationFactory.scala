@@ -91,7 +91,12 @@ object CategoricalLocationFactory
       entries: Seq[Entry]
   ): Map[CategoricalLocationKey, ProbabilityDensityFunction[Int]] =
     entries
-      .groupBy(entry => CategoricalLocationKey(entry.time, entry.poiType.id))
+      .groupBy(entry =>
+        CategoricalLocationKey(
+          entry.time,
+          CategoricalLocationDictionary(entry.poiType.toString)
+        )
+      )
       .map { case (key, entries) =>
         key -> ProbabilityDensityFunction(entries.map { entry =>
           entry.categoricalLocation.id -> entry.probability

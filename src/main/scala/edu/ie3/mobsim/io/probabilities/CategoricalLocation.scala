@@ -71,7 +71,10 @@ final case class CategoricalLocation(
 
         /* Sample categorical location */
         probabilities.get(
-          CategoricalLocationKey(timeInterval, poiType.id)
+          CategoricalLocationKey(
+            timeInterval,
+            CategoricalLocationDictionary(poiType.toString)
+          )
         ) match {
           case Some(pdf) => CategoricalLocationDictionary(pdf.sample())
           case _         => throw new RuntimeException("No pdf found")
@@ -80,5 +83,8 @@ final case class CategoricalLocation(
 }
 
 case object CategoricalLocation {
-  final case class CategoricalLocationKey(time: Int, poi: Int)
+  final case class CategoricalLocationKey(
+      time: Int,
+      poi: CategoricalLocationDictionary.Value
+  )
 }

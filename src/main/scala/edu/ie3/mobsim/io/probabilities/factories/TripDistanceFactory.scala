@@ -98,7 +98,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
   ): Map[TripDistanceKey, ProbabilityDensityFunction[Double]] =
     entries
       .groupBy(entry =>
-        TripDistanceKey(entry.quarterHour, entry.from.id, entry.to.id)
+        TripDistanceKey(entry.quarterHour, entry.from, entry.to)
       )
       .map { case (key, entries) =>
         key -> ProbabilityDensityFunction(entries.map { entry =>

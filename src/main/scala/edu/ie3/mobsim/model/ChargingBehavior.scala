@@ -69,8 +69,8 @@ object ChargingBehavior extends LazyLogging {
     if (ev.getDestinationPoi.nearestChargingStations.nonEmpty) {
       /* Always charge if the EV makes charging stop at charging hub */
       if (
-        ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN.id
-        || ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_HIGHWAY.id
+        ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN
+        || ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_HIGHWAY
       ) {
         logger.debug(
           s"${ev.getId} arrives at charging hub and wants to start charging."

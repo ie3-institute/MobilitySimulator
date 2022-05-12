@@ -88,7 +88,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
   ): Map[ParkingTimeKey, ProbabilityDensityFunction[Int]] =
     entries
       .groupBy { case Entry(quarterHourOfDay, _, poiType, _, _) =>
-        ParkingTimeKey(quarterHourOfDay, poiType.id)
+        ParkingTimeKey(quarterHourOfDay, poiType)
       }
       .map { case key -> entries =>
         key -> ProbabilityDensityFunction(

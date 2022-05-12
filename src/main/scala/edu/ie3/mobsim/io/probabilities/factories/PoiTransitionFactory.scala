@@ -92,7 +92,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
   ): Map[PoiTransitionKey, ProbabilityDensityFunction[Int]] =
     entries
       .groupBy { case Entry(quarterHour, _, from, _, _) =>
-        PoiTransitionKey(quarterHour, from.id)
+        PoiTransitionKey(quarterHour, from)
       }
       .map { case (key, entries) =>
         key -> ProbabilityDensityFunction(entries.map { entry =>
