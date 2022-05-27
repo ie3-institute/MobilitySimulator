@@ -14,7 +14,6 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
 import edu.ie3.mobsim.io.probabilities.{
   CategoricalLocation,
-  FirstDepartureOfDay,
   ProbabilityDensityFunction
 }
 import edu.ie3.mobsim.utils.DayType
@@ -24,13 +23,13 @@ import scala.util.{Failure, Success, Try}
 object CategoricalLocationFactory
     extends ProbabilityFactory[CategoricalLocation] {
   private val uuid = "uuid"
-  private val time = "time"
   private val dayType = "day_type"
+  private val time = "time"
   private val poiType = "poi_type"
   private val categoricalLocation = "categorical_location"
   private val probability = "probability"
   override protected val requiredFields: Seq[String] =
-    Seq(uuid, time, dayType, poiType, categoricalLocation, probability)
+    Seq(uuid, dayType, time, poiType, categoricalLocation, probability)
 
   /** Build the desired instance from a collection of entity field data
     *

@@ -7,14 +7,8 @@
 package edu.ie3.mobsim.io.probabilities.factories
 
 import edu.ie3.mobsim.exceptions.SourceException
-import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.ParkingTime.ParkingTimeKey
-import edu.ie3.mobsim.io.probabilities.{
-  DrivingSpeed,
-  ParkingTime,
-  ProbabilityDensityFunction
-}
+import edu.ie3.mobsim.io.probabilities.DrivingSpeed
 import edu.ie3.mobsim.utils.DayType
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
@@ -25,13 +19,13 @@ import scala.util.{Failure, Success, Try}
 
 object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
   private val uuid = "uuid"
-  private val time = "time"
   private val dayType = "day_type"
+  private val time = "time"
   private val a = "a"
   private val b = "b"
   private val min = "min"
   override protected val requiredFields: Seq[String] =
-    Seq(uuid, time, dayType, a, b, min)
+    Seq(uuid, dayType, time, a, b, min)
 
   /** Build the desired instance from a collection of entity field data
     *

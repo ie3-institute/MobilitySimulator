@@ -7,14 +7,9 @@
 package edu.ie3.mobsim.io.probabilities.factories
 
 import edu.ie3.mobsim.exceptions.SourceException
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
-import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.TripDistance.TripDistanceKey
 import edu.ie3.mobsim.io.probabilities.{
-  CategoricalLocation,
   ProbabilityDensityFunction,
   TripDistance
 }
@@ -22,21 +17,20 @@ import edu.ie3.mobsim.utils.DayType
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
 
 import javax.measure.quantity.Length
 import scala.util.{Failure, Success, Try}
 
 object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
   private val uuid = "uuid"
-  private val quarterHour = "quarter_hour_of_day"
   private val dayType = "day_type"
+  private val quarterHour = "quarter_hour_of_day"
   private val fromPoi = "from"
   private val toPoi = "to"
   private val distance = "distance"
   private val probability = "probability"
   override protected val requiredFields: Seq[String] =
-    Seq(uuid, quarterHour, dayType, fromPoi, toPoi, distance, probability)
+    Seq(uuid, dayType, quarterHour, fromPoi, toPoi, distance, probability)
 
   /** Build the desired instance from a collection of entity field data
     *

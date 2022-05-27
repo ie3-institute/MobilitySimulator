@@ -91,7 +91,7 @@ object FileChanger extends App {
     val targetPath =
       Seq(probabilityDir, "departure.csv").mkString(JavaFile.separator)
     val targetHeader =
-      Seq("uuid", "minute_of_day", "day_type", "probability")
+      Seq("uuid", "day_type", "minute_of_day", "probability")
 
     mergeFiles(sources, targetPath, targetHeader)
   }

@@ -9,24 +9,20 @@ package edu.ie3.mobsim.io.probabilities.factories
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.ParkingTime.ParkingTimeKey
-import edu.ie3.mobsim.io.probabilities.{
-  FirstDepartureOfDay,
-  ParkingTime,
-  ProbabilityDensityFunction
-}
+import edu.ie3.mobsim.io.probabilities.{ParkingTime, ProbabilityDensityFunction}
 import edu.ie3.mobsim.utils.DayType
 
 import scala.util.{Failure, Success, Try}
 
 object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
   private val uuid = "uuid"
-  private val quarterHourOfDay = "quarter_hour_of_day"
   private val dayType = "day_type"
+  private val quarterHourOfDay = "quarter_hour_of_day"
   private val poiType = "poi_type"
   private val duration = "duration"
   private val probability = "probability"
   override protected val requiredFields: Seq[String] =
-    Seq(uuid, quarterHourOfDay, dayType, poiType, duration, probability)
+    Seq(uuid, dayType, quarterHourOfDay, poiType, duration, probability)
 
   /** Build the desired instance from a collection of entity field data
     *
