@@ -4,9 +4,9 @@
  * Research group Distribution grid planning and operation
  */
 
-package edu.ie3.simona.api;
+package edu.ie3.mobsim
 
-import edu.ie3.mobsim.MobilitySimulator
+import edu.ie3.simona.api.ExtLinkInterface
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.simulation.ExtSimulation
 
