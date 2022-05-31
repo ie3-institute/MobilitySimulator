@@ -54,6 +54,10 @@ object PoiEnums {
           )
       }
     }
+
+    def apply(poiType: PoiTypeDictionary.Value): Value = {
+      apply(poiType)
+    }
   }
 
 }

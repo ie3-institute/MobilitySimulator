@@ -230,7 +230,7 @@ object TripSimulation extends LazyLogging {
                 s"${ev.getId} drives to a charging hub of type chargingHubTown."
                 // )
                 makeTripToChargingHub(
-                  "chargingHubTown",
+                  PoiTypeDictionary("chargingHubTown"),
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -260,7 +260,7 @@ object TripSimulation extends LazyLogging {
                 s"${ev.getId} drives to a charging hub of type chargingHubHighway."
                 // )
                 makeTripToChargingHub(
-                  "chargingHubHighway",
+                  PoiTypeDictionary("chargingHubHighway"),
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -278,7 +278,7 @@ object TripSimulation extends LazyLogging {
                   s"This is a modified trip, because there are no highway charging hubs."
                 // )
                 makeModifiedTripToChargingHub(
-                  "chargingHubTown",
+                  PoiTypeDictionary("chargingHubTown"),
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -710,7 +710,7 @@ object TripSimulation extends LazyLogging {
     *   The updated EV
     */
   def makeTripToChargingHub(
-      chargingHubPoiType: String,
+      chargingHubPoiType: PoiTypeDictionary.Value,
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
       poisWithSizes: Map[
@@ -763,8 +763,8 @@ object TripSimulation extends LazyLogging {
     val newParkingTimeStart: ZonedDateTime =
       currentTime.plusMinutes(newDrivingTime)
 
-    val newDestinationPoiType: PoiTypeDictionary.Value =
-      PoiEnums.PoiTypeDictionary(chargingHubPoiType)
+    val newDestinationPoiType: PoiTypeDictionary.Value = chargingHubPoiType
+
     val newDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
       PoiEnums.CategoricalLocationDictionary(chargingHubPoiType)
     /* Sample destination POI */
@@ -831,7 +831,7 @@ object TripSimulation extends LazyLogging {
     * @return
     */
   def makeModifiedTripToChargingHub(
-      chargingHubPoiType: String,
+      chargingHubPoiType: PoiTypeDictionary.Value,
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
       poisWithSizes: Map[
@@ -875,8 +875,8 @@ object TripSimulation extends LazyLogging {
       1
     )
 
-    val newDestinationPoiType: PoiTypeDictionary.Value =
-      PoiEnums.PoiTypeDictionary(chargingHubPoiType)
+    val newDestinationPoiType: PoiTypeDictionary.Value = chargingHubPoiType
+
     val newDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
       PoiEnums.CategoricalLocationDictionary(chargingHubPoiType)
     /* Sample destination POI */

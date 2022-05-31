@@ -88,17 +88,19 @@ object CategoricalLocationFactory
 
   private def entries2pdf(
       entries: Seq[Entry]
-  ): Map[CategoricalLocationKey, ProbabilityDensityFunction[Int]] =
+  ): Map[CategoricalLocationKey, ProbabilityDensityFunction[
+    CategoricalLocationDictionary.Value
+  ]] =
     entries
       .groupBy(entry =>
         CategoricalLocationKey(
           entry.time,
-          CategoricalLocationDictionary(entry.poiType.toString)
+          CategoricalLocationDictionary(entry.poiType)
         )
       )
       .map { case (key, entries) =>
         key -> ProbabilityDensityFunction(entries.map { entry =>
-          entry.categoricalLocation.id -> entry.probability
+          entry.categoricalLocation -> entry.probability
         }.toMap)
       }
 
