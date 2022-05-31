@@ -122,9 +122,9 @@ object TripSimulation extends LazyLogging {
       if (
         socAtStartOfTrip < SOC_OF_70_PERCENT &&
         (ev.getDestinationPoiType == PoiEnums
-          .PoiTypeDictionary("chargingHubTown")
+          .PoiTypeDictionary("charging_hub_town")
           .id || ev.getDestinationPoiType == PoiEnums
-          .PoiTypeDictionary("chargingHubHighway")
+          .PoiTypeDictionary("charging_hub_highway")
           .id)
       ) {
         // logger.info(
@@ -234,7 +234,7 @@ object TripSimulation extends LazyLogging {
                 s"${ev.getId} drives to a charging hub of type chargingHubTown."
                 // )
                 makeTripToChargingHub(
-                  "chargingHubTown",
+                  "charging_hub_town",
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -264,7 +264,7 @@ object TripSimulation extends LazyLogging {
                 s"${ev.getId} drives to a charging hub of type chargingHubHighway."
                 // )
                 makeTripToChargingHub(
-                  "chargingHubHighway",
+                  "charging_hub_highway",
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -282,7 +282,7 @@ object TripSimulation extends LazyLogging {
                   s"This is a modified trip, because there are no highway charging hubs."
                 // )
                 makeModifiedTripToChargingHub(
-                  "chargingHubTown",
+                  "charging_hub_town",
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -1090,9 +1090,9 @@ object TripSimulation extends LazyLogging {
     val parkingTimeStart: ZonedDateTime = currentTime.plusMinutes(1)
     val departureTime: ZonedDateTime =
       if (
-        ev.getDestinationPoiType == PoiTypeDictionary("chargingHubTown").id
+        ev.getDestinationPoiType == PoiTypeDictionary("charging_hub_town").id
         || ev.getDestinationPoiType == PoiTypeDictionary(
-          "chargingHubHighway"
+          "charging_hub_highway"
         ).id
       ) {
         parkingTimeStart.plusMinutes(
