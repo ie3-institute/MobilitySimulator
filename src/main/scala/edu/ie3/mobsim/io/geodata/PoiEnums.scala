@@ -56,7 +56,16 @@ object PoiEnums {
     }
 
     def apply(poiType: PoiTypeDictionary.Value): Value = {
-      apply(poiType)
+      poiType match {
+        case PoiTypeDictionary.HOME                 => HOME
+        case PoiTypeDictionary.WORK                 => WORK
+        case PoiTypeDictionary.CHARGING_HUB_TOWN    => CHARGING_HUB_TOWN
+        case PoiTypeDictionary.CHARGING_HUB_HIGHWAY => CHARGING_HUB_HIGHWAY
+        case malformed =>
+          throw new RuntimeException(
+            s"PoiType '$malformed' could not be applied to CategoricalLocationDictionary"
+          )
+      }
     }
   }
 

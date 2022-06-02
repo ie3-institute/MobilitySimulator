@@ -230,7 +230,7 @@ object TripSimulation extends LazyLogging {
                 s"${ev.getId} drives to a charging hub of type chargingHubTown."
                 // )
                 makeTripToChargingHub(
-                  PoiTypeDictionary("chargingHubTown"),
+                  PoiTypeDictionary.CHARGING_HUB_TOWN,
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -260,7 +260,7 @@ object TripSimulation extends LazyLogging {
                 s"${ev.getId} drives to a charging hub of type chargingHubHighway."
                 // )
                 makeTripToChargingHub(
-                  PoiTypeDictionary("chargingHubHighway"),
+                  PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
                   ev,
                   currentTime,
                   poisWithSizes,
@@ -278,7 +278,7 @@ object TripSimulation extends LazyLogging {
                   s"This is a modified trip, because there are no highway charging hubs."
                 // )
                 makeModifiedTripToChargingHub(
-                  PoiTypeDictionary("chargingHubTown"),
+                  PoiTypeDictionary.CHARGING_HUB_TOWN,
                   ev,
                   currentTime,
                   poisWithSizes,
