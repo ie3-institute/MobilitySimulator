@@ -18,6 +18,7 @@ import edu.ie3.datamodel.io.source.csv.{
 import edu.ie3.mobsim.config.MobSimConfig
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input
+import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY
 
 import java.io.{File, FileFilter}
@@ -83,12 +84,8 @@ object PathsAndSources extends LazyLogging {
     * @return
     *   The path with harmonized file separators
     */
-  private def harmonizeFileSeparators(path: String): String = {
-    /* Use the local system's file separator */
-    val harmonized = "[/\\\\]".r.replaceAllIn(path, File.separator)
-    /* Remove the trailing file separator */
-    "[/\\\\]+$".r.replaceAllIn(harmonized, "")
-  }
+  private def harmonizeFileSeparators(path: String): String =
+    FilenameUtils.normalizeNoEndSeparator(path)
 
   /** Build relevant paths and sources from given init data
     *
