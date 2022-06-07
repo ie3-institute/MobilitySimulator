@@ -38,9 +38,25 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
   protected val chargingStations: Set[ChargingStation] =
     Set(cs0, cs1, cs2, cs3, cs4, cs5, cs6)
 
-  protected val plannedDestinationPoi: PointOfInterest = itData(11)
+  private val poiData = Seq(
+    poiHome,
+    workPoi,
+    bbpgPoi,
+    culturePoi,
+    medicinalPoi,
+    other_shopPoi,
+    religiousPoi,
+    restaurantPoi,
+    servicePoi,
+    sportsPoi,
+    supermarketPoi,
+    charging_hub_townPoi,
+    charging_hub_highwayPoi
+  )
 
-  protected val pois: Set[PointOfInterest] = itData.toSet
+  protected val plannedDestinationPoi: PointOfInterest = poiData(11)
+
+  protected val pois: Set[PointOfInterest] = poiData.toSet
 
   protected val poisWithSizes = PoiUtils.createPoiPdf(
     pois.map { poi =>
