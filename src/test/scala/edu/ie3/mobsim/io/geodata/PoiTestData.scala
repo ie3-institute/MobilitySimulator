@@ -180,13 +180,13 @@ trait PoiTestData {
       1498.211731553507,
       Map.empty[ChargingStation, ComparableQuantity[Length]]
     ),
-      PointOfInterest(
+    PointOfInterest(
       UUID.fromString("4df0614d-0c01-4b31-af94-804e299f2686"),
       "charging_hub_town_261344967",
       CategoricalLocationDictionary.CHARGING_HUB_TOWN,
       new Coordinate(7.41153872, 51.4834271),
       1498.211731553507,
-        Map(cs4 -> Quantities.getQuantity(0, METRE))
+      Map(cs4 -> Quantities.getQuantity(0, METRE))
     ),
     PointOfInterest(
       UUID.fromString("3ddc93c7-77fc-4187-be68-833b3db39809"),

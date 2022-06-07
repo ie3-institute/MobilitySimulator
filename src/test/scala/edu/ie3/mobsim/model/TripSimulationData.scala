@@ -6,15 +6,22 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.{PoiTestData, PoiUtils, PointOfInterest}
-import edu.ie3.mobsim.io.probabilities.DrivingSpeed
+import edu.ie3.mobsim.io.geodata.{
+  PoiEnums,
+  PoiTestData,
+  PoiUtils,
+  PointOfInterest
+}
+import edu.ie3.mobsim.io.probabilities.{
+  DrivingSpeed,
+  ProbabilityDensityFunction
+}
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
 
-import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
 
 trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
@@ -48,5 +55,6 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
 
   protected val speed = DrivingSpeed(speedMap, speedMap, speedMap)
 
-  protected val storedEnergyValue : ComparableQuantity[Energy] = Quantities.getQuantity(20, PowerSystemUnits.KILOWATTHOUR)
+  protected val storedEnergyValue: ComparableQuantity[Energy] =
+    Quantities.getQuantity(20, PowerSystemUnits.KILOWATTHOUR)
 }

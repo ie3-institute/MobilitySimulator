@@ -1,16 +1,22 @@
+/*
+ * © 2022. TU Dortmund University,
+ * Institute of Energy Systems, Energy Efficiency and Energy Economics,
+ * Research group Distribution grid planning and operation
+ */
+
 package edu.ie3.mobsim.io.geodata
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationData}
 import edu.ie3.test.common.UnitSpec
 
-import scala.util.{Failure, Success}
-
 class PoiEnumsSpec
-  extends UnitSpec
-  with ElectricVehicleTestData
-  with TripSimulationData {
-
+    extends UnitSpec
+    with ElectricVehicleTestData
+    with TripSimulationData {
 
   "PoiEnums" should {
     // testing PoiTypeDictionary.apply(token: String)
@@ -49,11 +55,16 @@ class PoiEnumsSpec
         ("sports", CategoricalLocationDictionary.SPORTS),
         ("religious", CategoricalLocationDictionary.RELIGIOUS),
         ("charginghubtown", CategoricalLocationDictionary.CHARGING_HUB_TOWN),
-        ("charginghubhighway", CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY)
+        (
+          "charginghubhighway",
+          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
+        )
       )
 
       forAll(cases) { (categoricalLocation, expectedResult) =>
-        CategoricalLocationDictionary.apply(categoricalLocation) shouldBe expectedResult
+        CategoricalLocationDictionary.apply(
+          categoricalLocation
+        ) shouldBe expectedResult
       }
     }
 
@@ -64,8 +75,14 @@ class PoiEnumsSpec
         ("poiType", "expectedResult"),
         (PoiTypeDictionary.HOME, CategoricalLocationDictionary.HOME),
         (PoiTypeDictionary.WORK, CategoricalLocationDictionary.WORK),
-        (PoiTypeDictionary.CHARGING_HUB_TOWN, CategoricalLocationDictionary.CHARGING_HUB_TOWN),
-        (PoiTypeDictionary.CHARGING_HUB_HIGHWAY, CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY)
+        (
+          PoiTypeDictionary.CHARGING_HUB_TOWN,
+          CategoricalLocationDictionary.CHARGING_HUB_TOWN
+        ),
+        (
+          PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
+          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
+        )
       )
 
       forAll(cases) { (poiType, expectedResult) =>
