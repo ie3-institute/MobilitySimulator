@@ -15,6 +15,7 @@ import edu.ie3.util.quantities.PowerSystemUnits
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
+import tech.units.indriya.unit.Units.METRE
 
 import java.util.UUID
 import javax.measure.quantity.Length
@@ -78,6 +79,15 @@ trait PoiTestData {
     EvcsLocationType.HOME,
     1,
     homeChargingStationAssignedToPOI = true
+  )
+  protected val cs6: ChargingStation = ChargingStation(
+    UUID.randomUUID(),
+    "cs_4",
+    new Coordinate(7.41153842, 51.4834251),
+    csType,
+    EvcsLocationType.CHARGING_HUB_HIGHWAY,
+    1,
+    homeChargingStationAssignedToPOI = false
   )
 
   protected val poiHome: PointOfInterest = PointOfInterest(
@@ -169,6 +179,22 @@ trait PoiTestData {
       new Coordinate(7.370586, 51.5234725),
       1498.211731553507,
       Map.empty[ChargingStation, ComparableQuantity[Length]]
+    ),
+      PointOfInterest(
+      UUID.fromString("4df0614d-0c01-4b31-af94-804e299f2686"),
+      "charging_hub_town_261344967",
+      CategoricalLocationDictionary.CHARGING_HUB_TOWN,
+      new Coordinate(7.41153872, 51.4834271),
+      1498.211731553507,
+        Map(cs4 -> Quantities.getQuantity(0, METRE))
+    ),
+    PointOfInterest(
+      UUID.fromString("3ddc93c7-77fc-4187-be68-833b3db39809"),
+      "charging_hub_highway_261347306",
+      CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY,
+      new Coordinate(7.41153842, 51.4834251),
+      1498.211731553507,
+      Map(cs6 -> Quantities.getQuantity(0, METRE))
     )
   )
 }

@@ -20,11 +20,10 @@ import scala.collection.mutable
 
 class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
   "Building and assigning evs" when {
-    val buildEv = PrivateMethod[ElectricVehicle](Symbol("buildEv"))
 
     "building the car models" should {
       "assign the correct properties" in {
-        ElectricVehicle invokePrivate buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
@@ -84,7 +83,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
       }
 
       "adapt the dc charging power" in {
-        ElectricVehicle invokePrivate buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel.copy(
             dcPower = Quantities.getQuantity(0d, PowerSystemUnits.KILOWATT)
@@ -101,7 +100,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
       }
 
       "adapt the first departure" in {
-        ElectricVehicle invokePrivate buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
