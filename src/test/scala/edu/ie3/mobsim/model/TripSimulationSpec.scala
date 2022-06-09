@@ -40,7 +40,7 @@ class TripSimulationSpec
       ) match {
         case ElectricVehicle(
               simulationStart,
-              _,
+              uuid,
               id,
               model,
               batteryCapacity,
@@ -53,8 +53,8 @@ class TripSimulationSpec
               destinationPoiType,
               destinationCategoricalLocation,
               destinationPoi,
-              _,
-              _,
+              parkingTimeStart,
+              departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
@@ -77,8 +77,10 @@ class TripSimulationSpec
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
-          chosenChargingStation shouldBe None
+          parkingTimeStart shouldBe simulationStart.plusMinutes(10)
+          departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
+          chosenChargingStation shouldBe None
           finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
@@ -91,7 +93,7 @@ class TripSimulationSpec
     // testing makeModifiedTripToChargingHub
     "makeModifiedTripToChargingHub correctly" in {
 
-      val newEv = TripSimulation.makeModifiedTripToChargingHub(
+      TripSimulation.makeModifiedTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
         ev,
         givenSimulationStart,
@@ -105,7 +107,7 @@ class TripSimulationSpec
       ) match {
         case ElectricVehicle(
               simulationStart,
-              _,
+              uuid,
               id,
               model,
               batteryCapacity,
@@ -118,8 +120,8 @@ class TripSimulationSpec
               destinationPoiType,
               destinationCategoricalLocation,
               destinationPoi,
-              _,
-              _,
+              parkingTimeStart,
+              departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
@@ -142,8 +144,10 @@ class TripSimulationSpec
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
-          chosenChargingStation shouldBe None
+          parkingTimeStart shouldBe simulationStart.plusMinutes(1)
+          departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
+          chosenChargingStation shouldBe None
           finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(

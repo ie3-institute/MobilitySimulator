@@ -25,6 +25,8 @@ import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
 import javax.measure.quantity.Energy
 
 trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
+  private val isChargingAtHomePossible: Boolean = true
+
   val ev: ElectricVehicle = ElectricVehicle.buildEv(
     "test_car",
     givenModel,
@@ -32,13 +34,13 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    true
+    isChargingAtHomePossible
   )
 
   protected val chargingStations: Set[ChargingStation] =
     Set(cs0, cs1, cs2, cs3, cs4, cs5, cs6)
 
-  private val poiData = Seq(
+  private val poiData: Seq[PointOfInterest] = Seq(
     poiHome,
     workPoi,
     bbpgPoi,
@@ -58,18 +60,22 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
 
   protected val pois: Set[PointOfInterest] = poiData.toSet
 
-  protected val poisWithSizes = PoiUtils.createPoiPdf(
+  protected val poisWithSizes: Map[
+    PoiEnums.CategoricalLocationDictionary.Value,
+    ProbabilityDensityFunction[PointOfInterest]
+  ] = PoiUtils.createPoiPdf(
     pois.map { poi =>
       poi.categoricalLocation -> Set(poi)
     }.toMap
   )
 
-  private val speedFunction =
+  private val speedFunction: SpeedFunction =
     SpeedFunction(50, 0, Quantities.getQuantity(50, KILOMETRE_PER_HOUR))
 
-  private val speedMap = Range(0, 12).map(_ -> speedFunction).toMap
+  private val speedMap: Map[Int, SpeedFunction] =
+    Range(0, 12).map(_ -> speedFunction).toMap
 
-  protected val speed = DrivingSpeed(speedMap, speedMap, speedMap)
+  protected val speed: DrivingSpeed = DrivingSpeed(speedMap, speedMap, speedMap)
 
   protected val storedEnergyValue: ComparableQuantity[Energy] =
     Quantities.getQuantity(20, PowerSystemUnits.KILOWATTHOUR)

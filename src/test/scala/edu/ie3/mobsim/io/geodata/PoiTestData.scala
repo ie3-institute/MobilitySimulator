@@ -206,7 +206,7 @@ trait PoiTestData {
     Map(cs6 -> Quantities.getQuantity(0, METRE))
   )
 
-  protected val itData = Seq(
+  protected val itData: Seq[PointOfInterest] = Seq(
     poiHome,
     workPoi,
     bbpgPoi,

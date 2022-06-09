@@ -20,7 +20,7 @@ class PoiEnumsSpec
 
   "PoiEnums" should {
     // testing PoiTypeDictionary.apply(token: String)
-    "apply the PoiTypes correctly to the PoiTypeDictionary" in {
+    "parse PoiTypes correctly" in {
 
       val cases = Table(
         ("poiType", "expectedResult"),
@@ -38,8 +38,17 @@ class PoiEnumsSpec
       }
     }
 
+    // parsing malformed string to PoiTypeDictionary
+    "throw error if malformed string is parsed to PoiTypeDictionary" in {
+      val exception = intercept[RuntimeException] {
+        PoiTypeDictionary.apply("wrong_poi")
+      }
+
+      exception.getMessage shouldBe "POI not known"
+    }
+
     // testing CategoricalLocationDictionary.apply(token: String)
-    "apply the CategoricalLocation correctly to the CategoricalLocationDictionary" in {
+    "parse CategoricalLocation correctly" in {
 
       val cases = Table(
         ("categoricalLocation", "expectedResult"),
@@ -68,8 +77,17 @@ class PoiEnumsSpec
       }
     }
 
+    // parsing malformed string to CategoricalLocationDictionary
+    "throw error if malformed string is parsed to CategoricalLocationDictionary" in {
+      val exception = intercept[RuntimeException] {
+        CategoricalLocationDictionary.apply("wrong_poi")
+      }
+
+      exception.getMessage shouldBe "CategoricalLocation 'wrong_poi' not known"
+    }
+
     // testing CategoricalLocationDictionary.apply(poiType: PoiTypeDictionary.Value)
-    "apply the PoiTypes correctly to the CategoricalLocationDictionary" in {
+    "convert PoiTypes to CategoricalLocationDictionary" in {
 
       val cases = Table(
         ("poiType", "expectedResult"),
@@ -88,6 +106,15 @@ class PoiEnumsSpec
       forAll(cases) { (poiType, expectedResult) =>
         CategoricalLocationDictionary.apply(poiType) shouldBe expectedResult
       }
+    }
+
+    // parsing wrong poiType to CategoricalLocationDictionary
+    "throw error if wrong PoiType is parsed to CategoricalLocationDictionary" in {
+      val exception = intercept[RuntimeException] {
+        CategoricalLocationDictionary.apply(PoiTypeDictionary.OTHER)
+      }
+
+      exception.getMessage shouldBe "PoiType 'OTHER' could not be applied to CategoricalLocationDictionary"
     }
   }
 }
