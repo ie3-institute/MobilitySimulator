@@ -30,7 +30,7 @@ object FileChanger extends App {
   private val probabilityDir =
     Seq(baseDir, "trip_probabilities").mkString(JavaFile.separator)
 
-  changePoiFile()
+  //changePoiFile()
   mergeDepartures()
   mergeParkingTime()
   mergeDrivingSpeed()
@@ -549,7 +549,14 @@ object FileChanger extends App {
     /* Map the field names */
     val updatedEntityFieldData =
       entityFieldData.map { case (key, value) =>
-        fieldNameMapping.getOrElse(key, key) -> value
+        fieldNameMapping.getOrElse(key, key) -> {
+          value match {
+            case "othershop" => "other_shop"
+            case "charginghubtown" => "charging_hub_town"
+            case "charginghubhighway" => "charging_hub_highway"
+            case _ => value
+          }
+        }
       }
 
     /* Add missing data */
