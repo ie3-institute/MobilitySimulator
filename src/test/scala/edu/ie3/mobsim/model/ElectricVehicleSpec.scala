@@ -6,39 +6,27 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.io.model.EvTypeInput
-import edu.ie3.mobsim.io.probabilities.{
-  FirstDepartureOfDay,
-  ProbabilityDensityFunction
-}
+import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
-import org.locationtech.jts.geom.Coordinate
-import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units
 
-import java.time.ZonedDateTime
-import java.util.UUID
-import javax.measure.quantity.{ElectricInductance, Length}
-import scala.collection.immutable.SortedSet
 import scala.collection.mutable
 
 class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
   "Building and assigning evs" when {
-    val buildEv = PrivateMethod[ElectricVehicle](Symbol("buildEv"))
 
     "building the car models" should {
       "assign the correct properties" in {
-        ElectricVehicle invokePrivate buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case ElectricVehicle(
                 simulationStart,
@@ -91,7 +79,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
       }
 
       "adapt the dc charging power" in {
-        ElectricVehicle invokePrivate buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel.copy(
             dcPower = Quantities.getQuantity(0d, PowerSystemUnits.KILOWATT)
@@ -100,7 +88,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
             model.getSRatedDC shouldBe givenModel.acPower
@@ -108,14 +96,14 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
       }
 
       "adapt the first departure" in {
-        ElectricVehicle invokePrivate buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
           givenWorkPoi,
           givenSimulationStart,
           givenSimulationStart,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
             model.getDepartureTime shouldBe givenSimulationStart.plusMinutes(1L)
