@@ -425,7 +425,7 @@ case object ElectricVehicle extends LazyLogging {
     * @return
     *   An equivalent EV model
     */
-  private def buildEv(
+  def buildEv(
       id: String,
       evType: EvTypeInput,
       homePoi: PointOfInterest,

@@ -11,14 +11,13 @@ import edu.ie3.datamodel.models.ElectricCurrentType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
-import edu.ie3.simona.api.data.ev.ontology.ProvideCurrentPrices
 import tech.units.indriya.ComparableQuantity
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import tech.units.indriya.quantity.Quantities.getQuantity
 
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import javax.measure.quantity.{Energy, Length, Power}
+import javax.measure.quantity.Length
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
