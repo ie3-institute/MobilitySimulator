@@ -6,9 +6,17 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.{PoiEnums, PoiTestData, PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.{
+  PoiEnums,
+  PoiTestData,
+  PoiUtils,
+  PointOfInterest
+}
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.{DrivingSpeed, ProbabilityDensityFunction}
+import edu.ie3.mobsim.io.probabilities.{
+  DrivingSpeed,
+  ProbabilityDensityFunction
+}
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities

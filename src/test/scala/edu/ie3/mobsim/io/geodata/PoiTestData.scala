@@ -189,7 +189,7 @@ trait PoiTestData {
     Map.empty[ChargingStation, ComparableQuantity[Length]]
   )
 
-  protected val supermarket : PointOfInterest = PointOfInterest(
+  protected val supermarket: PointOfInterest = PointOfInterest(
     UUID.fromString("63dd665f-ac0b-4386-a4a9-bebf42ecdaf8"),
     "supermarket_01",
     CategoricalLocationDictionary.SUPERMARKET,
