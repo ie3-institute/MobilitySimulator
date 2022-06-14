@@ -10,12 +10,27 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.MobilitySimulator.Movement
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
-import edu.ie3.mobsim.exceptions.{InitializationException, SourceException, UninitializedException}
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.exceptions.{
+  InitializationException,
+  SourceException,
+  UninitializedException
+}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities._
-import edu.ie3.mobsim.io.probabilities.factories.{CategoricalLocationFactory, DrivingSpeedFactory, FirstDepartureFactory, LastTripFactory, ParkingTimeFactory, PoiTransitionFactory, TripDistanceFactory}
+import edu.ie3.mobsim.io.probabilities.factories.{
+  CategoricalLocationFactory,
+  DrivingSpeedFactory,
+  FirstDepartureFactory,
+  LastTripFactory,
+  ParkingTimeFactory,
+  PoiTransitionFactory,
+  TripDistanceFactory
+}
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
@@ -75,15 +90,15 @@ final class MobilitySimulator(
 
     /* Receive available charging points of evcs from SIMONA */
     val availableChargingPoints: Map[UUID, Int] = {
-      evData.requestAvailablePublicEvCs().asScala.toMap.map{
-        case (k,v) => (k, v.intValue())
+      evData.requestAvailablePublicEvCs().asScala.toMap.map { case (k, v) =>
+        (k, v.intValue())
       }
     }
 
     /* Receive current prices for public evcs situation */
     val currentPricesAtChargingStations: Map[UUID, Double] = {
-      evData.requestCurrentPrices().asScala.toMap.map{
-        case (k,v) => (k, v.doubleValue())
+      evData.requestCurrentPrices().asScala.toMap.map { case (k, v) =>
+        (k, v.doubleValue())
       }
     }
 
