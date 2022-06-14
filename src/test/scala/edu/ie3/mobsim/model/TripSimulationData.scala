@@ -13,16 +13,33 @@ import edu.ie3.mobsim.io.geodata.{
   PointOfInterest
 }
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.{
-  DrivingSpeed,
-  ProbabilityDensityFunction
+import edu.ie3.mobsim.io.probabilities.factories.{
+  CategoricalLocationFactory,
+  FirstDepartureFactory,
+  LastTripFactory,
+  ParkingTimeFactory,
+  PoiTransitionFactory,
+  TripDistanceFactory
 }
+import edu.ie3.mobsim.io.probabilities.{
+  CategoricalLocation,
+  DrivingSpeed,
+  FirstDepartureOfDay,
+  LastTripOfDay,
+  ParkingTime,
+  PoiTransition,
+  ProbabilityDensityFunction,
+  TripDistance
+}
+import edu.ie3.mobsim.utils.IoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
+import tech.units.indriya.unit.Units.{KILOMETRE_PER_HOUR, METRE}
 
-import javax.measure.quantity.Energy
+import java.io.File
+import javax.measure.quantity.{Energy, Length}
+import scala.util.{Failure, Success}
 
 trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
   private val isChargingAtHomePossible: Boolean = true
@@ -79,4 +96,71 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
 
   protected val storedEnergyValue: ComparableQuantity[Energy] =
     Quantities.getQuantity(20, PowerSystemUnits.KILOWATTHOUR)
+
+  protected val maxDistance: ComparableQuantity[Length] =
+    Quantities.getQuantity(5000, METRE)
+
+  protected val ioUtils: IoUtils = IoUtils(
+    new java.io.File(".").getCanonicalPath,
+    "movements",
+    "evs",
+    "evcs",
+    "positions",
+    "pois"
+  )
+
+  protected val categoricalLocation: CategoricalLocation = {
+    CategoricalLocationFactory.getFromFile(
+      this.getClass.getResource("categorical_location.csv").getFile,
+      ","
+    ) match {
+      case Success(value)     => value
+      case Failure(exception) => throw exception
+    }
+  }
+
+  protected val firstDepartureOfDay: FirstDepartureOfDay = {
+    FirstDepartureFactory.getFromFile(
+      this.getClass.getResource("departure.csv").getFile,
+      ","
+    ) match {
+      case Success(value) => value
+    }
+  }
+
+  protected val lastTripOfDay: LastTripOfDay = {
+    LastTripFactory.getFromFile(
+      this.getClass.getResource("last_trip.csv").getFile,
+      ","
+    ) match {
+      case Success(value) => value
+    }
+  }
+
+  protected val parkingTime: ParkingTime = {
+    ParkingTimeFactory.getFromFile(
+      this.getClass.getResource("parking_time.csv").getFile,
+      ","
+    ) match {
+      case Success(value) => value
+    }
+  }
+
+  protected val poiTransition: PoiTransition = {
+    PoiTransitionFactory.getFromFile(
+      this.getClass.getResource("transition.csv").getFile,
+      ","
+    ) match {
+      case Success(value) => value
+    }
+  }
+
+  protected val tripDistance: TripDistance = {
+    TripDistanceFactory.getFromFile(
+      this.getClass.getResource("trip_distance.csv").getFile,
+      ","
+    ) match {
+      case Success(value) => value
+    }
+  }
 }
