@@ -74,16 +74,22 @@ class TripSimulationSpec
 
     }
 
+    with TripSimulationData {
+
+  "The TripSimulation" should {
     // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
 
       TripSimulation.makeTripToChargingHub(
-        "charginghubtown",
+        PoiTypeDictionary.CHARGING_HUB_TOWN,
         ev,
         givenSimulationStart,
         poisWithSizes,
         0.5,
         0.2,
+        Quantities.getQuantity(1000, METRE),
+        plannedDestinationPoi,
+        PoiTypeDictionary.WORK,
         maxDistance,
         plannedDestinationPoi,
         1,
@@ -116,6 +122,7 @@ class TripSimulationSpec
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev.getUuid
           id shouldBe "test_car"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -126,14 +133,14 @@ class TripSimulationSpec
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN.id
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN.id
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK.id)
+          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(-7000, METRE)
@@ -146,14 +153,14 @@ class TripSimulationSpec
     "makeModifiedTripToChargingHub correctly" in {
 
       TripSimulation.makeModifiedTripToChargingHub(
-        "charginghubtown",
+        PoiTypeDictionary.CHARGING_HUB_TOWN,
         ev,
         givenSimulationStart,
         poisWithSizes,
         0.2,
-        maxDistance,
+        Quantities.getQuantity(1000, METRE),
         plannedDestinationPoi,
-        1,
+        PoiTypeDictionary.WORK,
         chargingStations,
         speed
       ) match {
@@ -183,6 +190,7 @@ class TripSimulationSpec
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev.getUuid
           id shouldBe "test_car"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -193,14 +201,14 @@ class TripSimulationSpec
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN.id
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN.id
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK.id)
+          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(10000, METRE)

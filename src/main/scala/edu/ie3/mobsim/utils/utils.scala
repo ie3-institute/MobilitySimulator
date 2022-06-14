@@ -6,15 +6,8 @@
 
 package edu.ie3.mobsim.utils
 
-import edu.ie3.mobsim.MobilitySimulator.seed
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.METRE
-import edu.ie3.util.quantities.PowerSystemUnits.KILOMETRE
-
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import javax.measure.quantity.{Angle, Length}
 
 object utils {
 

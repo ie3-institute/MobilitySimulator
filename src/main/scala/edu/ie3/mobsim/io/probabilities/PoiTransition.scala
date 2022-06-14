@@ -49,7 +49,7 @@ final case class PoiTransition(
 
     /* Sample destination POI type */
     probabilities.get(
-      PoiTransitionKey(timeQuarter, fromPoiType.id)
+      PoiTransitionKey(timeQuarter, fromPoiType)
     ) match {
       case Some(pdf) => PoiTypeDictionary(pdf.sample())
       case _         => throw new RuntimeException("No pdf found")
@@ -58,5 +58,5 @@ final case class PoiTransition(
 }
 
 case object PoiTransition {
-  final case class PoiTransitionKey(time: Int, poi: Int)
+  final case class PoiTransitionKey(time: Int, poi: PoiTypeDictionary.Value)
 }

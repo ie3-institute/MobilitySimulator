@@ -9,7 +9,6 @@ package edu.ie3.mobsim.utils
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOMETRE, KILOWATTHOUR}
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities.getQuantity
-import tech.units.indriya.unit.Units.METRE
 
 import javax.measure.quantity.{Energy, Length}
 

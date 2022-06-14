@@ -6,6 +6,11 @@
 
 package edu.ie3.mobsim.model
 
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
+import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
@@ -64,8 +69,8 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
             workPoi shouldBe givenWorkPoi
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
-            destinationPoiType shouldBe 0
-            destinationCategoricalLocation shouldBe 0
+            destinationPoiType shouldBe PoiTypeDictionary.HOME
+            destinationCategoricalLocation shouldBe CategoricalLocationDictionary.HOME
             destinationPoi shouldBe givenHomePoi
             parkingTimeStart shouldBe simulationStart
             departureTime shouldBe givenFirstDeparture
