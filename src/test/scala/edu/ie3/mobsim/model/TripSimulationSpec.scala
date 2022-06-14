@@ -64,6 +64,7 @@ class TripSimulationSpec
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev.getUuid
           id shouldBe "test_car"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -131,6 +132,7 @@ class TripSimulationSpec
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev.getUuid
           id shouldBe "test_car"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
