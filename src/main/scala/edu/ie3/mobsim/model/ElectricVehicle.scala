@@ -25,7 +25,6 @@ import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.quantity.Quantities
 
-import java.lang
 import javax.measure.quantity.{Energy, Length, Power}
 import scala.collection.immutable.SortedSet
 import scala.collection.mutable
@@ -107,7 +106,7 @@ case class ElectricVehicle(
 
   def getChargingPricesMemory: mutable.Queue[Double] = chargingPricesMemory
 
-  def getDepartureTick: lang.Long = toTick(simulationStart, departureTime)
+  def getDepartureTick: Long = toTick(simulationStart, departureTime)
 
   /** @param storedEnergy
     *   the new stored energy

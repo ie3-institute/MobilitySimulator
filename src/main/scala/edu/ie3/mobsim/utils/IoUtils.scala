@@ -111,7 +111,7 @@ final case class IoUtils private (
     */
   def writeEvcs(
       cs: ChargingStation,
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       currentTime: ZonedDateTime,
       uuid: UUID = UUID.randomUUID()
   ): Unit = {
@@ -122,7 +122,7 @@ final case class IoUtils private (
       "charging_points" -> cs.getChargingPoints.toString,
       "occupied_charging_points" -> (cs.getChargingPoints - availableChargingPoints
         .getOrElse(cs.getUuid, 0)
-        .asInstanceOf[Integer]).toString
+        .asInstanceOf[Int]).toString
     ).asJava
 
     evcsWriter.write(fieldData)
