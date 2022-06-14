@@ -25,7 +25,6 @@ import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
 import javax.measure.quantity.Energy
 
 trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
-  private val isChargingAtHomePossible: Boolean = true
 
   val ev: ElectricVehicle = ElectricVehicle.buildEv(
     "test_car",
@@ -34,7 +33,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible
+    isChargingAtHomePossible = true
   )
 
   protected val chargingStations: Set[ChargingStation] =
