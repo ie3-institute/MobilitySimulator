@@ -9,6 +9,10 @@ package edu.ie3.mobsim.model
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities.{
@@ -42,15 +46,15 @@ case class ElectricVehicle(
     private val homePoi: PointOfInterest,
     private val workPoi: PointOfInterest,
     private var storedEnergy: ComparableQuantity[Energy],
-    private var destinationPoiType: Int,
-    private var destinationCategoricalLocation: Int,
+    private var destinationPoiType: PoiTypeDictionary.Value,
+    private var destinationCategoricalLocation: CategoricalLocationDictionary.Value,
     private var destinationPoi: PointOfInterest,
     private var parkingTimeStart: ZonedDateTime,
     private var departureTime: ZonedDateTime,
     private val chargingAtHomePossible: Boolean,
     private var chosenChargingStation: Option[UUID],
     private var chargingAtSimona: Boolean,
-    private var finalDestinationPoiType: Option[Int],
+    private var finalDestinationPoiType: Option[PoiTypeDictionary.Value],
     private var finalDestinationPoi: Option[PointOfInterest],
     private var remainingDistanceAfterChargingHub: Option[
       ComparableQuantity[Length]
@@ -79,9 +83,10 @@ case class ElectricVehicle(
 
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
-  def getDestinationPoiType: Int = destinationPoiType
+  def getDestinationPoiType: PoiTypeDictionary.Value = destinationPoiType
 
-  def getDestinationCategoricalLocation: Int = destinationCategoricalLocation
+  def getDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
+    destinationCategoricalLocation
 
   def getDestinationPoi: PointOfInterest = destinationPoi
 
@@ -95,7 +100,8 @@ case class ElectricVehicle(
 
   def isChargingAtSimona: Boolean = chargingAtSimona
 
-  def getFinalDestinationPoiType: Option[Int] = finalDestinationPoiType
+  def getFinalDestinationPoiType: Option[PoiTypeDictionary.Value] =
+    finalDestinationPoiType
 
   def getFinalDestinationPoi: Option[PointOfInterest] = finalDestinationPoi
 
@@ -125,8 +131,8 @@ case class ElectricVehicle(
     */
   def copyWith(
       storedEnergy: ComparableQuantity[Energy],
-      destinationPoiType: Int,
-      destinationCategoricalLocation: Int,
+      destinationPoiType: PoiTypeDictionary.Value,
+      destinationCategoricalLocation: CategoricalLocationDictionary.Value,
       destinationPoi: PointOfInterest,
       parkingTimeStart: ZonedDateTime,
       departureTime: ZonedDateTime
@@ -148,7 +154,9 @@ case class ElectricVehicle(
     chargingAtSimona = isCharging
   }
 
-  def setFinalDestinationPoiType(destinationPoiType: Option[Int]): Unit = {
+  def setFinalDestinationPoiType(
+      destinationPoiType: Option[PoiTypeDictionary.Value]
+  ): Unit = {
     finalDestinationPoiType = destinationPoiType
   }
 
@@ -424,7 +432,7 @@ case object ElectricVehicle extends LazyLogging {
     * @return
     *   An equivalent EV model
     */
-  private def buildEv(
+  def buildEv(
       id: String,
       evType: EvTypeInput,
       homePoi: PointOfInterest,
@@ -452,8 +460,10 @@ case object ElectricVehicle extends LazyLogging {
       homePoi = homePoi,
       workPoi = workPoi,
       storedEnergy = evType.capacity,
-      destinationPoiType = 0, // is updated when trip is sampled
-      destinationCategoricalLocation = 0, // is updated when trip is sampled
+      destinationPoiType =
+        PoiTypeDictionary.HOME, // is updated when trip is sampled
+      destinationCategoricalLocation =
+        CategoricalLocationDictionary.HOME, // is updated when trip is sampled
       destinationPoi = homePoi, // is updated when trip is sampled
       parkingTimeStart = simulationStart, // EV starts parking at first tick
       departureTime =

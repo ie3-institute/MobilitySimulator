@@ -40,8 +40,8 @@ final case class TripDistance(
     */
   def sample(
       time: ZonedDateTime,
-      fromPoiType: Int,
-      toPoiType: Int
+      fromPoiType: PoiTypeDictionary.Value,
+      toPoiType: PoiTypeDictionary.Value
   ): ComparableQuantity[Length] = {
 
     /* Get current time on 15min basis */
@@ -60,8 +60,8 @@ final case class TripDistance(
     val distance = probabilities.get(
       TripDistanceKey(
         timeQuarter,
-        PoiTypeDictionary(fromPoiType).id,
-        PoiTypeDictionary(toPoiType).id
+        fromPoiType,
+        toPoiType
       )
     ) match {
       case Some(pdf) => pdf.sample()
@@ -73,5 +73,9 @@ final case class TripDistance(
 }
 
 case object TripDistance {
-  final case class TripDistanceKey(time: Int, fromPoi: Int, toPoi: Int)
+  final case class TripDistanceKey(
+      time: Int,
+      fromPoi: PoiTypeDictionary.Value,
+      toPoi: PoiTypeDictionary.Value
+  )
 }

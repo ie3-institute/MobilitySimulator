@@ -8,7 +8,7 @@ package edu.ie3.mobsim.utils
 
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
-import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATT,
@@ -55,9 +55,7 @@ final case class IoUtils private (
       "status" -> status,
       "soc" -> (ev.getStoredEnergy.getValue.doubleValue / ev.getEStorage.getValue.doubleValue).toString,
       "destination_poi" -> ev.getDestinationPoi.id,
-      "categorical_location" -> PoiEnums
-        .CategoricalLocationDictionary(ev.getDestinationCategoricalLocation)
-        .toString,
+      "categorical_location" -> ev.getDestinationCategoricalLocation.toString,
       "scheduled_departure" -> ev.getDepartureTime.toString,
       "is_charging" -> ev.isChargingAtSimona.toString
     ).asJava
@@ -172,9 +170,7 @@ final case class IoUtils private (
         ("DRIVING", "")
       } else {
         (
-          PoiEnums
-            .CategoricalLocationDictionary(ev.getDestinationCategoricalLocation)
-            .toString,
+          ev.getDestinationCategoricalLocation.toString,
           ev.getDestinationPoi.toString
         )
       }

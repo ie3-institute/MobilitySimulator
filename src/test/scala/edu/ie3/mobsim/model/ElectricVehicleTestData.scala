@@ -68,7 +68,7 @@ trait ElectricVehicleTestData {
   private val departureProbability: Map[Int, Double] =
     Range.inclusive(0, 96).map(_ -> 1.0).toMap
   protected val givenFirstDepartureMetaData: FirstDepartureOfDay =
-    new FirstDepartureOfDay(
+    FirstDepartureOfDay(
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability)
