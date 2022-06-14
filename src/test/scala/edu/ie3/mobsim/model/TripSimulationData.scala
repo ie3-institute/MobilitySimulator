@@ -101,7 +101,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     Quantities.getQuantity(5000, METRE)
 
   protected val ioUtils: IoUtils = IoUtils(
-    new java.io.File(".").getCanonicalPath,
+    new java.io.File(".").getCanonicalPath+File.separator+"out"+File.separator,
     "movements",
     "evs",
     "evcs",
