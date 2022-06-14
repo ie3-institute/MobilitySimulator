@@ -95,7 +95,7 @@ object CategoricalLocationFactory
       .groupBy(entry =>
         CategoricalLocationKey(
           entry.time,
-          CategoricalLocationDictionary(entry.poiType)
+          entry.poiType
         )
       )
       .map { case (key, entries) =>
