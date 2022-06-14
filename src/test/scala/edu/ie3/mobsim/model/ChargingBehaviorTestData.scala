@@ -13,11 +13,10 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
 
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.measure.quantity.{Energy, Length}
+import javax.measure.quantity.Energy
 import scala.util.Random
 
 trait ChargingBehaviorTestData extends TripSimulationData {
@@ -28,9 +27,9 @@ trait ChargingBehaviorTestData extends TripSimulationData {
 
   val evChargingNeeded: ElectricVehicle = ev.copyWith(
     Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR),
-    destinationPoiType = PoiTypeDictionary.SHOPPING.id,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     destinationCategoricalLocation =
-      CategoricalLocationDictionary.SUPERMARKET.id,
+      CategoricalLocationDictionary.SUPERMARKET,
     destinationPoi = supermarket,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)

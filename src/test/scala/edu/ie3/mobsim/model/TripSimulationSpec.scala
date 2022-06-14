@@ -10,7 +10,6 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
-import edu.ie3.mobsim.utils.IoUtils
 import edu.ie3.test.common.UnitSpec
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units.METRE
@@ -44,39 +43,36 @@ class TripSimulationSpec
 
       x match {
         case ElectricVehicle(
-              simulationStart,
-              uuid,
-              id,
-              model,
-              batteryCapacity,
-              acChargingPower,
-              dcChargingPower,
-              consumption,
-              homePoi,
-              workPoi,
-              storedEnergy,
-              destinationPoiType,
-              destinationCategoricalLocation,
-              destinationPoi,
-              parkingTimeStart,
-              departureTime,
-              chargingAtHomePossible,
-              chosenChargingStation,
-              chargingAtSimona,
-              finalDestinationPoiType,
-              finalDestinationPoi,
-              remainingDistanceAfterChargingHub,
-              chargingPricesMemory
-            ) =>
+        simulationStart,
+        uuid,
+        id,
+        model,
+        batteryCapacity,
+        acChargingPower,
+        dcChargingPower,
+        consumption,
+        homePoi,
+        workPoi,
+        storedEnergy,
+        destinationPoiType,
+        destinationCategoricalLocation,
+        destinationPoi,
+        parkingTimeStart,
+        departureTime,
+        chargingAtHomePossible,
+        chosenChargingStation,
+        chargingAtSimona,
+        finalDestinationPoiType,
+        finalDestinationPoi,
+        remainingDistanceAfterChargingHub,
+        chargingPricesMemory
+        ) =>
           simulationStart shouldBe givenSimulationStart
 
       }
-
     }
 
-    with TripSimulationData {
 
-  "The TripSimulation" should {
     // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
 
@@ -90,9 +86,6 @@ class TripSimulationSpec
         Quantities.getQuantity(1000, METRE),
         plannedDestinationPoi,
         PoiTypeDictionary.WORK,
-        maxDistance,
-        plannedDestinationPoi,
-        1,
         chargingStations,
         speed
       ) match {
