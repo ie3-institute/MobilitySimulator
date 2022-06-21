@@ -17,10 +17,7 @@ import tech.units.indriya.unit.Units.METRE
 
 import scala.collection.mutable
 
-class TripSimulationSpec
-    extends UnitSpec
-    with ElectricVehicleTestData
-    with ChargingBehaviorTestData {
+class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
 
   "TripSimulation" should {
     "not simulate a new trip and keep charging when SoC < 70 %" in {
