@@ -13,10 +13,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationData}
 import edu.ie3.test.common.UnitSpec
 
-class PoiEnumsSpec
-    extends UnitSpec
-    with ElectricVehicleTestData
-    with TripSimulationData {
+class PoiEnumsSpec extends UnitSpec {
 
   "PoiEnums" should {
     // testing PoiTypeDictionary.apply(token: String)
@@ -29,8 +26,8 @@ class PoiEnumsSpec
         ("shopping", PoiTypeDictionary.SHOPPING),
         ("leisure", PoiTypeDictionary.LEISURE),
         ("other", PoiTypeDictionary.OTHER),
-        ("charginghubtown", PoiTypeDictionary.CHARGING_HUB_TOWN),
-        ("charginghubhighway", PoiTypeDictionary.CHARGING_HUB_HIGHWAY)
+        ("charging_hub_town", PoiTypeDictionary.CHARGING_HUB_TOWN),
+        ("charging_hub_highway", PoiTypeDictionary.CHARGING_HUB_HIGHWAY)
       )
 
       forAll(cases) { (poiType, expectedResult) =>
@@ -56,16 +53,16 @@ class PoiEnumsSpec
         ("work", CategoricalLocationDictionary.WORK),
         ("supermarket", CategoricalLocationDictionary.SUPERMARKET),
         ("services", CategoricalLocationDictionary.SERVICES),
-        ("othershop", CategoricalLocationDictionary.OTHER_SHOP),
+        ("other_shop", CategoricalLocationDictionary.OTHER_SHOP),
         ("medicinal", CategoricalLocationDictionary.MEDICINAL),
         ("bbpg", CategoricalLocationDictionary.BBPG),
         ("restaurant", CategoricalLocationDictionary.RESTAURANT),
         ("culture", CategoricalLocationDictionary.CULTURE),
         ("sports", CategoricalLocationDictionary.SPORTS),
         ("religious", CategoricalLocationDictionary.RELIGIOUS),
-        ("charginghubtown", CategoricalLocationDictionary.CHARGING_HUB_TOWN),
+        ("charging_hub_town", CategoricalLocationDictionary.CHARGING_HUB_TOWN),
         (
-          "charginghubhighway",
+          "charging_hub_highway",
           CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
         )
       )
