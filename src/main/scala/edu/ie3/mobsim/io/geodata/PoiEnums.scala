@@ -20,8 +20,8 @@ object PoiEnums {
         case "shopping"           => SHOPPING
         case "leisure"            => LEISURE
         case "other"              => OTHER
-        case "charginghubtown"    => CHARGING_HUB_TOWN
-        case "charginghubhighway" => CHARGING_HUB_HIGHWAY
+        case "charging_hub_town"    => CHARGING_HUB_TOWN
+        case "charging_hub_highway" => CHARGING_HUB_HIGHWAY
         case _                    => throw new RuntimeException("POI not known")
       }
     }
@@ -39,15 +39,15 @@ object PoiEnums {
         case "work"               => WORK
         case "supermarket"        => SUPERMARKET
         case "services"           => SERVICES
-        case "othershop"          => OTHER_SHOP
+        case "other_shop"          => OTHER_SHOP
         case "medicinal"          => MEDICINAL
         case "bbpg"               => BBPG
         case "restaurant"         => RESTAURANT
         case "culture"            => CULTURE
         case "sports"             => SPORTS
         case "religious"          => RELIGIOUS
-        case "charginghubtown"    => CHARGING_HUB_TOWN
-        case "charginghubhighway" => CHARGING_HUB_HIGHWAY
+        case "charging_hub_town"    => CHARGING_HUB_TOWN
+        case "charging_hub_highway" => CHARGING_HUB_HIGHWAY
         case malformed =>
           throw new RuntimeException(
             s"CategoricalLocation '$malformed' not known"

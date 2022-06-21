@@ -30,7 +30,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
     "choose no chargingStation if charging is not needed" in {
       val uuid: UUID = ChargingBehavior.chooseChargingStation(
-        ev.copyWith(ev.getEStorage),
+        ev1.copyWith(ev1.getEStorage),
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
         seed,
@@ -64,14 +64,14 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         seed
       ) shouldBe true
       ChargingBehavior.doesEvWantToCharge(
-        ev.copyWith(ev.getEStorage),
+        ev1.copyWith(ev1.getEStorage),
         seed
       ) shouldBe false
     }
 
     "should give correct rations for chargingStations" in {
       val x = ChargingBehavior.createRatingsForChargingStations(
-        ev.copyWith(half),
+        ev1.copyWith(half),
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
         maxDistance

@@ -23,8 +23,38 @@ import scala.util.{Failure, Success}
 trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
   private val isChargingAtHomePossible: Boolean = true
 
-  val ev: ElectricVehicle = ElectricVehicle.buildEv(
-    "test_car",
+  val ev1: ElectricVehicle = ElectricVehicle.buildEv(
+    "car_1",
+    givenModel,
+    givenHomePoi,
+    givenWorkPoi,
+    givenSimulationStart,
+    givenFirstDeparture,
+    isChargingAtHomePossible
+  )
+
+  val ev2: ElectricVehicle = ElectricVehicle.buildEv(
+    "car_2",
+    givenModel,
+    givenHomePoi,
+    givenWorkPoi,
+    givenSimulationStart,
+    givenFirstDeparture,
+    isChargingAtHomePossible
+  )
+
+  val ev3: ElectricVehicle = ElectricVehicle.buildEv(
+    "car_3",
+    givenModel,
+    givenHomePoi,
+    givenWorkPoi,
+    givenSimulationStart,
+    givenFirstDeparture,
+    isChargingAtHomePossible
+  )
+
+  val ev4: ElectricVehicle = ElectricVehicle.buildEv(
+    "car_4",
     givenModel,
     givenHomePoi,
     givenWorkPoi,
