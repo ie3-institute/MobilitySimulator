@@ -6,11 +6,35 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
-import edu.ie3.mobsim.io.geodata.{PoiEnums, PoiTestData, PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
+import edu.ie3.mobsim.io.geodata.{
+  PoiEnums,
+  PoiTestData,
+  PoiUtils,
+  PointOfInterest
+}
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.factories.{CategoricalLocationFactory, FirstDepartureFactory, LastTripFactory, ParkingTimeFactory, PoiTransitionFactory, TripDistanceFactory}
-import edu.ie3.mobsim.io.probabilities.{CategoricalLocation, DrivingSpeed, FirstDepartureOfDay, LastTripOfDay, ParkingTime, PoiTransition, ProbabilityDensityFunction, TripDistance}
+import edu.ie3.mobsim.io.probabilities.factories.{
+  CategoricalLocationFactory,
+  FirstDepartureFactory,
+  LastTripFactory,
+  ParkingTimeFactory,
+  PoiTransitionFactory,
+  TripDistanceFactory
+}
+import edu.ie3.mobsim.io.probabilities.{
+  CategoricalLocation,
+  DrivingSpeed,
+  FirstDepartureOfDay,
+  LastTripOfDay,
+  ParkingTime,
+  PoiTransition,
+  ProbabilityDensityFunction,
+  TripDistance
+}
 import edu.ie3.mobsim.utils.IoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
@@ -107,8 +131,10 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
   protected val plannedDestinationCategoricalLocation
       : CategoricalLocationDictionary.Value =
     CategoricalLocationDictionary.CULTURE
-  protected val plannedParkingTimeStart: ZonedDateTime = givenSimulationStart.plusMinutes(30)
-  protected val plannedDepartureTime: ZonedDateTime = givenSimulationStart.plusHours(2)
+  protected val plannedParkingTimeStart: ZonedDateTime =
+    givenSimulationStart.plusMinutes(30)
+  protected val plannedDepartureTime: ZonedDateTime =
+    givenSimulationStart.plusHours(2)
 
   protected val pois: Set[PointOfInterest] = poiData.toSet
 

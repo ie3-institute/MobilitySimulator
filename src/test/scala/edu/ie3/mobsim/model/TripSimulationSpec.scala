@@ -6,7 +6,10 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
@@ -426,14 +429,14 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
     }
 
     "calculate stored energy at the end of trip" in {
-      val energy: ComparableQuantity[Energy] = TripSimulation.calculateStoredEnergyAtEndOfTrip(
-        ev3.copyWith(ev3.getEStorage),
-        drivingDistance = Quantities.getQuantity(4000, METRE)
-      )
+      val energy: ComparableQuantity[Energy] =
+        TripSimulation.calculateStoredEnergyAtEndOfTrip(
+          ev3.copyWith(ev3.getEStorage),
+          drivingDistance = Quantities.getQuantity(4000, METRE)
+        )
 
       energy shouldBe Quantities.getQuantity(60d, PowerSystemUnits.KILOWATTHOUR)
     }
-
 
     // calculateDepartureTime
     // checkAndIfNecessaryAdjustDrivingDistance
