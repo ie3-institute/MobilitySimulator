@@ -62,6 +62,15 @@ trait ChargingBehaviorTestData extends TripSimulationData {
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
+  val evNoChargingStations: ElectricVehicle = ev5.copyWith(
+    zero,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
+    destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
+    destinationPoi = supermarketPoi,
+    parkingTimeStart = ZonedDateTime.now(),
+    departureTime = ZonedDateTime.now().plusHours(5)
+  )
+
   protected val currentPricesAtChargingStations: Map[UUID, java.lang.Double] = {
     chargingStations.map { chargingStations =>
       chargingStations.getUuid -> java.lang.Double.valueOf(0.0)

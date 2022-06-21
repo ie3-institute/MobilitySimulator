@@ -84,6 +84,16 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
+  val ev5: ElectricVehicle = ElectricVehicle.buildEv(
+    "car_5",
+    givenModel,
+    givenHomePoi,
+    givenWorkPoi,
+    givenSimulationStart,
+    givenFirstDeparture,
+    isChargingAtHomePossible
+  )
+
   protected val chargingStations: Set[ChargingStation] =
     Set(cs0, cs1, cs2, cs3, cs4, cs5, cs6)
 

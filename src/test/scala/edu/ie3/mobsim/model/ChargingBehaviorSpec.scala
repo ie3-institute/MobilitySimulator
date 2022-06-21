@@ -45,7 +45,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
     "choose no chargingStation if no station is nearby" in {
       val uuid: UUID = ChargingBehavior.chooseChargingStation(
-        evChargingNeeded,
+        evNoChargingStations,
         currentPricesAtChargingStations,
         noAvailableChargingPoints,
         seed,
