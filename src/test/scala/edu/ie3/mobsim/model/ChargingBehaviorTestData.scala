@@ -28,8 +28,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
   val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
-    destinationCategoricalLocation =
-      CategoricalLocationDictionary.SUPERMARKET,
+    destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
     destinationPoi = supermarket,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
@@ -48,8 +47,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
   val evNextTrip: ElectricVehicle = ev3.copyWith(
     half,
     destinationPoiType = PoiTypeDictionary.LEISURE,
-    destinationCategoricalLocation =
-      CategoricalLocationDictionary.SPORTS,
+    destinationCategoricalLocation = CategoricalLocationDictionary.SPORTS,
     destinationPoi = sportsPoi,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
@@ -58,8 +56,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
   val evChargingNeeded: ElectricVehicle = ev4.copyWith(
     zero,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
-    destinationCategoricalLocation =
-      CategoricalLocationDictionary.SUPERMARKET,
+    destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
     destinationPoi = supermarket,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)

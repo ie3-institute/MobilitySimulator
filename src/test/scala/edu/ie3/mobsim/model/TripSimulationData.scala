@@ -6,10 +6,31 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.{PoiEnums, PoiTestData, PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.{
+  PoiEnums,
+  PoiTestData,
+  PoiUtils,
+  PointOfInterest
+}
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.factories.{CategoricalLocationFactory, FirstDepartureFactory, LastTripFactory, ParkingTimeFactory, PoiTransitionFactory, TripDistanceFactory}
-import edu.ie3.mobsim.io.probabilities.{CategoricalLocation, DrivingSpeed, FirstDepartureOfDay, LastTripOfDay, ParkingTime, PoiTransition, ProbabilityDensityFunction, TripDistance}
+import edu.ie3.mobsim.io.probabilities.factories.{
+  CategoricalLocationFactory,
+  FirstDepartureFactory,
+  LastTripFactory,
+  ParkingTimeFactory,
+  PoiTransitionFactory,
+  TripDistanceFactory
+}
+import edu.ie3.mobsim.io.probabilities.{
+  CategoricalLocation,
+  DrivingSpeed,
+  FirstDepartureOfDay,
+  LastTripOfDay,
+  ParkingTime,
+  PoiTransition,
+  ProbabilityDensityFunction,
+  TripDistance
+}
 import edu.ie3.mobsim.utils.IoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
@@ -110,7 +131,9 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     Quantities.getQuantity(5000, METRE)
 
   protected val ioUtils: IoUtils = IoUtils(
-    new java.io.File(".").getCanonicalPath+File.separator+"out"+File.separator,
+    new java.io.File(
+      "."
+    ).getCanonicalPath + File.separator + "out" + File.separator,
     "movements",
     "evs",
     "evcs",

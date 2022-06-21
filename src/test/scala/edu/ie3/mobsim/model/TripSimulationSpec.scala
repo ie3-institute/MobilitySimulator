@@ -6,7 +6,10 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.quantity.Quantities
@@ -39,30 +42,30 @@ class TripSimulationSpec
         maxDistance
       ) match {
         case ElectricVehicle(
-        simulationStart,
-        uuid,
-        id,
-        model,
-        batteryCapacity,
-        acChargingPower,
-        dcChargingPower,
-        consumption,
-        homePoi,
-        workPoi,
-        storedEnergy,
-        destinationPoiType,
-        destinationCategoricalLocation,
-        destinationPoi,
-        parkingTimeStart,
-        departureTime,
-        chargingAtHomePossible,
-        chosenChargingStation,
-        chargingAtSimona,
-        finalDestinationPoiType,
-        finalDestinationPoi,
-        remainingDistanceAfterChargingHub,
-        chargingPricesMemory
-        ) =>
+              simulationStart,
+              uuid,
+              id,
+              model,
+              batteryCapacity,
+              acChargingPower,
+              dcChargingPower,
+              consumption,
+              homePoi,
+              workPoi,
+              storedEnergy,
+              destinationPoiType,
+              destinationCategoricalLocation,
+              destinationPoi,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              chargingAtSimona,
+              finalDestinationPoiType,
+              finalDestinationPoi,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev2.getUuid
           id shouldBe "car_2"
@@ -108,30 +111,30 @@ class TripSimulationSpec
         maxDistance
       ) match {
         case ElectricVehicle(
-        simulationStart,
-        uuid,
-        id,
-        model,
-        batteryCapacity,
-        acChargingPower,
-        dcChargingPower,
-        consumption,
-        homePoi,
-        workPoi,
-        storedEnergy,
-        destinationPoiType,
-        destinationCategoricalLocation,
-        destinationPoi,
-        parkingTimeStart,
-        departureTime,
-        chargingAtHomePossible,
-        chosenChargingStation,
-        chargingAtSimona,
-        finalDestinationPoiType,
-        finalDestinationPoi,
-        remainingDistanceAfterChargingHub,
-        chargingPricesMemory
-        ) =>
+              simulationStart,
+              uuid,
+              id,
+              model,
+              batteryCapacity,
+              acChargingPower,
+              dcChargingPower,
+              consumption,
+              homePoi,
+              workPoi,
+              storedEnergy,
+              destinationPoiType,
+              destinationCategoricalLocation,
+              destinationPoi,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              chargingAtSimona,
+              finalDestinationPoiType,
+              finalDestinationPoi,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev1.getUuid
           id shouldBe "car_1"
@@ -177,30 +180,30 @@ class TripSimulationSpec
         maxDistance
       ) match {
         case ElectricVehicle(
-        simulationStart,
-        uuid,
-        id,
-        model,
-        batteryCapacity,
-        acChargingPower,
-        dcChargingPower,
-        consumption,
-        homePoi,
-        workPoi,
-        storedEnergy,
-        destinationPoiType,
-        destinationCategoricalLocation,
-        destinationPoi,
-        parkingTimeStart,
-        departureTime,
-        chargingAtHomePossible,
-        chosenChargingStation,
-        chargingAtSimona,
-        finalDestinationPoiType,
-        finalDestinationPoi,
-        remainingDistanceAfterChargingHub,
-        chargingPricesMemory
-        ) =>
+              simulationStart,
+              uuid,
+              id,
+              model,
+              batteryCapacity,
+              acChargingPower,
+              dcChargingPower,
+              consumption,
+              homePoi,
+              workPoi,
+              storedEnergy,
+              destinationPoiType,
+              destinationCategoricalLocation,
+              destinationPoi,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              chargingAtSimona,
+              finalDestinationPoiType,
+              finalDestinationPoi,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev3.getUuid
           id shouldBe "car_3"
@@ -211,7 +214,10 @@ class TripSimulationSpec
           consumption shouldBe givenModel.consumption
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
-          storedEnergy shouldBe Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR)
+          storedEnergy shouldBe Quantities.getQuantity(
+            40,
+            PowerSystemUnits.KILOWATTHOUR
+          )
           chargingAtSimona shouldBe false
           destinationPoiType shouldBe PoiTypeDictionary.SHOPPING
           destinationCategoricalLocation shouldBe CategoricalLocationDictionary.OTHER_SHOP
@@ -230,136 +236,136 @@ class TripSimulationSpec
     // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
       TripSimulation.makeTripToChargingHub(
-          PoiTypeDictionary.CHARGING_HUB_TOWN,
-          ev4,
-          givenSimulationStart,
-          poisWithSizes,
-          0.5,
-          0.2,
-          Quantities.getQuantity(1000, METRE),
-          plannedDestinationPoi,
-          PoiTypeDictionary.WORK,
-          chargingStations,
-          speed
-        ) match {
-          case ElectricVehicle(
-          simulationStart,
-          uuid,
-          id,
-          model,
-          batteryCapacity,
-          acChargingPower,
-          dcChargingPower,
-          consumption,
-          homePoi,
-          workPoi,
-          storedEnergy,
-          destinationPoiType,
-          destinationCategoricalLocation,
-          destinationPoi,
-          parkingTimeStart,
-          departureTime,
-          chargingAtHomePossible,
-          chosenChargingStation,
-          chargingAtSimona,
-          finalDestinationPoiType,
-          finalDestinationPoi,
-          remainingDistanceAfterChargingHub,
-          chargingPricesMemory
-          ) =>
-            simulationStart shouldBe givenSimulationStart
-            uuid shouldBe ev4.getUuid
-            id shouldBe "car_4"
-            model shouldBe "cool_producer cool_model"
-            batteryCapacity shouldBe givenModel.capacity
-            acChargingPower shouldBe givenModel.acPower
-            dcChargingPower shouldBe givenModel.dcPower
-            consumption shouldBe givenModel.consumption
-            homePoi shouldBe givenHomePoi
-            workPoi shouldBe givenWorkPoi
-            storedEnergy shouldBe storedEnergyValue
-            chargingAtSimona shouldBe false
-            destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-            destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
-            destinationPoi shouldBe plannedDestinationPoi
-            parkingTimeStart shouldBe simulationStart.plusMinutes(1)
-            departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
-            chargingAtHomePossible shouldBe true
-            chosenChargingStation shouldBe None
-            finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
-            finalDestinationPoi shouldBe Some(plannedDestinationPoi)
-            remainingDistanceAfterChargingHub shouldBe Some(
-              Quantities.getQuantity(3000, METRE)
-            )
-            chargingPricesMemory shouldBe mutable.Queue[Double]()
-        }
-      }
-
-      // testing makeModifiedTripToChargingHub
-      "makeModifiedTripToChargingHub correctly" in {
-        TripSimulation.makeModifiedTripToChargingHub(
-          PoiTypeDictionary.CHARGING_HUB_TOWN,
-          ev4,
-          givenSimulationStart,
-          poisWithSizes,
-          0.2,
-          Quantities.getQuantity(1000, METRE),
-          plannedDestinationPoi,
-          PoiTypeDictionary.WORK,
-          chargingStations,
-          speed
-        ) match {
-          case ElectricVehicle(
-          simulationStart,
-          uuid,
-          id,
-          model,
-          batteryCapacity,
-          acChargingPower,
-          dcChargingPower,
-          consumption,
-          homePoi,
-          workPoi,
-          storedEnergy,
-          destinationPoiType,
-          destinationCategoricalLocation,
-          destinationPoi,
-          parkingTimeStart,
-          departureTime,
-          chargingAtHomePossible,
-          chosenChargingStation,
-          chargingAtSimona,
-          finalDestinationPoiType,
-          finalDestinationPoi,
-          remainingDistanceAfterChargingHub,
-          chargingPricesMemory
-          ) =>
-            simulationStart shouldBe givenSimulationStart
-            uuid shouldBe ev4.getUuid
-            id shouldBe "car_4"
-            model shouldBe "cool_producer cool_model"
-            batteryCapacity shouldBe givenModel.capacity
-            acChargingPower shouldBe givenModel.acPower
-            dcChargingPower shouldBe givenModel.dcPower
-            consumption shouldBe givenModel.consumption
-            homePoi shouldBe givenHomePoi
-            workPoi shouldBe givenWorkPoi
-            storedEnergy shouldBe storedEnergyValue
-            chargingAtSimona shouldBe false
-            destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-            destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
-            destinationPoi shouldBe plannedDestinationPoi
-            parkingTimeStart shouldBe simulationStart.plusMinutes(1)
-            departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
-            chargingAtHomePossible shouldBe true
-            chosenChargingStation shouldBe None
-            finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
-            finalDestinationPoi shouldBe Some(plannedDestinationPoi)
-            remainingDistanceAfterChargingHub shouldBe Some(
-              Quantities.getQuantity(10000, METRE)
-            )
-            chargingPricesMemory shouldBe mutable.Queue[Double]()
-        }
+        PoiTypeDictionary.CHARGING_HUB_TOWN,
+        ev4,
+        givenSimulationStart,
+        poisWithSizes,
+        0.5,
+        0.2,
+        Quantities.getQuantity(1000, METRE),
+        plannedDestinationPoi,
+        PoiTypeDictionary.WORK,
+        chargingStations,
+        speed
+      ) match {
+        case ElectricVehicle(
+              simulationStart,
+              uuid,
+              id,
+              model,
+              batteryCapacity,
+              acChargingPower,
+              dcChargingPower,
+              consumption,
+              homePoi,
+              workPoi,
+              storedEnergy,
+              destinationPoiType,
+              destinationCategoricalLocation,
+              destinationPoi,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              chargingAtSimona,
+              finalDestinationPoiType,
+              finalDestinationPoi,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
+          simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev4.getUuid
+          id shouldBe "car_4"
+          model shouldBe "cool_producer cool_model"
+          batteryCapacity shouldBe givenModel.capacity
+          acChargingPower shouldBe givenModel.acPower
+          dcChargingPower shouldBe givenModel.dcPower
+          consumption shouldBe givenModel.consumption
+          homePoi shouldBe givenHomePoi
+          workPoi shouldBe givenWorkPoi
+          storedEnergy shouldBe storedEnergyValue
+          chargingAtSimona shouldBe false
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          destinationPoi shouldBe plannedDestinationPoi
+          parkingTimeStart shouldBe simulationStart.plusMinutes(1)
+          departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
+          chargingAtHomePossible shouldBe true
+          chosenChargingStation shouldBe None
+          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
+          finalDestinationPoi shouldBe Some(plannedDestinationPoi)
+          remainingDistanceAfterChargingHub shouldBe Some(
+            Quantities.getQuantity(3000, METRE)
+          )
+          chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
+
+    // testing makeModifiedTripToChargingHub
+    "makeModifiedTripToChargingHub correctly" in {
+      TripSimulation.makeModifiedTripToChargingHub(
+        PoiTypeDictionary.CHARGING_HUB_TOWN,
+        ev4,
+        givenSimulationStart,
+        poisWithSizes,
+        0.2,
+        Quantities.getQuantity(1000, METRE),
+        plannedDestinationPoi,
+        PoiTypeDictionary.WORK,
+        chargingStations,
+        speed
+      ) match {
+        case ElectricVehicle(
+              simulationStart,
+              uuid,
+              id,
+              model,
+              batteryCapacity,
+              acChargingPower,
+              dcChargingPower,
+              consumption,
+              homePoi,
+              workPoi,
+              storedEnergy,
+              destinationPoiType,
+              destinationCategoricalLocation,
+              destinationPoi,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              chargingAtSimona,
+              finalDestinationPoiType,
+              finalDestinationPoi,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
+          simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev4.getUuid
+          id shouldBe "car_4"
+          model shouldBe "cool_producer cool_model"
+          batteryCapacity shouldBe givenModel.capacity
+          acChargingPower shouldBe givenModel.acPower
+          dcChargingPower shouldBe givenModel.dcPower
+          consumption shouldBe givenModel.consumption
+          homePoi shouldBe givenHomePoi
+          workPoi shouldBe givenWorkPoi
+          storedEnergy shouldBe storedEnergyValue
+          chargingAtSimona shouldBe false
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          destinationPoi shouldBe plannedDestinationPoi
+          parkingTimeStart shouldBe simulationStart.plusMinutes(1)
+          departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
+          chargingAtHomePossible shouldBe true
+          chosenChargingStation shouldBe None
+          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
+          finalDestinationPoi shouldBe Some(plannedDestinationPoi)
+          remainingDistanceAfterChargingHub shouldBe Some(
+            Quantities.getQuantity(10000, METRE)
+          )
+          chargingPricesMemory shouldBe mutable.Queue[Double]()
+      }
+    }
+  }
 }
