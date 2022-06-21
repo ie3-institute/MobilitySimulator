@@ -370,7 +370,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
 
     "keep the original trip" in {
       TripSimulation.keepOriginalTrip(
-        ev3,
+        ev4,
         plannedStoredEnergyEndOfTrip,
         plannedDestinationPoiType,
         plannedDestinationCategoricalLocation,
@@ -404,8 +404,8 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev3.getUuid
-          id shouldBe "car_3"
+          uuid shouldBe ev4.getUuid
+          id shouldBe "car_4"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
@@ -432,7 +432,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
     "calculate stored energy at the end of trip" in {
       val energy: ComparableQuantity[Energy] =
         TripSimulation.calculateStoredEnergyAtEndOfTrip(
-          ev3.copyWith(ev3.getEStorage),
+          ev4.copyWith(ev4.getEStorage),
           drivingDistance = Quantities.getQuantity(4000, METRE)
         )
 

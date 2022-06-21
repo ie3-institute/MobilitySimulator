@@ -10,13 +10,8 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
-import edu.ie3.util.quantities.PowerSystemUnits
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
-
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.measure.quantity.Energy
 import scala.util.Random
 
 trait ChargingBehaviorTestData extends TripSimulationData {
