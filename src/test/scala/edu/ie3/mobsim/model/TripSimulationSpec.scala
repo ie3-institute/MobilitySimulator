@@ -6,15 +6,14 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
+import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units.METRE
 
+import javax.measure.quantity.Energy
 import scala.collection.mutable
 
 class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
@@ -364,5 +363,79 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
+
+    "keep the original trip" in {
+      TripSimulation.keepOriginalTrip(
+        ev3,
+        plannedStoredEnergyEndOfTrip,
+        plannedDestinationPoiType,
+        plannedDestinationCategoricalLocation,
+        plannedDestinationPoi,
+        plannedParkingTimeStart,
+        plannedDepartureTime
+      ) match {
+        case ElectricVehicle(
+              simulationStart,
+              uuid,
+              id,
+              model,
+              batteryCapacity,
+              acChargingPower,
+              dcChargingPower,
+              consumption,
+              homePoi,
+              workPoi,
+              storedEnergy,
+              destinationPoiType,
+              destinationCategoricalLocation,
+              destinationPoi,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              chargingAtSimona,
+              finalDestinationPoiType,
+              finalDestinationPoi,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
+          simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev3.getUuid
+          id shouldBe "car_3"
+          model shouldBe "cool_producer cool_model"
+          batteryCapacity shouldBe givenModel.capacity
+          acChargingPower shouldBe givenModel.acPower
+          dcChargingPower shouldBe givenModel.dcPower
+          consumption shouldBe givenModel.consumption
+          homePoi shouldBe givenHomePoi
+          workPoi shouldBe givenWorkPoi
+          storedEnergy shouldBe plannedStoredEnergyEndOfTrip
+          chargingAtSimona shouldBe false
+          destinationPoiType shouldBe plannedDestinationPoiType
+          destinationCategoricalLocation shouldBe plannedDestinationCategoricalLocation
+          destinationPoi shouldBe plannedDestinationPoi
+          parkingTimeStart shouldBe plannedParkingTimeStart
+          departureTime shouldBe plannedDepartureTime
+          chargingAtHomePossible shouldBe true
+          chosenChargingStation shouldBe None
+          finalDestinationPoiType shouldBe None
+          finalDestinationPoi shouldBe None
+          remainingDistanceAfterChargingHub shouldBe None
+          chargingPricesMemory shouldBe mutable.Queue[Double]()
+      }
+    }
+
+    "calculate stored energy at the end of trip" in {
+      val energy: ComparableQuantity[Energy] = TripSimulation.calculateStoredEnergyAtEndOfTrip(
+        ev3.copyWith(ev3.getEStorage),
+        drivingDistance = Quantities.getQuantity(4000, METRE)
+      )
+
+      energy shouldBe Quantities.getQuantity(60d, PowerSystemUnits.KILOWATTHOUR)
+    }
+
+
+    // calculateDepartureTime
+    // checkAndIfNecessaryAdjustDrivingDistance
   }
 }

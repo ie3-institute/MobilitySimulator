@@ -20,10 +20,6 @@ import javax.measure.quantity.Energy
 import scala.util.Random
 
 trait ChargingBehaviorTestData extends TripSimulationData {
-  protected val zero: ComparableQuantity[Energy] =
-    Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
-  protected val half: ComparableQuantity[Energy] =
-    Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR)
 
   val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
