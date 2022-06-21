@@ -6,16 +6,14 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units.METRE
 
+import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
 import scala.collection.mutable
 
@@ -438,7 +436,16 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
       energy shouldBe Quantities.getQuantity(60d, PowerSystemUnits.KILOWATTHOUR)
     }
 
-    // calculateDepartureTime
-    // checkAndIfNecessaryAdjustDrivingDistance
+    "calculate departure time" in {
+      val time: ZonedDateTime = TripSimulation.calculateDepartureTime(
+        plannedDestinationPoiType,
+        plannedParkingTimeStart,
+        firstDepartureOfDay,
+        lastTripOfDay,
+        parkingTime
+      )
+
+      time shouldBe plannedParkingTimeStart.plusHours(1)
+    }
   }
 }
