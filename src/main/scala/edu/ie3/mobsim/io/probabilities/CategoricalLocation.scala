@@ -75,7 +75,7 @@ final case class CategoricalLocation(
         probabilities.get(
           CategoricalLocationKey(
             timeInterval,
-            CategoricalLocationDictionary(poiType)
+            poiType
           )
         ) match {
           case Some(pdf) => pdf.sample()
@@ -87,6 +87,6 @@ final case class CategoricalLocation(
 case object CategoricalLocation {
   final case class CategoricalLocationKey(
       time: Int,
-      poi: CategoricalLocationDictionary.Value
+      poi: PoiTypeDictionary.Value
   )
 }
