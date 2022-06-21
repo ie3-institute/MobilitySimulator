@@ -50,15 +50,12 @@ class TripSimulationSpec
               homePoi,
               workPoi,
               storedEnergy,
-              destinationPoiType,
-              destinationCategoricalLocation,
               destinationPoi,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
-              finalDestinationPoiType,
               finalDestinationPoi,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
@@ -75,14 +72,16 @@ class TripSimulationSpec
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          ev.getDestinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          ev.getDestinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
+          ev.getFinalDestinationPoiType shouldBe Some(
+            plannedDestinationPoi.poiType
+          )
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(-7000, METRE)
@@ -118,15 +117,12 @@ class TripSimulationSpec
               homePoi,
               workPoi,
               storedEnergy,
-              destinationPoiType,
-              destinationCategoricalLocation,
               destinationPoi,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
-              finalDestinationPoiType,
               finalDestinationPoi,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
@@ -143,14 +139,16 @@ class TripSimulationSpec
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          ev.getDestinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          ev.getDestinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
+          ev.getFinalDestinationPoiType shouldBe Some(
+            plannedDestinationPoi.poiType
+          )
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(10000, METRE)

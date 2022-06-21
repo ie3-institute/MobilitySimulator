@@ -415,7 +415,6 @@ object TripSimulation extends LazyLogging {
             Some(remainingDistance)
           ) =>
         /* Reset saved values */
-        ev.setFinalDestinationPoiType(None)
         ev.setFinalDestinationPoi(None)
         ev.setRemainingDistanceAfterChargingHub(None)
 
@@ -791,13 +790,10 @@ object TripSimulation extends LazyLogging {
       Some(plannedDrivingDistance.subtract(newDrivingDistance))
     )
     ev.setFinalDestinationPoi(Some(plannedDestinationPoi))
-    ev.setFinalDestinationPoiType(Some(plannedDestinationPoiType))
 
     /* Create updated EV */
     ev.copyWith(
       newStoredEnergyEndOfTrip,
-      newDestinationPoiType,
-      newDestinationCategoricalLocation,
       newDestinationPoi,
       newParkingTimeStart,
       newDepartureTime
@@ -907,13 +903,10 @@ object TripSimulation extends LazyLogging {
       Some(plannedDrivingDistance.subtract(newDrivingDistance))
     )
     ev.setFinalDestinationPoi(Some(plannedDestinationPoi))
-    ev.setFinalDestinationPoiType(Some(plannedDestinationPoiType))
 
     /* Create updated EV */
     ev.copyWith(
       newStoredEnergyEndOfTrip,
-      newDestinationPoiType,
-      newDestinationCategoricalLocation,
       newDestinationPoi,
       newParkingTimeStart,
       newDepartureTime
@@ -1026,7 +1019,6 @@ object TripSimulation extends LazyLogging {
   ): ElectricVehicle = {
 
     /* Because there is no stop at a charging hub, no trip values need to be saved */
-    ev.setFinalDestinationPoiType(None)
     ev.setFinalDestinationPoi(None)
     ev.setRemainingDistanceAfterChargingHub(None)
 
@@ -1045,8 +1037,6 @@ object TripSimulation extends LazyLogging {
     /* Create updated EV */
     ev.copyWith(
       plannedStoredEnergyEndOfTrip,
-      plannedDestinationPoiType,
-      plannedDestinationCategoricalLocation,
       plannedDestinationPoi,
       plannedParkingTimeStart,
       plannedDepartureTime
@@ -1107,8 +1097,6 @@ object TripSimulation extends LazyLogging {
     /* Create updated EV */
     ev.copyWith(
       ev.getStoredEnergy,
-      ev.getDestinationPoiType,
-      ev.getDestinationCategoricalLocation,
       ev.getDestinationPoi,
       parkingTimeStart,
       departureTime

@@ -23,7 +23,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
 
     "building the car models" should {
       "assign the correct properties" in {
-        ElectricVehicle.buildEv(
+        val ev: ElectricVehicle = ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
@@ -31,10 +31,12 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenSimulationStart,
           givenFirstDeparture,
           true
-        ) match {
+        )
+
+        ev match {
           case ElectricVehicle(
                 simulationStart,
-                _,
+                uuid,
                 id,
                 model,
                 batteryCapacity,
@@ -44,20 +46,18 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
                 homePoi,
                 workPoi,
                 storedEnergy,
-                destinationPoiType,
-                destinationCategoricalLocation,
                 destinationPoi,
                 parkingTimeStart,
                 departureTime,
                 chargingAtHomePossible,
                 chosenChargingStation,
                 chargingAtSimona,
-                finalDestinationPoiType,
                 finalDestinationPoi,
                 remainingDistanceAfterChargingHub,
                 chargingPricesMemory
               ) =>
             simulationStart shouldBe givenSimulationStart
+            uuid shouldBe ev.getUuid
             id shouldBe "test_car"
             model shouldBe "cool_producer cool_model"
             batteryCapacity shouldBe givenModel.capacity
@@ -68,14 +68,14 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
             workPoi shouldBe givenWorkPoi
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
-            destinationPoiType shouldBe PoiTypeDictionary.HOME
-            destinationCategoricalLocation shouldBe CategoricalLocationDictionary.HOME
+            ev.getDestinationPoiType shouldBe PoiTypeDictionary.HOME
+            ev.getDestinationCategoricalLocation shouldBe CategoricalLocationDictionary.HOME
             destinationPoi shouldBe givenHomePoi
             parkingTimeStart shouldBe simulationStart
             departureTime shouldBe givenFirstDeparture
             chosenChargingStation shouldBe None
             chargingAtHomePossible shouldBe true
-            finalDestinationPoiType shouldBe None
+            ev.getFinalDestinationPoiType shouldBe None
             finalDestinationPoi shouldBe None
             remainingDistanceAfterChargingHub shouldBe None
             chargingPricesMemory shouldBe mutable.Queue[Double]()

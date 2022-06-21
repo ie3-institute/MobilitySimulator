@@ -8,7 +8,10 @@ package edu.ie3.mobsim.io.geodata
 
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
-import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.geo.GeoUtils
 import org.locationtech.jts.geom.Coordinate
@@ -43,6 +46,7 @@ import scala.jdk.CollectionConverters._
 final case class PointOfInterest(
     uuid: UUID,
     id: String,
+    poiType: PoiTypeDictionary.Value,
     categoricalLocation: CategoricalLocationDictionary.Value,
     geoPosition: Coordinate,
     size: Double,
@@ -206,6 +210,7 @@ case object PointOfInterest {
           val poi = PointOfInterest(
             uuid,
             identifier,
+            PoiTypeDictionary.apply(catLoc),
             catLoc,
             coordinate,
             sze,
@@ -347,6 +352,7 @@ case object PointOfInterest {
     new PointOfInterest(
       uuid,
       identifier,
+      PoiTypeDictionary.apply(catLoc),
       catLoc,
       coordinate,
       sze,

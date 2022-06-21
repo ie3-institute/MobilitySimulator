@@ -25,6 +25,32 @@ object PoiEnums {
         case _                    => throw new RuntimeException("POI not known")
       }
     }
+
+    def apply(
+        categoricalLocation: CategoricalLocationDictionary.Value
+    ): Value = {
+      categoricalLocation match {
+        case CategoricalLocationDictionary.HOME        => HOME
+        case CategoricalLocationDictionary.WORK        => WORK
+        case CategoricalLocationDictionary.SUPERMARKET => SHOPPING
+        case CategoricalLocationDictionary.SERVICES    => SHOPPING
+        case CategoricalLocationDictionary.OTHER_SHOP  => SHOPPING
+        case CategoricalLocationDictionary.RESTAURANT  => LEISURE
+        case CategoricalLocationDictionary.CULTURE     => LEISURE
+        case CategoricalLocationDictionary.SPORTS      => LEISURE
+        case CategoricalLocationDictionary.RELIGIOUS   => LEISURE
+        case CategoricalLocationDictionary.MEDICINAL   => OTHER
+        case CategoricalLocationDictionary.BBPG        => OTHER
+        case CategoricalLocationDictionary.CHARGING_HUB_TOWN =>
+          CHARGING_HUB_TOWN
+        case CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY =>
+          CHARGING_HUB_HIGHWAY
+        case malformed =>
+          throw new RuntimeException(
+            s"CategoricalLocation '$malformed' could not be applied to PoiTypeDictionary"
+          )
+      }
+    }
   }
 
   object CategoricalLocationDictionary extends Enumeration {

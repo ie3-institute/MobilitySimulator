@@ -9,7 +9,10 @@ package edu.ie3.mobsim.model
 import edu.ie3.datamodel.models.ElectricCurrentType
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
-import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities.{
@@ -42,6 +45,7 @@ trait ElectricVehicleTestData {
   protected val givenHomePoi: PointOfInterest = PointOfInterest(
     UUID.fromString("d40b4feb-fd57-42b5-9247-43eaad2dff4b"),
     "test",
+    PoiTypeDictionary.HOME,
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116482, 51.4843281),
     1.0,
@@ -53,6 +57,7 @@ trait ElectricVehicleTestData {
   protected val givenWorkPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("c34a031e-8568-4b59-99e4-1ad113bef6ea"),
     "test",
+    PoiTypeDictionary.WORK,
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.4116482, 51.4843281),
     1.0,
