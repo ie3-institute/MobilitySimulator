@@ -46,7 +46,7 @@ case class ElectricVehicle(
     private val consumption: ComparableQuantity[SpecificEnergy], // kWh per km
     private val homePoi: PointOfInterest,
     private val workPoi: PointOfInterest,
-    private var storedEnergy: ComparableQuantity[Energy],
+    private val storedEnergy: ComparableQuantity[Energy],
     private var destinationPoi: PointOfInterest,
     private var parkingTimeStart: ZonedDateTime,
     private var departureTime: ZonedDateTime,
@@ -98,12 +98,8 @@ case class ElectricVehicle(
 
   def isChargingAtSimona: Boolean = chargingAtSimona
 
-  def getFinalDestinationPoiType: Option[PoiTypeDictionary.Value] = {
-    getFinalDestinationPoi match {
-      case Some(poi) => Some(poi.poiType)
-      case None      => None
-    }
-  }
+  def getFinalDestinationPoiType: Option[PoiTypeDictionary.Value] =
+    getFinalDestinationPoi.map(_.poiType)
 
   def getFinalDestinationPoi: Option[PointOfInterest] = finalDestinationPoi
 
@@ -121,10 +117,8 @@ case class ElectricVehicle(
     * @return
     *   a copy of this ElectricVehicle with given new stored energy / soc
     */
-  def copyWith(storedEnergy: ComparableQuantity[Energy]): ElectricVehicle = {
-    this.storedEnergy = storedEnergy
-    this
-  }
+  def copyWith(storedEnergy: ComparableQuantity[Energy]): ElectricVehicle =
+    copy(storedEnergy = storedEnergy)
 
   /** @param storedEnergy
     *   the new stored energy
@@ -136,13 +130,13 @@ case class ElectricVehicle(
       destinationPoi: PointOfInterest,
       parkingTimeStart: ZonedDateTime,
       departureTime: ZonedDateTime
-  ): ElectricVehicle = {
-    this.storedEnergy = storedEnergy
-    this.destinationPoi = destinationPoi
-    this.parkingTimeStart = parkingTimeStart
-    this.departureTime = departureTime
-    this
-  }
+  ): ElectricVehicle =
+    copy(
+      storedEnergy = storedEnergy,
+      destinationPoi = destinationPoi,
+      parkingTimeStart = parkingTimeStart,
+      departureTime = departureTime
+    )
 
   def setChosenChargingStation(chargingStation: Option[UUID]): Unit = {
     chosenChargingStation = chargingStation
