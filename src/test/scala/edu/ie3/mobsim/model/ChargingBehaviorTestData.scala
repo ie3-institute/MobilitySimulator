@@ -16,7 +16,7 @@ import scala.util.Random
 
 trait ChargingBehaviorTestData extends TripSimulationData {
 
-  val evLowSoC: ElectricVehicle = ev1.copyWith(
+  protected val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
@@ -25,7 +25,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
-  val evAtChargingHub: ElectricVehicle = ev2.copyWith(
+  protected val evAtChargingHub: ElectricVehicle = ev2.copyWith(
     half,
     destinationPoiType = PoiTypeDictionary.CHARGING_HUB_TOWN,
     destinationCategoricalLocation =
@@ -35,7 +35,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
     departureTime = ZonedDateTime.now().plusHours(1)
   )
 
-  val evNextTrip: ElectricVehicle = ev3.copyWith(
+  protected val evNextTrip: ElectricVehicle = ev3.copyWith(
     half,
     destinationPoiType = PoiTypeDictionary.LEISURE,
     destinationCategoricalLocation = CategoricalLocationDictionary.SPORTS,
@@ -44,7 +44,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
-  val evChargingNeeded: ElectricVehicle = ev4.copyWith(
+  protected val evChargingNeeded: ElectricVehicle = ev4.copyWith(
     zero,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
@@ -53,7 +53,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
-  val evNoChargingStations: ElectricVehicle = ev5.copyWith(
+  protected val evNoChargingStations: ElectricVehicle = ev5.copyWith(
     zero,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,

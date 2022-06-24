@@ -14,51 +14,43 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
   "The ChargingBehavior" should {
 
     "choose a chargingStation if charging is needed" in {
-      val uuid: UUID = ChargingBehavior.chooseChargingStation(
+      val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
         evChargingNeeded,
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
         seed,
         maxDistance
-      ) match {
-        case Some(uuid) => uuid
-        case None => UUID.fromString("c34a031e-8368-4b59-99e4-1ad283bef6ea")
-      }
+      )
 
-      uuid.toString shouldBe "7537c0b6-3137-4e30-8a95-db1c0f9d9b81"
+      uuid.isDefined shouldBe true
+      uuid.map(_.toString) shouldBe Some("7537c0b6-3137-4e30-8a95-db1c0f9d9b81")
     }
 
     "choose no chargingStation if charging is not needed" in {
-      val uuid: UUID = ChargingBehavior.chooseChargingStation(
+      val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
         ev1.copyWith(ev1.getEStorage),
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
         seed,
         maxDistance
-      ) match {
-        case Some(uuid) => uuid
-        case None => UUID.fromString("c34a031e-8368-4b59-99e4-1ad283bef6ea")
-      }
+      )
 
-      uuid.toString shouldBe "c34a031e-8368-4b59-99e4-1ad283bef6ea"
+      uuid.isDefined shouldBe false
     }
 
     "choose no chargingStation if no station is nearby" in {
-      val uuid: UUID = ChargingBehavior.chooseChargingStation(
+      val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
         evNoChargingStations,
         currentPricesAtChargingStations,
         noAvailableChargingPoints,
         seed,
         maxDistance
-      ) match {
-        case Some(uuid) => uuid
-        case None => UUID.fromString("c34a031e-8368-4b59-99e4-1ad283bef6ea")
-      }
+      )
 
-      uuid.toString shouldBe "c34a031e-8368-4b59-99e4-1ad283bef6ea"
+      uuid.isDefined shouldBe false
     }
 
-    "should check if ev wants to charge" in {
+    "check if ev wants to charge" in {
       ChargingBehavior.doesEvWantToCharge(
         evChargingNeeded.copyWith(zero),
         seed
@@ -69,7 +61,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       ) shouldBe false
     }
 
-    "should give correct rations for chargingStations" in {
+    "give correct rations for chargingStations" in {
       val x = ChargingBehavior.createRatingsForChargingStations(
         ev1.copyWith(half),
         currentPricesAtChargingStations,
