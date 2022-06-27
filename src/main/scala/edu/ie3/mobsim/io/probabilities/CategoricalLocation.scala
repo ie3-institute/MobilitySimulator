@@ -17,15 +17,15 @@ import java.time.{DayOfWeek, ZonedDateTime}
 final case class CategoricalLocation(
     probabilitiesWeekday: Map[
       CategoricalLocationKey,
-      ProbabilityDensityFunction[Int]
+      ProbabilityDensityFunction[CategoricalLocationDictionary.Value]
     ],
     probabilitiesSaturday: Map[
       CategoricalLocationKey,
-      ProbabilityDensityFunction[Int]
+      ProbabilityDensityFunction[CategoricalLocationDictionary.Value]
     ],
     probabilitiesSunday: Map[
       CategoricalLocationKey,
-      ProbabilityDensityFunction[Int]
+      ProbabilityDensityFunction[CategoricalLocationDictionary.Value]
     ]
 ) {
 
@@ -62,7 +62,9 @@ final case class CategoricalLocation(
 
         /* Get probabilities for the correct day */
         val probabilities
-            : Map[CategoricalLocationKey, ProbabilityDensityFunction[Int]] =
+            : Map[CategoricalLocationKey, ProbabilityDensityFunction[
+              CategoricalLocationDictionary.Value
+            ]] =
           time.getDayOfWeek match {
             case DayOfWeek.SATURDAY => probabilitiesSaturday
             case DayOfWeek.SUNDAY   => probabilitiesSunday
@@ -71,14 +73,20 @@ final case class CategoricalLocation(
 
         /* Sample categorical location */
         probabilities.get(
-          CategoricalLocationKey(timeInterval, poiType.id)
+          CategoricalLocationKey(
+            timeInterval,
+            poiType
+          )
         ) match {
-          case Some(pdf) => CategoricalLocationDictionary(pdf.sample())
+          case Some(pdf) => pdf.sample()
           case _         => throw new RuntimeException("No pdf found")
         }
     }
 }
 
 case object CategoricalLocation {
-  final case class CategoricalLocationKey(time: Int, poi: Int)
+  final case class CategoricalLocationKey(
+      time: Int,
+      poi: PoiTypeDictionary.Value
+  )
 }

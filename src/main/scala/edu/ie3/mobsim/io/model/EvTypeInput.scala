@@ -16,7 +16,6 @@ import tech.units.indriya.quantity.Quantities
 import javax.measure.quantity.{Energy, Power}
 import scala.io.Source
 import scala.util.{Failure, Success, Try, Using}
-import scala.util.matching.Regex
 
 /** EvInput models which are generated from csv file.
   * @param model
