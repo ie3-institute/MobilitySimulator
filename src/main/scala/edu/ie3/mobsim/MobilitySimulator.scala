@@ -46,7 +46,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.Predef.->
 import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -77,7 +76,7 @@ final class MobilitySimulator(
     maxDistanceFromPoi: ComparableQuantity[Length],
     thresholdChargingHubDistance: ComparableQuantity[Length]
 ) extends LazyLogging {
-  def doActivity(tick: Long): java.util.ArrayList[Long] = {
+  def doActivity(tick: Long): java.util.ArrayList[java.lang.Long] = {
     /* Update current time */
     val currentTime = startTime.plusSeconds(tick)
 
@@ -137,7 +136,7 @@ final class MobilitySimulator(
       )
     )
 
-    val newTicks = new java.util.ArrayList[Long](1)
+    val newTicks = new java.util.ArrayList[java.lang.Long](1)
     newTicks.add(tick + timeUntilNextEvent)
     newTicks
   }
@@ -622,7 +621,7 @@ object MobilitySimulator
     * @return
     *   Time tick (as ArrayList) when simulation should be triggered again
     */
-  protected def doActivity(tick: Long): java.util.ArrayList[Long] = {
+  protected def doActivity(tick: Long): java.util.ArrayList[java.lang.Long] = {
     simulator
       .map(_.doActivity(tick))
       .getOrElse(
@@ -635,7 +634,7 @@ object MobilitySimulator
     * necessary data such as probabilities, EV models, etc. and creates all
     * objects such as EVs, POIs, and charging stations.
     */
-  protected def initialize(): java.util.ArrayList[Long] = {
+  protected def initialize(): java.util.ArrayList[java.lang.Long] = {
 
     val availableEvData = evData.getOrElse(
       throw InitializationException(

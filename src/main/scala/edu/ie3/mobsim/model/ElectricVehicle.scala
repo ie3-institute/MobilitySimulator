@@ -112,7 +112,7 @@ case class ElectricVehicle(
 
   def getChargingPricesMemory: mutable.Queue[Double] = chargingPricesMemory
 
-  def getDepartureTick: Long = toTick(simulationStart, departureTime)
+  def getDepartureTick: java.lang.Long = toTick(simulationStart, departureTime)
 
   /** @param storedEnergy
     *   the new stored energy
