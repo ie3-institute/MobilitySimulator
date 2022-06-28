@@ -959,8 +959,7 @@ object TripSimulation extends LazyLogging {
 
     /* EV can be sufficiently charged if the next destination is home, home charging is possible and EV stays for at least 3 hours */
     val sufficientHomeChargingPossible: Boolean =
-      (plannedDestinationCategoricalLocation == PoiEnums
-        .CategoricalLocationDictionary("home")
+      (plannedDestinationCategoricalLocation == PoiEnums.CategoricalLocationDictionary.HOME
         && ev.isChargingAtHomePossible
         && plannedParkingTimeStart.until(
           plannedDepartureTime,
@@ -1159,7 +1158,7 @@ object TripSimulation extends LazyLogging {
     *   departure time for the trip
     */
   def calculateDepartureTime(
-      destinationPoiType: Int,
+      destinationPoiType: PoiTypeDictionary.Value,
       parkingTimeStart: ZonedDateTime,
       firstDepartureOfDay: FirstDepartureOfDay,
       lastTripOfDay: LastTripOfDay,
@@ -1179,7 +1178,7 @@ object TripSimulation extends LazyLogging {
     /* Sample whether this trip is the last trip of day */
     val departureTime: ZonedDateTime = destinationPoiType match {
       /* if destination POI type is home */
-      case 0 =>
+      case HOME =>
         if (lastTripOfDay.sample(parkingTimeStart, seed)) {
           firstDepartureOfDay.sample(parkingTimeStart)
         } else {
