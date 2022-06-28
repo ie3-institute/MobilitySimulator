@@ -24,9 +24,11 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
 
   "TripSimulation" should {
     "not simulate a new trip and keep charging when SoC < 70 %" in {
+      val ev: ElectricVehicle = evAtChargingHub
+
       TripSimulation.simulateNextTrip(
         givenSimulationStart,
-        evAtChargingHub,
+        ev,
         poisWithSizes,
         chargingHubTownIsPresent = true,
         chargingHubHighwayIsPresent = true,
@@ -67,7 +69,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev2.getUuid
+          uuid shouldBe ev.getUuid
           id shouldBe "car_2"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -93,9 +95,11 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
     }
 
     "not simulate a new trip and keep charging when SoC < 10 % and charging is available" in {
+      val ev: ElectricVehicle = evLowSoC
+
       TripSimulation.simulateNextTrip(
         givenSimulationStart,
-        evLowSoC,
+        ev,
         poisWithSizes,
         chargingHubTownIsPresent = true,
         chargingHubHighwayIsPresent = true,
@@ -136,7 +140,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev1.getUuid
+          uuid shouldBe ev.getUuid
           id shouldBe "car_1"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -162,9 +166,11 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
     }
 
     "simulate the next trip without additional charging stops" in {
+      val ev: ElectricVehicle = evNextTrip
+
       TripSimulation.simulateNextTrip(
         givenSimulationStart,
-        evNextTrip,
+        ev,
         poisWithSizes,
         chargingHubTownIsPresent = true,
         chargingHubHighwayIsPresent = true,
@@ -205,7 +211,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev3.getUuid
+          uuid shouldBe ev.getUuid
           id shouldBe "car_3"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -235,9 +241,11 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
 
     // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
+      val ev: ElectricVehicle = ev4
+
       TripSimulation.makeTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
-        ev4,
+        ev,
         givenSimulationStart,
         poisWithSizes,
         0.5,
@@ -274,7 +282,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev4.getUuid
+          uuid shouldBe ev.getUuid
           id shouldBe "car_4"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -288,14 +296,14 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
-          parkingTimeStart shouldBe simulationStart.plusMinutes(1)
-          departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
+          parkingTimeStart shouldBe simulationStart.plusMinutes(10)
+          departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
           finalDestinationPoiType shouldBe Some(PoiTypeDictionary.WORK)
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
-            Quantities.getQuantity(3000, METRE)
+            Quantities.getQuantity(-7000, METRE)
           )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
@@ -303,9 +311,11 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
 
     // testing makeModifiedTripToChargingHub
     "makeModifiedTripToChargingHub correctly" in {
+      val ev: ElectricVehicle = ev4
+
       TripSimulation.makeModifiedTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
-        ev4,
+        ev,
         givenSimulationStart,
         poisWithSizes,
         0.2,
@@ -341,7 +351,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev4.getUuid
+          uuid shouldBe ev.getUuid
           id shouldBe "car_4"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
@@ -369,8 +379,10 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
     }
 
     "keep the original trip" in {
+      val ev: ElectricVehicle = ev4
+
       TripSimulation.keepOriginalTrip(
-        ev4,
+        ev,
         plannedStoredEnergyEndOfTrip,
         plannedDestinationPoiType,
         plannedDestinationCategoricalLocation,
@@ -404,7 +416,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev4.getUuid
+          uuid shouldBe ev.getUuid
           id shouldBe "car_4"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
