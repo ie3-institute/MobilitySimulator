@@ -959,8 +959,7 @@ object TripSimulation extends LazyLogging {
 
     /* EV can be sufficiently charged if the next destination is home, home charging is possible and EV stays for at least 3 hours */
     val sufficientHomeChargingPossible: Boolean =
-      (plannedDestinationCategoricalLocation == PoiEnums
-        .CategoricalLocationDictionary("home")
+      (plannedDestinationCategoricalLocation == PoiEnums.CategoricalLocationDictionary.HOME
         && ev.isChargingAtHomePossible
         && plannedParkingTimeStart.until(
           plannedDepartureTime,

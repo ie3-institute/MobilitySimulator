@@ -17,11 +17,11 @@ import scala.util.{Failure, Success, Try}
 
 object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
   private val uuid = "uuid"
-  private val minute = "minute_of_day"
   private val dayType = "day_type"
+  private val minute = "minute_of_day"
   private val probability = "probability"
   override protected val requiredFields: Seq[String] =
-    Seq(uuid, minute, dayType, probability)
+    Seq(uuid, dayType, minute, probability)
 
   /** Build the desired instance from a collection of entity field data
     *
