@@ -119,8 +119,7 @@ final case class IoUtils private (
       "evcs" -> cs.getUuid.toString,
       "charging_points" -> cs.getChargingPoints.toString,
       "occupied_charging_points" -> (cs.getChargingPoints - availableChargingPoints
-        .getOrElse(cs.getUuid, 0)
-        ).toString
+        .getOrElse(cs.getUuid, 0)).toString
     ).asJava
 
     evcsWriter.write(fieldData)
