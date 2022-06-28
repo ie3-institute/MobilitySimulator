@@ -36,7 +36,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
   )
 
   protected def evNextTrip: ElectricVehicle = ev3.copyWith(
-    half,
+    ev3.getEStorage,
     destinationPoiType = PoiTypeDictionary.LEISURE,
     destinationCategoricalLocation = CategoricalLocationDictionary.SPORTS,
     destinationPoi = sportsPoi,

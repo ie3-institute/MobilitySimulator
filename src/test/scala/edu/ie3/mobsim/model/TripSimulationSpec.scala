@@ -220,6 +220,10 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           consumption shouldBe givenModel.consumption
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
+          storedEnergy shouldBe Quantities.getQuantity(
+            90,
+            PowerSystemUnits.KILOWATTHOUR
+          )
           chargingAtSimona shouldBe false
           destinationPoiType shouldBe PoiTypeDictionary.SHOPPING
           destinationCategoricalLocation shouldBe CategoricalLocationDictionary.OTHER_SHOP
