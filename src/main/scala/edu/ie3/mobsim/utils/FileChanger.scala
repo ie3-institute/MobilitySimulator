@@ -30,7 +30,7 @@ object FileChanger extends App {
   private val probabilityDir =
     Seq(baseDir, "trip_probabilities").mkString(JavaFile.separator)
 
-  // changePoiFile()
+  changePoiFile()
   mergeDepartures()
   mergeParkingTime()
   mergeDrivingSpeed()
