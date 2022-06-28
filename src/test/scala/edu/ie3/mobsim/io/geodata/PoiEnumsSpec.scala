@@ -45,7 +45,6 @@ class PoiEnumsSpec extends UnitSpec {
 
     // testing CategoricalLocationDictionary.apply(token: String)
     "parse CategoricalLocation correctly" in {
-
       val cases = Table(
         ("categoricalLocation", "expectedResult"),
         ("home", CategoricalLocationDictionary.HOME),

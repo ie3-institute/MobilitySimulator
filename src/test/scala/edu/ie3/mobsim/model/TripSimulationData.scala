@@ -54,7 +54,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
   protected val half: ComparableQuantity[Energy] =
     Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR)
 
-  val ev1: ElectricVehicle = ElectricVehicle.buildEv(
+  def ev1: ElectricVehicle = ElectricVehicle.buildEv(
     "car_1",
     givenModel,
     givenHomePoi,
@@ -64,7 +64,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  val ev2: ElectricVehicle = ElectricVehicle.buildEv(
+  def ev2: ElectricVehicle = ElectricVehicle.buildEv(
     "car_2",
     givenModel,
     givenHomePoi,
@@ -74,7 +74,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  val ev3: ElectricVehicle = ElectricVehicle.buildEv(
+  def ev3: ElectricVehicle = ElectricVehicle.buildEv(
     "car_3",
     givenModel,
     givenHomePoi,
@@ -84,7 +84,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  val ev4: ElectricVehicle = ElectricVehicle.buildEv(
+  def ev4: ElectricVehicle = ElectricVehicle.buildEv(
     "car_4",
     givenModel,
     givenHomePoi,
@@ -94,7 +94,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  val ev5: ElectricVehicle = ElectricVehicle.buildEv(
+  def ev5: ElectricVehicle = ElectricVehicle.buildEv(
     "car_5",
     givenModel,
     givenHomePoi,
@@ -187,7 +187,8 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
       this.getClass.getResource("departure.csv").getFile,
       ","
     ) match {
-      case Success(value) => value
+      case Success(value)     => value
+      case Failure(exception) => throw exception
     }
   }
 
@@ -196,7 +197,8 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
       this.getClass.getResource("last_trip.csv").getFile,
       ","
     ) match {
-      case Success(value) => value
+      case Success(value)     => value
+      case Failure(exception) => throw exception
     }
   }
 
@@ -205,7 +207,8 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
       this.getClass.getResource("parking_time.csv").getFile,
       ","
     ) match {
-      case Success(value) => value
+      case Success(value)     => value
+      case Failure(exception) => throw exception
     }
   }
 
@@ -214,7 +217,8 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
       this.getClass.getResource("transition.csv").getFile,
       ","
     ) match {
-      case Success(value) => value
+      case Success(value)     => value
+      case Failure(exception) => throw exception
     }
   }
 
@@ -223,7 +227,8 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
       this.getClass.getResource("trip_distance.csv").getFile,
       ","
     ) match {
-      case Success(value) => value
+      case Success(value)     => value
+      case Failure(exception) => throw exception
     }
   }
 }
