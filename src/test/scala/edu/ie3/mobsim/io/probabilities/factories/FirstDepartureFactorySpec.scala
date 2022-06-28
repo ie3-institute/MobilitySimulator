@@ -40,7 +40,7 @@ class FirstDepartureFactorySpec extends UnitSpec {
 
         FirstDepartureFactory.getFromFile(path, ",") match {
           case Failure(exception) =>
-            exception.getMessage shouldBe "Unable to read from content from file. Available headline elements: 'uuid,minute_of_day,day_type,something_weird', required fields: 'uuid,minute_of_day,day_type,probability'"
+            exception.getMessage shouldBe "Unable to read from content from file. Available headline elements: 'uuid,day_type,minute_of_day,something_weird', required fields: 'uuid,day_type,minute_of_day,probability'"
           case Success(value) =>
             fail(s"Should fail, but succeeded with '$value'.")
         }

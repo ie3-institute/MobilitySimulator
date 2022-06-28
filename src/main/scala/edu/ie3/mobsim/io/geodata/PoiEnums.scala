@@ -23,7 +23,7 @@ object PoiEnums {
         case "charging_hub_town"    => CHARGING_HUB_TOWN
         case "charging_hub_highway" => CHARGING_HUB_HIGHWAY
         case malformed =>
-          throw new RuntimeException(s"PoiType '$malformed' not know")
+          throw new RuntimeException(s"PoiType '$malformed' not known")
       }
     }
   }
