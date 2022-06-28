@@ -41,7 +41,7 @@ trait ChargingBehaviorTestData extends TripSimulationData {
     destinationCategoricalLocation = CategoricalLocationDictionary.SPORTS,
     destinationPoi = sportsPoi,
     parkingTimeStart = ZonedDateTime.now(),
-    departureTime = ZonedDateTime.now().plusHours(5)
+    departureTime = ZonedDateTime.now().plusHours(1)
   )
 
   protected def evChargingNeeded: ElectricVehicle = ev4.copyWith(
