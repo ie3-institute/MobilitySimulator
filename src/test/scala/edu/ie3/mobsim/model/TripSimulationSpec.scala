@@ -225,9 +225,9 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
             PowerSystemUnits.KILOWATTHOUR
           )
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.SHOPPING
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.OTHER_SHOP
-          destinationPoi shouldBe other_shopPoi
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          destinationPoi shouldBe charging_hub_townPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(1).plusMinutes(1)
           chargingAtHomePossible shouldBe true
