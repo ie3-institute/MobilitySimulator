@@ -1,4 +1,4 @@
-﻿model,manufacturer,segment,battery [kWh],consume [kWh / 100 km],AC_Power [kW],DC_Power [kW]
+﻿model,manufacturer,segment,battery,consume,ac_power,dc_ower
 e-tron 55 quattro,Audi,SUV,86.5,23.7,11,155
 iX xDrive50,BMW,upper_medium_class_car,105.2,20.8,11,200
 i4 eDrive40,BMW,medium_class_car,80.7,17,11,200
