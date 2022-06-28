@@ -19,7 +19,6 @@ import tech.units.indriya.unit.Units
 
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable.TreeSet
 import scala.util.{Failure, Success}
 
 class PointOfInterestSpec extends UnitSpec with PoiTestData {

@@ -15,10 +15,7 @@ import edu.ie3.mobsim.exceptions.{
   SourceException,
   UninitializedException
 }
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities._
@@ -437,8 +434,8 @@ final class MobilitySimulator(
         Some((cs, Movement(cs, ev)))
       } else {
         logger.debug(
-          s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi.id} " +
-            s"(${PoiTypeDictionary(ev.getDestinationPoiType)}) because all charging points " +
+          s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi} " +
+            s"(${ev.getDestinationPoiType}) because all charging points " +
             s"at $cs were taken."
         )
         None
