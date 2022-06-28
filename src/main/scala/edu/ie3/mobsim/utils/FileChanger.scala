@@ -91,7 +91,7 @@ object FileChanger extends App {
     val targetPath =
       Seq(probabilityDir, "departure.csv").mkString(JavaFile.separator)
     val targetHeader =
-      Seq("uuid", "minute_of_day", "day_type", "probability")
+      Seq("uuid", "day_type", "minute_of_day", "probability")
 
     mergeFiles(sources, targetPath, targetHeader)
   }
@@ -549,7 +549,14 @@ object FileChanger extends App {
     /* Map the field names */
     val updatedEntityFieldData =
       entityFieldData.map { case (key, value) =>
-        fieldNameMapping.getOrElse(key, key) -> value
+        fieldNameMapping.getOrElse(key, key) -> {
+          value match {
+            case "othershop"          => "other_shop"
+            case "charginghubtown"    => "charging_hub_town"
+            case "charginghubhighway" => "charging_hub_highway"
+            case _                    => value
+          }
+        }
       }
 
     /* Add missing data */
