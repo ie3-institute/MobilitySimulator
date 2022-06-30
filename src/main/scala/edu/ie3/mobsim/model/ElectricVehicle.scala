@@ -144,8 +144,12 @@ case class ElectricVehicle(
     copy(chosenChargingStation = chargingStation)
   }
 
-  def setChargingAtSimona(isCharging: Boolean): ElectricVehicle = {
-    copy(chargingAtSimona = isCharging)
+  def setChargingAtSimona(): ElectricVehicle = {
+    copy(chargingAtSimona = true)
+  }
+
+  def removeChargingAtSimona(): ElectricVehicle = {
+    copy(chargingAtSimona = false)
   }
 
   def setFinalDestinationPoi(

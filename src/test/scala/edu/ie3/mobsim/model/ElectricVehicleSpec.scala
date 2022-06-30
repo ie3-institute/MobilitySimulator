@@ -297,13 +297,13 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
         evEmpty.getStoredEnergy shouldBe zero
       }
 
-      "copy object with new charging station" in {
+      "copy object with updated charging at simona information" in {
         val evChargingAtSimona: ElectricVehicle =
-          evWithHomeCharging.setChargingAtSimona(true)
+          evWithHomeCharging.setChargingAtSimona()
         evChargingAtSimona.isChargingAtSimona shouldBe true
 
         val evNotChargingAtSimona: ElectricVehicle =
-          evWithHomeCharging.setChargingAtSimona(false)
+          evWithHomeCharging.removeChargingAtSimona()
         evNotChargingAtSimona.isChargingAtSimona shouldBe false
       }
 

@@ -305,7 +305,7 @@ final class MobilitySimulator(
         cs -> movement
       } match {
         case result @ Some(_) =>
-          ev.setChargingAtSimona(false)
+          ev.removeChargingAtSimona()
           ev.setChosenChargingStation(None)
           result
         case result @ None =>
@@ -424,7 +424,7 @@ final class MobilitySimulator(
       val availableChargingPointsAtStation: Integer =
         availableChargingPoints.getOrElse(cs, 0)
       if (availableChargingPointsAtStation > 0) {
-        ev.setChargingAtSimona(true)
+        ev.setChargingAtSimona()
         ev.setChosenChargingStation(Some(cs))
 
         logger.debug(
