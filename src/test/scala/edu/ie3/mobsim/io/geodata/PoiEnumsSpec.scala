@@ -29,8 +29,8 @@ class PoiEnumsSpec
         ("shopping", PoiTypeDictionary.SHOPPING),
         ("leisure", PoiTypeDictionary.LEISURE),
         ("other", PoiTypeDictionary.OTHER),
-        ("charginghubtown", PoiTypeDictionary.CHARGING_HUB_TOWN),
-        ("charginghubhighway", PoiTypeDictionary.CHARGING_HUB_HIGHWAY)
+        ("charging_hub_town", PoiTypeDictionary.CHARGING_HUB_TOWN),
+        ("charging_hub_highway", PoiTypeDictionary.CHARGING_HUB_HIGHWAY)
       )
 
       forAll(cases) { (poiType, expectedResult) =>
@@ -44,7 +44,7 @@ class PoiEnumsSpec
         PoiTypeDictionary.apply("wrong_poi")
       }
 
-      exception.getMessage shouldBe "POI not known"
+      exception.getMessage shouldBe "PoiType 'wrong_poi' not known"
     }
 
     // testing PoiTypeDictionary.apply(categoricalLocation: CategoricalLocationDictionary.Value)
@@ -87,16 +87,16 @@ class PoiEnumsSpec
         ("work", CategoricalLocationDictionary.WORK),
         ("supermarket", CategoricalLocationDictionary.SUPERMARKET),
         ("services", CategoricalLocationDictionary.SERVICES),
-        ("othershop", CategoricalLocationDictionary.OTHER_SHOP),
+        ("other_shop", CategoricalLocationDictionary.OTHER_SHOP),
         ("medicinal", CategoricalLocationDictionary.MEDICINAL),
         ("bbpg", CategoricalLocationDictionary.BBPG),
         ("restaurant", CategoricalLocationDictionary.RESTAURANT),
         ("culture", CategoricalLocationDictionary.CULTURE),
         ("sports", CategoricalLocationDictionary.SPORTS),
         ("religious", CategoricalLocationDictionary.RELIGIOUS),
-        ("charginghubtown", CategoricalLocationDictionary.CHARGING_HUB_TOWN),
+        ("charging_hub_town", CategoricalLocationDictionary.CHARGING_HUB_TOWN),
         (
-          "charginghubhighway",
+          "charging_hub_highway",
           CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
         )
       )

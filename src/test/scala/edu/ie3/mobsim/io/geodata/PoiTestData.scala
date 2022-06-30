@@ -18,7 +18,7 @@ import edu.ie3.util.quantities.PowerSystemUnits
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.{METRE, PASCAL, PERCENT}
+import tech.units.indriya.unit.Units.METRE
 
 import java.util.UUID
 import javax.measure.quantity.Length
@@ -145,7 +145,7 @@ trait PoiTestData {
 
   protected val other_shopPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("dda899fb-e085-479d-b3a9-cba594770a2b"),
-    "othershop_251193227",
+    "other_shop_251193227",
     PoiTypeDictionary.SHOPPING,
     CategoricalLocationDictionary.OTHER_SHOP,
     new Coordinate(7.3682537, 51.4935477),

@@ -1,2 +1,2 @@
-uuid,minute_of_day,day_type,probability
-4df0614d-0c01-4b31-af94-804e299f2686,0,friyay,0.01042
+uuid,day_type,minute_of_day,probability
+4df0614d-0c01-4b31-af94-804e299f2686,friyay,0,0.01042
