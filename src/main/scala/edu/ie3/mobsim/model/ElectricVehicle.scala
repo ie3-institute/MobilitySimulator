@@ -138,7 +138,9 @@ case class ElectricVehicle(
       departureTime = departureTime
     )
 
-  def setChosenChargingStation(chargingStation: Option[UUID]): ElectricVehicle = {
+  def setChosenChargingStation(
+      chargingStation: Option[UUID]
+  ): ElectricVehicle = {
     copy(chosenChargingStation = chargingStation)
   }
 
@@ -146,7 +148,9 @@ case class ElectricVehicle(
     copy(chargingAtSimona = isCharging)
   }
 
-  def setFinalDestinationPoi(destinationPoi: Option[PointOfInterest]): ElectricVehicle = {
+  def setFinalDestinationPoi(
+      destinationPoi: Option[PointOfInterest]
+  ): ElectricVehicle = {
     copy(finalDestinationPoi = destinationPoi)
   }
 

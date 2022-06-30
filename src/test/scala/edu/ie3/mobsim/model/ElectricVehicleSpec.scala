@@ -6,7 +6,10 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
@@ -284,28 +287,33 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
       }
 
       "copy object with new stored energy" in {
-        val evFull: ElectricVehicle = evWithHomeCharging.copyWith(evWithHomeCharging.getStoredEnergy)
+        val evFull: ElectricVehicle =
+          evWithHomeCharging.copyWith(evWithHomeCharging.getStoredEnergy)
         evFull.getStoredEnergy shouldBe givenModel.capacity
 
-
-        val zero: ComparableQuantity[Energy] = Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
+        val zero: ComparableQuantity[Energy] =
+          Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
         val evEmpty: ElectricVehicle = evWithHomeCharging.copyWith(zero)
         evEmpty.getStoredEnergy shouldBe zero
       }
 
       "copy object with new charging station" in {
-        val evChargingAtSimona: ElectricVehicle = evWithHomeCharging.setChargingAtSimona(true)
+        val evChargingAtSimona: ElectricVehicle =
+          evWithHomeCharging.setChargingAtSimona(true)
         evChargingAtSimona.isChargingAtSimona shouldBe true
 
-        val evNotChargingAtSimona: ElectricVehicle = evWithHomeCharging.setChargingAtSimona(false)
+        val evNotChargingAtSimona: ElectricVehicle =
+          evWithHomeCharging.setChargingAtSimona(false)
         evNotChargingAtSimona.isChargingAtSimona shouldBe false
       }
 
       "copy object with chosen charging station" in {
-        val evSetChargingStation: ElectricVehicle = evWithHomeCharging.setChosenChargingStation(Some(cs6.getUuid))
+        val evSetChargingStation: ElectricVehicle =
+          evWithHomeCharging.setChosenChargingStation(Some(cs6.getUuid))
         evSetChargingStation.getChosenChargingStation shouldBe Some(cs6.getUuid)
 
-        val evNoChargingStation: ElectricVehicle = evWithHomeCharging.setChosenChargingStation(None)
+        val evNoChargingStation: ElectricVehicle =
+          evWithHomeCharging.setChosenChargingStation(None)
         evNoChargingStation.getChosenChargingStation shouldBe None
       }
     }
