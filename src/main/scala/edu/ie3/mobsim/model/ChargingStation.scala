@@ -24,7 +24,7 @@ case class ChargingStation(
     private val evcsType: ChargingPointType,
     private val evcsLocationType: EvcsLocationType,
     private val chargingPoints: Int,
-    private var homeChargingStationAssignedToPOI: Boolean
+    private val homeChargingStationAssignedToPOI: Boolean
 ) {
 
   def getUuid: UUID = uuid
@@ -36,7 +36,7 @@ case class ChargingStation(
     homeChargingStationAssignedToPOI
 
   def setHomeChargingStationAssignedToPOI(assigned: Boolean): Unit = {
-    homeChargingStationAssignedToPOI = assigned
+    copy(homeChargingStationAssignedToPOI = assigned)
   }
 
 }

@@ -47,17 +47,17 @@ case class ElectricVehicle(
     private val homePoi: PointOfInterest,
     private val workPoi: PointOfInterest,
     private val storedEnergy: ComparableQuantity[Energy],
-    private var destinationPoi: PointOfInterest,
-    private var parkingTimeStart: ZonedDateTime,
-    private var departureTime: ZonedDateTime,
+    private val destinationPoi: PointOfInterest,
+    private val parkingTimeStart: ZonedDateTime,
+    private val departureTime: ZonedDateTime,
     private val chargingAtHomePossible: Boolean,
-    private var chosenChargingStation: Option[UUID],
-    private var chargingAtSimona: Boolean,
-    private var finalDestinationPoi: Option[PointOfInterest],
-    private var remainingDistanceAfterChargingHub: Option[
+    private val chosenChargingStation: Option[UUID],
+    private val chargingAtSimona: Boolean,
+    private val finalDestinationPoi: Option[PointOfInterest],
+    private val remainingDistanceAfterChargingHub: Option[
       ComparableQuantity[Length]
     ],
-    private var chargingPricesMemory: mutable.Queue[Double]
+    private val chargingPricesMemory: mutable.Queue[Double]
 ) extends EvModel
     with Ordered[ElectricVehicle] {
 
@@ -139,21 +139,21 @@ case class ElectricVehicle(
     )
 
   def setChosenChargingStation(chargingStation: Option[UUID]): Unit = {
-    chosenChargingStation = chargingStation
+    copy(chosenChargingStation = chargingStation)
   }
 
   def setChargingAtSimona(isCharging: Boolean): Unit = {
-    chargingAtSimona = isCharging
+    copy(chargingAtSimona = isCharging)
   }
 
   def setFinalDestinationPoi(destinationPoi: Option[PointOfInterest]): Unit = {
-    finalDestinationPoi = destinationPoi
+    copy(finalDestinationPoi = destinationPoi)
   }
 
   def setRemainingDistanceAfterChargingHub(
       remainingDistance: Option[ComparableQuantity[Length]]
   ): Unit = {
-    remainingDistanceAfterChargingHub = remainingDistance
+    copy(remainingDistanceAfterChargingHub = remainingDistance)
   }
 
   def updateChargingPricesMemory(newPrice: Double): mutable.Queue[Double] = {
