@@ -762,8 +762,6 @@ object TripSimulation extends LazyLogging {
     val newParkingTimeStart: ZonedDateTime =
       currentTime.plusMinutes(newDrivingTime)
 
-    val newDestinationPoiType: PoiTypeDictionary.Value = chargingHubPoiType
-
     val newDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
       PoiEnums.CategoricalLocationDictionary(chargingHubPoiType)
     /* Sample destination POI */
@@ -870,8 +868,6 @@ object TripSimulation extends LazyLogging {
         .doubleValue() * 60)).toInt,
       1
     )
-
-    val newDestinationPoiType: PoiTypeDictionary.Value = chargingHubPoiType
 
     val newDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
       PoiEnums.CategoricalLocationDictionary(chargingHubPoiType)

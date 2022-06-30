@@ -72,20 +72,16 @@ class TripSimulationSpec
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          ev.getDestinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-          ev.getDestinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          destinationPoi.poiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          ev.getFinalDestinationPoiType shouldBe Some(
-            plannedDestinationPoi.poiType
-          )
-          finalDestinationPoi shouldBe Some(plannedDestinationPoi)
-          remainingDistanceAfterChargingHub shouldBe Some(
-            Quantities.getQuantity(-7000, METRE)
-          )
+          finalDestinationPoi.map(_.poiType) shouldBe None
+          finalDestinationPoi shouldBe None
+          remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
@@ -139,20 +135,16 @@ class TripSimulationSpec
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          ev.getDestinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-          ev.getDestinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          destinationPoi.poiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          ev.getFinalDestinationPoiType shouldBe Some(
-            plannedDestinationPoi.poiType
-          )
-          finalDestinationPoi shouldBe Some(plannedDestinationPoi)
-          remainingDistanceAfterChargingHub shouldBe Some(
-            Quantities.getQuantity(10000, METRE)
-          )
+          finalDestinationPoi.map(_.poiType) shouldBe None
+          finalDestinationPoi shouldBe None
+          remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
