@@ -46,10 +46,6 @@ object PoiEnums {
           CHARGING_HUB_TOWN
         case CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY =>
           CHARGING_HUB_HIGHWAY
-        case malformed =>
-          throw new RuntimeException(
-            s"CategoricalLocation '$malformed' could not be applied to PoiTypeDictionary"
-          )
       }
     }
   }
