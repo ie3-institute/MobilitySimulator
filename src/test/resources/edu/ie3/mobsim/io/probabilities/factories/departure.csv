@@ -1,4 +1,4 @@
-uuid,minute_of_day,day_type,probability
-4df0614d-0c01-4b31-af94-804e299f2686,0,weekday,0.01042
-b8884957-da6c-42f4-a1ad-3567cca52942,0,saturday,0.01042
-554e5e47-2dd3-4f31-996b-a2c9c12b10a1,0,sunday,0.01042
+uuid,day_type,minute_of_day,probability
+4df0614d-0c01-4b31-af94-804e299f2686,weekday,0,0.01042
+b8884957-da6c-42f4-a1ad-3567cca52942,saturday,0,0.01042
+554e5e47-2dd3-4f31-996b-a2c9c12b10a1,sunday,0,0.01042

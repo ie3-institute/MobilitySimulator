@@ -19,13 +19,13 @@ import scala.util.{Failure, Success, Try}
 
 object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
   private val uuid = "uuid"
-  private val quarterHour = "quarter_hour_of_day"
   private val dayType = "day_type"
+  private val quarterHour = "quarter_hour_of_day"
   private val fromPoi = "from"
   private val toPoi = "to"
   private val probability = "probability"
   override protected val requiredFields: Seq[String] =
-    Seq(uuid, quarterHour, dayType, fromPoi, toPoi, probability)
+    Seq(uuid, dayType, quarterHour, fromPoi, toPoi, probability)
 
   /** Build the desired instance from a collection of entity field data
     *

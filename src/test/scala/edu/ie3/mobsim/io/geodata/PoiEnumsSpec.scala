@@ -40,7 +40,7 @@ class PoiEnumsSpec extends UnitSpec {
         PoiTypeDictionary.apply("wrong_poi")
       }
 
-      exception.getMessage shouldBe "POI not known"
+      exception.getMessage shouldBe "PoiType 'wrong_poi' not known"
     }
 
     // testing CategoricalLocationDictionary.apply(token: String)
