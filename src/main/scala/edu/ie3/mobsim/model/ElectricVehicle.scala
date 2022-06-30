@@ -138,21 +138,21 @@ case class ElectricVehicle(
       departureTime = departureTime
     )
 
-  def setChosenChargingStation(chargingStation: Option[UUID]): Unit = {
+  def setChosenChargingStation(chargingStation: Option[UUID]): ElectricVehicle = {
     copy(chosenChargingStation = chargingStation)
   }
 
-  def setChargingAtSimona(isCharging: Boolean): Unit = {
+  def setChargingAtSimona(isCharging: Boolean): ElectricVehicle = {
     copy(chargingAtSimona = isCharging)
   }
 
-  def setFinalDestinationPoi(destinationPoi: Option[PointOfInterest]): Unit = {
+  def setFinalDestinationPoi(destinationPoi: Option[PointOfInterest]): ElectricVehicle = {
     copy(finalDestinationPoi = destinationPoi)
   }
 
   def setRemainingDistanceAfterChargingHub(
       remainingDistance: Option[ComparableQuantity[Length]]
-  ): Unit = {
+  ): ElectricVehicle = {
     copy(remainingDistanceAfterChargingHub = remainingDistance)
   }
 

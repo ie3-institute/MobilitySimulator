@@ -6,19 +6,18 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
+import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units
 
+import javax.measure.quantity.Energy
 import scala.collection.mutable
 
-class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
+class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
   "Building and assigning evs" when {
 
     "building the car models" should {
@@ -30,7 +29,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          true
+          isChargingAtHomePossible = true
         )
 
         ev match {
@@ -64,8 +63,8 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
             acChargingPower shouldBe givenModel.acPower
             dcChargingPower shouldBe givenModel.dcPower
             consumption shouldBe givenModel.consumption
-            homePoi shouldBe givenHomePoi
-            workPoi shouldBe givenWorkPoi
+            homePoi shouldBe ev.getHomePOI
+            workPoi shouldBe ev.getWorkPOI
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
             ev.getDestinationPoiType shouldBe PoiTypeDictionary.HOME
@@ -92,7 +91,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
             model.getSRatedDC shouldBe givenModel.acPower
@@ -107,7 +106,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenSimulationStart,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
             model.getDepartureTime shouldBe givenSimulationStart.plusMinutes(1L)
@@ -275,6 +274,39 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
               _.isChargingAtHomePossible
             ) shouldBe expectedAmountOfHomeCharging
         }
+      }
+    }
+
+    "An electricVehicle" should {
+      "check if home charging is possible" in {
+        evWithHomeCharging.isChargingAtHomePossible shouldBe true
+        evWithoutHomeCharging.isChargingAtHomePossible shouldBe false
+      }
+
+      "copy object with new stored energy" in {
+        val evFull: ElectricVehicle = evWithHomeCharging.copyWith(evWithHomeCharging.getStoredEnergy)
+        evFull.getStoredEnergy shouldBe givenModel.capacity
+
+
+        val zero: ComparableQuantity[Energy] = Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
+        val evEmpty: ElectricVehicle = evWithHomeCharging.copyWith(zero)
+        evEmpty.getStoredEnergy shouldBe zero
+      }
+
+      "copy object with new charging station" in {
+        val evChargingAtSimona: ElectricVehicle = evWithHomeCharging.setChargingAtSimona(true)
+        evChargingAtSimona.isChargingAtSimona shouldBe true
+
+        val evNotChargingAtSimona: ElectricVehicle = evWithHomeCharging.setChargingAtSimona(false)
+        evNotChargingAtSimona.isChargingAtSimona shouldBe false
+      }
+
+      "copy object with chosen charging station" in {
+        val evSetChargingStation: ElectricVehicle = evWithHomeCharging.setChosenChargingStation(Some(cs6.getUuid))
+        evSetChargingStation.getChosenChargingStation shouldBe Some(cs6.getUuid)
+
+        val evNoChargingStation: ElectricVehicle = evWithHomeCharging.setChosenChargingStation(None)
+        evNoChargingStation.getChosenChargingStation shouldBe None
       }
     }
   }

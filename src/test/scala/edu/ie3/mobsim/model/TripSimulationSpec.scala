@@ -18,7 +18,6 @@ import scala.collection.mutable
 
 class TripSimulationSpec
     extends UnitSpec
-    with ElectricVehicleTestData
     with TripSimulationData {
 
   "The TripSimulation" should {
@@ -62,8 +61,8 @@ class TripSimulationSpec
             ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev.getUuid
-          id shouldBe "test_car"
-          model shouldBe "cool_producer cool_model"
+          id shouldBe ev.getId
+          model shouldBe ev.getModel
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
           dcChargingPower shouldBe givenModel.dcPower
@@ -81,7 +80,7 @@ class TripSimulationSpec
           chosenChargingStation shouldBe None
           finalDestinationPoi.map(_.poiType) shouldBe None
           finalDestinationPoi shouldBe None
-          remainingDistanceAfterChargingHub shouldBe None
+          remainingDistanceAfterChargingHub shouldBe ev.getRemainingDistanceAfterChargingHub
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
