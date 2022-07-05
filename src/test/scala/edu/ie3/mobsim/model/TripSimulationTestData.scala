@@ -46,7 +46,7 @@ import java.time.ZonedDateTime
 import javax.measure.quantity.{Energy, Length}
 import scala.util.{Failure, Success}
 
-trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
+trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   private val isChargingAtHomePossible: Boolean = true
 
   protected val zero: ComparableQuantity[Energy] =
@@ -143,17 +143,6 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     ProbabilityDensityFunction[PointOfInterest]
   ] = PoiUtils.createPoiPdf(
     pois.map { poi =>
-      poi.categoricalLocation -> Set(poi)
-    }.toMap
-  )
-
-  private val nextPoi: Set[PointOfInterest] = Seq(other_shopPoi).toSet
-
-  protected val nextDestinationPoi: Map[
-    PoiEnums.CategoricalLocationDictionary.Value,
-    ProbabilityDensityFunction[PointOfInterest]
-  ] = PoiUtils.createPoiPdf(
-    nextPoi.map { poi =>
       poi.categoricalLocation -> Set(poi)
     }.toMap
   )

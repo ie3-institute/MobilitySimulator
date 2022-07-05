@@ -14,7 +14,7 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import scala.util.Random
 
-trait ChargingBehaviorTestData extends TripSimulationData {
+trait ChargingBehaviorTestData extends TripSimulationTestData {
 
   protected def evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
@@ -37,9 +37,9 @@ trait ChargingBehaviorTestData extends TripSimulationData {
 
   protected def evNextTrip: ElectricVehicle = ev3.copyWith(
     ev3.getEStorage,
-    destinationPoiType = PoiTypeDictionary.LEISURE,
-    destinationCategoricalLocation = CategoricalLocationDictionary.SPORTS,
-    destinationPoi = sportsPoi,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
+    destinationCategoricalLocation = CategoricalLocationDictionary.OTHER_SHOP,
+    destinationPoi = other_shopPoi,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
