@@ -176,8 +176,10 @@ final class MobilitySimulator(
       updatedChargingPoints,
       maxDistance
     )
-    arrivals.foreach { case Movement(cs, ev) =>
-      builder.addArrival(cs, ev)
+    arrivals.foreach { case Movement(cs, updatedEv) =>
+      builder.addArrival(cs, updatedEv)
+
+      updateElectricVehicle(Movement(cs, updatedEv))
     }
     val finalTakenChargingPoints =
       updateFreeLots(updatedChargingPoints, takenChargingPoints)
@@ -212,16 +214,15 @@ final class MobilitySimulator(
       evs: SortedSet[ElectricVehicle],
       currentTime: ZonedDateTime
   ): (SortedSet[ElectricVehicle], SortedSet[ElectricVehicle]) = {
-    val isParking = (ev: ElectricVehicle) =>
-      ev.getParkingTimeStart == currentTime
+    val isParking = (ev: ElectricVehicle) => ev.parkingTimeStart == currentTime
     /* Relevant are only cars, that depart AND that are charging at a suitable charging station in SIMONA */
     val isDeparting = (ev: ElectricVehicle) =>
-      ev.getDepartureTime == currentTime && ev.isChargingAtSimona && ev.getChosenChargingStation.isDefined
+      ev.departureTime == currentTime && ev.chargingAtSimona && ev.chosenChargingStation.isDefined
     evs.par
       .filter { ev =>
         isDeparting(ev) || isParking(ev)
       }
-      .partition(_.getParkingTimeStart == currentTime) match {
+      .partition(_.parkingTimeStart == currentTime) match {
       case (arrivals, departures) =>
         (TreeSet.from(arrivals), TreeSet.from(departures))
     }
@@ -245,8 +246,10 @@ final class MobilitySimulator(
   ): Map[UUID, Integer] = {
     val (additionallyFreeChargingPoints, departures) =
       handleDepartingEvs(evs)
-    departures.foreach { case Movement(cs, ev) =>
-      builder.addDeparture(cs, ev.getUuid)
+    departures.foreach { case Movement(cs, updatedEv) =>
+      builder.addDeparture(cs, updatedEv.getUuid)
+
+      updateElectricVehicle(Movement(cs, updatedEv))
     }
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
@@ -296,7 +299,7 @@ final class MobilitySimulator(
   ): Future[Option[(UUID, Movement)]] =
     Future {
       /* Determine the charging station, the car currently is connected to */
-      ev.getChosenChargingStation.map { cs =>
+      ev.chosenChargingStation.map { cs =>
         /* Register departure */
         val movement = MobilitySimulator.Movement(cs, ev)
         logger.debug(
@@ -305,9 +308,12 @@ final class MobilitySimulator(
         cs -> movement
       } match {
         case result @ Some(_) =>
-          ev.removeChargingAtSimona()
-          ev.setChosenChargingStation(None)
-          result
+          var updatedEv: ElectricVehicle = ev.removeChargingAtSimona()
+          updatedEv = updatedEv.setChosenChargingStation(None)
+
+          val cs: UUID = result.value._1
+
+          Some(cs, MobilitySimulator.Movement(cs, updatedEv))
         case result @ None =>
           logger.warn(
             s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
@@ -424,17 +430,17 @@ final class MobilitySimulator(
       val availableChargingPointsAtStation: Integer =
         availableChargingPoints.getOrElse(cs, 0)
       if (availableChargingPointsAtStation > 0) {
-        ev.setChargingAtSimona()
-        ev.setChosenChargingStation(Some(cs))
+        var updatedEv: ElectricVehicle = ev.setChargingAtSimona()
+        updatedEv = updatedEv.setChosenChargingStation(Some(cs))
 
         logger.debug(
           s"${ev.getId} starts charging at $cs."
         )
 
-        Some((cs, Movement(cs, ev)))
+        Some((cs, Movement(cs, updatedEv)))
       } else {
         logger.debug(
-          s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi} " +
+          s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
             s"(${ev.getDestinationPoiType}) because all charging points " +
             s"at $cs were taken."
         )
@@ -488,7 +494,7 @@ final class MobilitySimulator(
   ): Unit = {
 
     val allDepartedEvs: Set[UUID] = electricVehicles
-      .filter(_.getDepartureTime == currentTime)
+      .filter(_.departureTime == currentTime)
       .map(filteredEv => filteredEv.getUuid)
 
     electricVehicles = electricVehicles.map(ev => {
@@ -544,18 +550,18 @@ final class MobilitySimulator(
 
     val nextEvent: ZonedDateTime = evs.foldLeft(currentTime.plusYears(1))(
       (earliestEvent: ZonedDateTime, ev: ElectricVehicle) => {
-        val earlierEvent = if (ev.getParkingTimeStart.isAfter(currentTime)) {
+        val earlierEvent = if (ev.parkingTimeStart.isAfter(currentTime)) {
           Seq(
             earliestEvent,
-            ev.getParkingTimeStart,
-            ev.getDepartureTime
+            ev.parkingTimeStart,
+            ev.departureTime
           ).minOption.getOrElse(
             throw new IllegalArgumentException(
               "Unable to determine the earlier time"
             )
           )
         } else {
-          Seq(earliestEvent, ev.getDepartureTime).minOption.getOrElse(
+          Seq(earliestEvent, ev.departureTime).minOption.getOrElse(
             throw new IllegalArgumentException(
               "Unable to determine the earlier time"
             )
@@ -573,6 +579,16 @@ final class MobilitySimulator(
     )
 
     timeUntilNextEvent
+  }
+
+  private def updateElectricVehicle(movement: Movement): Unit = {
+    val updatedEv: ElectricVehicle = movement.ev
+
+    electricVehicles.zipWithIndex.par.foreach { sortedEv =>
+      if (sortedEv._1.uuid.equals(updatedEv.uuid)) {
+        electricVehicles.drop(sortedEv._2) + updatedEv
+      }
+    }
   }
 }
 
@@ -755,7 +771,7 @@ object MobilitySimulator
     logger.info(
       s"Created ${evs.size} EVs in ${"%.2f"
         .format((System.currentTimeMillis() - start) / 1000d)} s, of which ${evs
-        .count(_.isChargingAtHomePossible)} can charge at home."
+        .count(_.chargingAtHomePossible)} can charge at home."
     )
 
     /* Calculate and print total number of charging points at charging stations */

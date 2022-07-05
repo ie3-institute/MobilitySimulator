@@ -66,12 +66,12 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
             acChargingPower shouldBe givenModel.acPower
             dcChargingPower shouldBe givenModel.dcPower
             consumption shouldBe givenModel.consumption
-            homePoi shouldBe ev.getHomePOI
-            workPoi shouldBe ev.getWorkPOI
+            homePoi shouldBe ev.homePoi
+            workPoi shouldBe ev.workPoi
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
-            ev.getDestinationPoiType shouldBe PoiTypeDictionary.HOME
-            ev.getDestinationCategoricalLocation shouldBe CategoricalLocationDictionary.HOME
+            ev.destinationPoi.getPoiType shouldBe PoiTypeDictionary.HOME
+            ev.destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.HOME
             destinationPoi shouldBe givenHomePoi
             parkingTimeStart shouldBe simulationStart
             departureTime shouldBe givenFirstDeparture
@@ -112,7 +112,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
           isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
-            model.getDepartureTime shouldBe givenSimulationStart.plusMinutes(1L)
+            model.departureTime shouldBe givenSimulationStart.plusMinutes(1L)
         }
       }
     }
@@ -225,7 +225,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
 
             additionalCars should have size expectedOverallAmount
             additionalCars.count(
-              _.isChargingAtHomePossible
+              _.chargingAtHomePossible
             ) shouldBe expectedHomeChargingAmount
         }
       }
@@ -274,7 +274,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
 
             evs should have size targetAmount
             evs.count(
-              _.isChargingAtHomePossible
+              _.chargingAtHomePossible
             ) shouldBe expectedAmountOfHomeCharging
         }
       }
@@ -282,8 +282,8 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
 
     "An electricVehicle" should {
       "check if home charging is possible" in {
-        evWithHomeCharging.isChargingAtHomePossible shouldBe true
-        evWithoutHomeCharging.isChargingAtHomePossible shouldBe false
+        evWithHomeCharging.chargingAtHomePossible shouldBe true
+        evWithoutHomeCharging.chargingAtHomePossible shouldBe false
       }
 
       "copy object with new stored energy" in {
@@ -300,21 +300,21 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationData {
       "copy object with updated charging at simona information" in {
         val evChargingAtSimona: ElectricVehicle =
           evWithHomeCharging.setChargingAtSimona()
-        evChargingAtSimona.isChargingAtSimona shouldBe true
+        evChargingAtSimona.chargingAtSimona shouldBe true
 
         val evNotChargingAtSimona: ElectricVehicle =
           evWithHomeCharging.removeChargingAtSimona()
-        evNotChargingAtSimona.isChargingAtSimona shouldBe false
+        evNotChargingAtSimona.chargingAtSimona shouldBe false
       }
 
       "copy object with chosen charging station" in {
         val evSetChargingStation: ElectricVehicle =
           evWithHomeCharging.setChosenChargingStation(Some(cs6.getUuid))
-        evSetChargingStation.getChosenChargingStation shouldBe Some(cs6.getUuid)
+        evSetChargingStation.chosenChargingStation shouldBe Some(cs6.getUuid)
 
         val evNoChargingStation: ElectricVehicle =
           evWithHomeCharging.setChosenChargingStation(None)
-        evNoChargingStation.getChosenChargingStation shouldBe None
+        evNoChargingStation.chosenChargingStation shouldBe None
       }
     }
   }

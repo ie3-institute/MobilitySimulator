@@ -22,7 +22,7 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
     // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
 
-      TripSimulation.makeTripToChargingHub(
+      val updatedEv: ElectricVehicle = TripSimulation.makeTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
         ev,
         givenSimulationStart,
@@ -31,10 +31,11 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
         0.2,
         Quantities.getQuantity(1000, METRE),
         plannedDestinationPoi,
-        PoiTypeDictionary.WORK,
         chargingStations,
         speed
-      ) match {
+      )
+
+      updatedEv match {
         case ElectricVehicle(
               simulationStart,
               uuid,
@@ -60,7 +61,7 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev.getUuid
           id shouldBe ev.getId
-          model shouldBe ev.getModel
+          model shouldBe ev.model
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
           dcChargingPower shouldBe givenModel.dcPower
@@ -69,16 +70,16 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoi.poiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationPoi.getPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
-          destinationPoi shouldBe plannedDestinationPoi
+          destinationPoi shouldBe charging_hub_townPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi.map(_.poiType) shouldBe None
-          finalDestinationPoi shouldBe None
-          remainingDistanceAfterChargingHub shouldBe ev.getRemainingDistanceAfterChargingHub
+          finalDestinationPoi.map(_.getPoiType) shouldBe Some(supermarketPoi.getPoiType)
+          finalDestinationPoi shouldBe Some(supermarketPoi)
+          remainingDistanceAfterChargingHub shouldBe Some(Quantities.getQuantity(-7000, METRE))
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
@@ -86,7 +87,7 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
     // testing makeModifiedTripToChargingHub
     "makeModifiedTripToChargingHub correctly" in {
 
-      TripSimulation.makeModifiedTripToChargingHub(
+      val updatedEv: ElectricVehicle = TripSimulation.makeModifiedTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
         ev,
         givenSimulationStart,
@@ -94,10 +95,11 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
         0.2,
         Quantities.getQuantity(1000, METRE),
         plannedDestinationPoi,
-        PoiTypeDictionary.WORK,
         chargingStations,
         speed
-      ) match {
+      )
+
+      updatedEv match {
         case ElectricVehicle(
               simulationStart,
               uuid,
@@ -122,8 +124,8 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
             ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev.getUuid
-          id shouldBe "test_car"
-          model shouldBe "cool_producer cool_model"
+          id shouldBe ev.id
+          model shouldBe ev.model
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
           dcChargingPower shouldBe givenModel.dcPower
@@ -132,16 +134,16 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoi.poiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationPoi.getPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
-          destinationPoi shouldBe plannedDestinationPoi
+          destinationPoi shouldBe charging_hub_townPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi.map(_.poiType) shouldBe None
-          finalDestinationPoi shouldBe None
-          remainingDistanceAfterChargingHub shouldBe None
+          finalDestinationPoi.map(_.getPoiType) shouldBe Some(supermarketPoi.getPoiType)
+          finalDestinationPoi shouldBe Some(supermarketPoi)
+          remainingDistanceAfterChargingHub shouldBe Some(Quantities.getQuantity(10000, METRE))
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }

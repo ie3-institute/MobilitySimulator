@@ -46,7 +46,6 @@ import scala.jdk.CollectionConverters._
 final case class PointOfInterest(
     uuid: UUID,
     id: String,
-    poiType: PoiTypeDictionary.Value,
     categoricalLocation: CategoricalLocationDictionary.Value,
     geoPosition: Coordinate,
     size: Double,
@@ -57,6 +56,9 @@ final case class PointOfInterest(
     else if (this.id > that.id) 1
     else -1
   }
+
+  def getPoiType: PoiTypeDictionary.Value =
+    PoiTypeDictionary.apply(categoricalLocation)
 }
 
 case object PointOfInterest {
@@ -210,7 +212,6 @@ case object PointOfInterest {
           val poi = PointOfInterest(
             uuid,
             identifier,
-            PoiTypeDictionary.apply(catLoc),
             catLoc,
             coordinate,
             sze,
@@ -352,7 +353,6 @@ case object PointOfInterest {
     new PointOfInterest(
       uuid,
       identifier,
-      PoiTypeDictionary.apply(catLoc),
       catLoc,
       coordinate,
       sze,

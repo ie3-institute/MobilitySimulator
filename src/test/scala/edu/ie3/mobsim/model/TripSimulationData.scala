@@ -55,7 +55,7 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     charging_hub_highwayPoi
   )
 
-  protected val plannedDestinationPoi: PointOfInterest = poiData(11)
+  protected val plannedDestinationPoi: PointOfInterest = poiData(10)
 
   protected val pois: Set[PointOfInterest] = poiData.toSet
 

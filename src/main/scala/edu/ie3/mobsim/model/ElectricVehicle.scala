@@ -9,16 +9,10 @@ package edu.ie3.mobsim.model
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.model.EvTypeInput
-import edu.ie3.mobsim.io.probabilities.{
-  FirstDepartureOfDay,
-  ProbabilityDensityFunction
-}
+import edu.ie3.mobsim.io.probabilities.{FirstDepartureOfDay, ProbabilityDensityFunction}
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
@@ -32,40 +26,38 @@ import tech.units.indriya.quantity.Quantities
 import java.lang
 import javax.measure.quantity.{Energy, Length, Power}
 import scala.collection.immutable.SortedSet
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.util.{Failure, Success, Try}
 
-case class ElectricVehicle(
-    private val simulationStart: ZonedDateTime,
-    private val uuid: UUID,
-    private val id: String,
-    private val model: String,
-    private val batteryCapacity: ComparableQuantity[Energy],
-    private val acChargingPower: ComparableQuantity[Power],
-    private val dcChargingPower: ComparableQuantity[Power],
-    private val consumption: ComparableQuantity[SpecificEnergy], // kWh per km
-    private val homePoi: PointOfInterest,
-    private val workPoi: PointOfInterest,
-    private val storedEnergy: ComparableQuantity[Energy],
-    private val destinationPoi: PointOfInterest,
-    private val parkingTimeStart: ZonedDateTime,
-    private val departureTime: ZonedDateTime,
-    private val chargingAtHomePossible: Boolean,
-    private val chosenChargingStation: Option[UUID],
-    private val chargingAtSimona: Boolean,
-    private val finalDestinationPoi: Option[PointOfInterest],
-    private val remainingDistanceAfterChargingHub: Option[
+final case class ElectricVehicle(
+    simulationStart: ZonedDateTime,
+    uuid: UUID,
+    id: String,
+    model: String,
+    batteryCapacity: ComparableQuantity[Energy],
+    acChargingPower: ComparableQuantity[Power],
+    dcChargingPower: ComparableQuantity[Power],
+    consumption: ComparableQuantity[SpecificEnergy], // kWh per km
+    homePoi: PointOfInterest,
+    workPoi: PointOfInterest,
+    storedEnergy: ComparableQuantity[Energy],
+    destinationPoi: PointOfInterest,
+    parkingTimeStart: ZonedDateTime,
+    departureTime: ZonedDateTime,
+    chargingAtHomePossible: Boolean,
+    chosenChargingStation: Option[UUID],
+    chargingAtSimona: Boolean,
+    finalDestinationPoi: Option[PointOfInterest],
+    remainingDistanceAfterChargingHub: Option[
       ComparableQuantity[Length]
     ],
-    private val chargingPricesMemory: mutable.Queue[Double]
+    chargingPricesMemory: immutable.Queue[Double]
 ) extends EvModel
     with Ordered[ElectricVehicle] {
 
   def getUuid: UUID = uuid
 
   def getId: String = id
-
-  def getModel: String = model
 
   def getEStorage: ComparableQuantity[Energy] = batteryCapacity
 
@@ -75,40 +67,12 @@ case class ElectricVehicle(
 
   def getConsumption: ComparableQuantity[SpecificEnergy] = consumption
 
-  def getHomePOI: PointOfInterest = homePoi
-
-  def getWorkPOI: PointOfInterest = workPoi
-
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
-  def getDestinationPoiType: PoiTypeDictionary.Value = destinationPoi.poiType
-
-  def getDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
-    destinationPoi.categoricalLocation
-
-  def getDestinationPoi: PointOfInterest = destinationPoi
-
-  def getParkingTimeStart: ZonedDateTime = parkingTimeStart
-
-  def getDepartureTime: ZonedDateTime = departureTime
-
-  def isChargingAtHomePossible: Boolean = chargingAtHomePossible
-
-  def getChosenChargingStation: Option[UUID] = chosenChargingStation
-
-  def isChargingAtSimona: Boolean = chargingAtSimona
+  def getDestinationPoiType: PoiTypeDictionary.Value = destinationPoi.getPoiType
 
   def getFinalDestinationPoiType: Option[PoiTypeDictionary.Value] =
-    getFinalDestinationPoi.map(_.poiType)
-
-  def getFinalDestinationPoi: Option[PointOfInterest] = finalDestinationPoi
-
-  def getRemainingDistanceAfterChargingHub
-      : Option[ComparableQuantity[Length]] = {
-    remainingDistanceAfterChargingHub
-  }
-
-  def getChargingPricesMemory: mutable.Queue[Double] = chargingPricesMemory
+    finalDestinationPoi.map(_.getPoiType)
 
   def getDepartureTick: lang.Long = toTick(simulationStart, departureTime)
 
@@ -164,12 +128,20 @@ case class ElectricVehicle(
     copy(remainingDistanceAfterChargingHub = remainingDistance)
   }
 
-  def updateChargingPricesMemory(newPrice: Double): mutable.Queue[Double] = {
+  def updateChargingPricesMemory(
+      newPrices: mutable.Queue[Double]
+  ): ElectricVehicle = {
+    val queue: mutable.Queue[Double] = mutable.Queue.empty
+
+    queue.enqueueAll(chargingPricesMemory)
+    queue.enqueueAll(newPrices)
+
     /* keep maximum of 20 last known prices */
-    while (chargingPricesMemory.size >= 20) {
-      chargingPricesMemory.dequeue()
+    while (queue.size >= 20) {
+      queue.dequeue()
     }
-    chargingPricesMemory += newPrice
+
+    copy(chargingPricesMemory = queue.asInstanceOf[immutable.Queue[Double]])
   }
 
   def compare(that: ElectricVehicle): Int = {
@@ -465,7 +437,7 @@ case object ElectricVehicle extends LazyLogging {
       chargingAtSimona = false,
       finalDestinationPoi = None,
       remainingDistanceAfterChargingHub = None,
-      chargingPricesMemory = mutable.Queue[Double]()
+      chargingPricesMemory = immutable.Queue[Double]()
     )
   }
 
