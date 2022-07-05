@@ -122,7 +122,9 @@ case object PointOfInterest {
                   locationTypeToChargingStations,
                   maxDistanceFromPoi
                 )
-              ).seq.toSet
+              )
+              .seq
+              .toSet
           )
 
           Await.result(

@@ -80,8 +80,9 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         )
         /* Check, that an already assigned home-cs is not considered */
         actual.get(EvcsLocationType.HOME) match {
-          case Some(cs) => cs should contain theSameElementsAs Seq(cs0, cs1, cs5)
-          case None     => fail("Unable to determine cs of type home")
+          case Some(cs) =>
+            cs should contain theSameElementsAs Seq(cs0, cs1, cs5)
+          case None => fail("Unable to determine cs of type home")
         }
       }
     }
