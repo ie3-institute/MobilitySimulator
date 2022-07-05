@@ -132,10 +132,13 @@ object ChargingBehavior extends LazyLogging {
       /* Probability that the EV wants to charge based on its SoC.
       Distinguish between home and work and elsewhere for threshold for charging */
       val (lowerThreshold, upperThreshold) = {
+        val categoricalLocation: CategoricalLocationDictionary.Value =
+          ev.destinationPoi.categoricalLocation
+
         if (ev.chargingAtHomePossible) {
           if (
-            ev.destinationPoi.categoricalLocation == CategoricalLocationDictionary.HOME
-            || ev.destinationPoi.categoricalLocation == CategoricalLocationDictionary.WORK
+            categoricalLocation == CategoricalLocationDictionary.HOME
+            || categoricalLocation == CategoricalLocationDictionary.WORK
           ) {
             (0.4, 0.85)
           } else {
@@ -143,8 +146,8 @@ object ChargingBehavior extends LazyLogging {
           }
         } else {
           if (
-            ev.destinationPoi.categoricalLocation == CategoricalLocationDictionary.HOME
-            || ev.destinationPoi.categoricalLocation == CategoricalLocationDictionary.WORK
+            categoricalLocation == CategoricalLocationDictionary.HOME
+            || categoricalLocation == CategoricalLocationDictionary.WORK
           ) {
             (0.4, 0.85)
           } else {

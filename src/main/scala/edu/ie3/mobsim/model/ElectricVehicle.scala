@@ -144,7 +144,8 @@ final case class ElectricVehicle(
       queue.dequeue()
     }
 
-    copy(chargingPricesMemory = queue.asInstanceOf[immutable.Queue[Double]])
+    val newChargingPricesMemory: immutable.Queue[Double] = immutable.Queue.empty
+    copy(chargingPricesMemory = newChargingPricesMemory.enqueueAll(queue))
   }
 
   def compare(that: ElectricVehicle): Int = {
