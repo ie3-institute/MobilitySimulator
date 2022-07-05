@@ -12,7 +12,10 @@ import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.model.EvTypeInput
-import edu.ie3.mobsim.io.probabilities.{FirstDepartureOfDay, ProbabilityDensityFunction}
+import edu.ie3.mobsim.io.probabilities.{
+  FirstDepartureOfDay,
+  ProbabilityDensityFunction
+}
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity

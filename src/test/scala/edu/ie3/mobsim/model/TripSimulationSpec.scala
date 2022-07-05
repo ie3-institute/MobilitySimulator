@@ -77,9 +77,13 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi.map(_.getPoiType) shouldBe Some(supermarketPoi.getPoiType)
+          finalDestinationPoi.map(_.getPoiType) shouldBe Some(
+            supermarketPoi.getPoiType
+          )
           finalDestinationPoi shouldBe Some(supermarketPoi)
-          remainingDistanceAfterChargingHub shouldBe Some(Quantities.getQuantity(-7000, METRE))
+          remainingDistanceAfterChargingHub shouldBe Some(
+            Quantities.getQuantity(-7000, METRE)
+          )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
@@ -87,17 +91,18 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
     // testing makeModifiedTripToChargingHub
     "makeModifiedTripToChargingHub correctly" in {
 
-      val updatedEv: ElectricVehicle = TripSimulation.makeModifiedTripToChargingHub(
-        PoiTypeDictionary.CHARGING_HUB_TOWN,
-        ev,
-        givenSimulationStart,
-        poisWithSizes,
-        0.2,
-        Quantities.getQuantity(1000, METRE),
-        plannedDestinationPoi,
-        chargingStations,
-        speed
-      )
+      val updatedEv: ElectricVehicle =
+        TripSimulation.makeModifiedTripToChargingHub(
+          PoiTypeDictionary.CHARGING_HUB_TOWN,
+          ev,
+          givenSimulationStart,
+          poisWithSizes,
+          0.2,
+          Quantities.getQuantity(1000, METRE),
+          plannedDestinationPoi,
+          chargingStations,
+          speed
+        )
 
       updatedEv match {
         case ElectricVehicle(
@@ -141,9 +146,13 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi.map(_.getPoiType) shouldBe Some(supermarketPoi.getPoiType)
+          finalDestinationPoi.map(_.getPoiType) shouldBe Some(
+            supermarketPoi.getPoiType
+          )
           finalDestinationPoi shouldBe Some(supermarketPoi)
-          remainingDistanceAfterChargingHub shouldBe Some(Quantities.getQuantity(10000, METRE))
+          remainingDistanceAfterChargingHub shouldBe Some(
+            Quantities.getQuantity(10000, METRE)
+          )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
     }
