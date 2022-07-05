@@ -135,24 +135,15 @@ object ChargingBehavior extends LazyLogging {
         val categoricalLocation: CategoricalLocationDictionary.Value =
           ev.destinationPoi.categoricalLocation
 
-        if (ev.chargingAtHomePossible) {
-          if (
-            categoricalLocation == CategoricalLocationDictionary.HOME
+        (
+          ev.chargingAtHomePossible,
+          categoricalLocation == CategoricalLocationDictionary.HOME
             || categoricalLocation == CategoricalLocationDictionary.WORK
-          ) {
-            (0.4, 0.85)
-          } else {
-            (0.3, 0.5)
-          }
-        } else {
-          if (
-            categoricalLocation == CategoricalLocationDictionary.HOME
-            || categoricalLocation == CategoricalLocationDictionary.WORK
-          ) {
-            (0.4, 0.85)
-          } else {
-            (0.3, 0.75)
-          }
+        ) match {
+          case (true, true)   => (0.4, 0.85)
+          case (true, false)  => (0.3, 0.5)
+          case (false, true)  => (0.4, 0.85)
+          case (false, false) => (0.3, 0.75)
         }
       }
 
