@@ -48,9 +48,6 @@ import java.util.UUID
 import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Random, Success}
 
@@ -263,23 +260,19 @@ final class MobilitySimulator(
     */
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
-  ): (Map[UUID, Integer], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence(evs.toSeq.map(handleDepartingEv))
-        .map {
-          _.flatten.unzip match {
-            case (uuids, movements) =>
-              (
-                uuids.groupBy(identity).map { case (uuid, uuids) =>
-                  uuid -> uuids.size
-                },
-                movements
-              )
-          }
-        },
-      Duration("1h")
-    )
+  ): (Map[UUID, Int], Seq[Movement]) =
+    evs.par.flatMap(handleDepartingEv).unzip match {
+      case (uuids, movements) =>
+        (
+          uuids
+            .groupBy(identity)
+            .map { case (uuid, uuids) =>
+              uuid -> uuids.size
+            }
+            .seq,
+          movements.seq.toSeq
+        )
+    }
 
   /** Handle a single departing ev. Empty information are handed back, if the
     * car either does not charge in SIMONA or there is no target charging
@@ -288,32 +281,30 @@ final class MobilitySimulator(
     * @param ev
     *   The car to handle
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the target charging stations' UUID as well as
+    *   information about the movement
     */
   private def handleDepartingEv(
       ev: ElectricVehicle
-  ): Future[Option[(UUID, Movement)]] =
-    Future {
-      /* Determine the charging station, the car currently is connected to */
-      ev.getChosenChargingStation.map { cs =>
-        /* Register departure */
-        val movement = MobilitySimulator.Movement(cs, ev)
-        logger.debug(
-          s"${ev.getId} departs from $cs."
+  ): Option[(UUID, Movement)] =
+    /* Determine the charging station, the car currently is connected to */
+    ev.getChosenChargingStation.map { cs =>
+      /* Register departure */
+      val movement = MobilitySimulator.Movement(cs, ev)
+      logger.debug(
+        s"${ev.getId} departs from $cs."
+      )
+      cs -> movement
+    } match {
+      case result @ Some(_) =>
+        ev.setChargingAtSimona(false)
+        ev.setChosenChargingStation(None)
+        result
+      case result @ None =>
+        logger.warn(
+          s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
         )
-        cs -> movement
-      } match {
-        case result @ Some(_) =>
-          ev.setChargingAtSimona(false)
-          ev.setChosenChargingStation(None)
-          result
-        case result @ None =>
-          logger.warn(
-            s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
-          )
-          result
-      }
+        result
     }
 
   /** Update the free charging lots per charging station.
@@ -327,7 +318,7 @@ final class MobilitySimulator(
     */
   private def updateFreeLots(
       freeLots: Map[UUID, Integer],
-      change: Map[UUID, Integer]
+      change: Map[UUID, Int]
   ): Map[UUID, Integer] =
     freeLots.map { case (uuid, freeLots) =>
       val lotDiff: Integer = change.getOrElse(uuid, 0)
@@ -365,33 +356,27 @@ final class MobilitySimulator(
       pricesAtChargingStation: Map[UUID, java.lang.Double],
       availableChargingPoints: Map[UUID, Integer],
       maxDistance: ComparableQuantity[Length]
-  ): (Map[UUID, Integer], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence {
-          evs.toSeq.map {
-            /* Lets the EV choose whether and at which charging station it wants to charge */
-            handleArrivingEv(
-              _,
-              pricesAtChargingStation,
-              availableChargingPoints,
-              maxDistance
-            )
-          }
-        }
-        .map {
-          _.flatten.unzip match {
-            case (uuids, movements) =>
-              (
-                uuids.groupBy(uuid => uuid).map { case (uuid, uuids) =>
-                  uuid -> -uuids.size
-                },
-                movements
-              )
-          }
-        },
-      Duration("1h")
-    )
+  ): (Map[UUID, Int], Seq[Movement]) =
+    evs.par.flatMap {
+      /* Lets the EV choose whether and at which charging station it wants to charge */
+      handleArrivingEv(
+        _,
+        pricesAtChargingStation,
+        availableChargingPoints,
+        maxDistance
+      )
+    }.unzip match {
+      case (uuids, movements) =>
+        (
+          uuids
+            .groupBy(uuid => uuid)
+            .map { case (uuid, uuids) =>
+              uuid -> -uuids.size
+            }
+            .seq,
+          movements.seq.toSeq
+        )
+    }
 
   /** Handle a single arriving ev, that wants to charge
     *
@@ -405,15 +390,15 @@ final class MobilitySimulator(
     *   Maximum permissible distance between point of interest and charging
     *   station
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the target charging stations' UUID as well as
+    *   information about the movement
     */
   private def handleArrivingEv(
       ev: ElectricVehicle,
       pricesAtChargingStation: Map[UUID, java.lang.Double],
       availableChargingPoints: Map[UUID, Integer],
       maxDistance: ComparableQuantity[Length]
-  ): Future[Option[(UUID, Movement)]] = Future {
+  ): Option[(UUID, Movement)] =
     chooseChargingStation(
       ev,
       pricesAtChargingStation,
@@ -446,7 +431,6 @@ final class MobilitySimulator(
       )
       None
     }
-  }
 
   /** Update and simulate EVs which are ending their parking at current time.
     * <p> First, the battery level is updated with the data returned from
