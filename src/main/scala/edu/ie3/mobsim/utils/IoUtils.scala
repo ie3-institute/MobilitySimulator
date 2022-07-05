@@ -109,7 +109,7 @@ final case class IoUtils private (
     */
   def writeEvcs(
       cs: ChargingStation,
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       currentTime: ZonedDateTime,
       uuid: UUID = UUID.randomUUID()
   ): Unit = {

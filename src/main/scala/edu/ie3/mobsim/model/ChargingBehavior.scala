@@ -60,7 +60,7 @@ object ChargingBehavior extends LazyLogging {
   def chooseChargingStation(
       ev: ElectricVehicle,
       currentPricesAtChargingStations: Map[UUID, java.lang.Double],
-      currentlyAvailableChargingPoints: Map[UUID, Integer],
+      currentlyAvailableChargingPoints: Map[UUID, Int],
       seed: Random,
       maxDistance: ComparableQuantity[Length]
   ): Option[UUID] = {
@@ -180,13 +180,13 @@ object ChargingBehavior extends LazyLogging {
   def createRatingsForChargingStations(
       ev: ElectricVehicle,
       currentPricesAtChargingStations: Map[UUID, java.lang.Double],
-      currentlyAvailableChargingPoints: Map[UUID, Integer],
+      currentlyAvailableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Map[UUID, Double] =
     ev.getDestinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
         /* Check if free charging spots are even available */
-        val freeSpots: Integer =
+        val freeSpots =
           currentlyAvailableChargingPoints.getOrElse(cs.uuid, 0)
 
         /* If no spots are available, the rating is 0. Otherwise, calculate a rating */
