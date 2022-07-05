@@ -32,8 +32,7 @@ trait PoiTestData {
     new Coordinate(7.4116482, 51.4843281),
     csType,
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs1: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -41,8 +40,7 @@ trait PoiTestData {
     new Coordinate(7.4116472, 51.4843381),
     csType,
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs2: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -50,8 +48,7 @@ trait PoiTestData {
     new Coordinate(7.4115482, 51.4833281),
     csType,
     EvcsLocationType.STREET,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs3: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -59,8 +56,7 @@ trait PoiTestData {
     new Coordinate(7.41154872, 51.4833271),
     csType,
     EvcsLocationType.WORK,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs4: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -68,26 +64,23 @@ trait PoiTestData {
     new Coordinate(7.41153872, 51.4834271),
     csType,
     EvcsLocationType.CHARGING_HUB_TOWN,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs5: ChargingStation = ChargingStation(
     UUID.randomUUID(),
-    "cs_4",
+    "cs_5",
     new Coordinate(7.41153872, 51.4834271),
     csType,
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = true
+    1
   )
   protected val cs6: ChargingStation = ChargingStation(
     UUID.randomUUID(),
-    "cs_4",
+    "cs_6",
     new Coordinate(7.41153842, 51.4834251),
     csType,
     EvcsLocationType.CHARGING_HUB_HIGHWAY,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
 
   protected val poiHome: PointOfInterest = PointOfInterest(
