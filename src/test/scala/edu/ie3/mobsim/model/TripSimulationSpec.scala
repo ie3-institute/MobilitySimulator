@@ -171,7 +171,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
       TripSimulation.simulateNextTrip(
         givenSimulationStart,
         ev,
-        poisWithSizes,
+        nextDestinationPoi,
         chargingHubTownIsPresent = true,
         chargingHubHighwayIsPresent = true,
         chargingStations,

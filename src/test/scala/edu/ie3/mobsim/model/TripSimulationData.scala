@@ -147,6 +147,17 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
     }.toMap
   )
 
+  private val nextPoi: Set[PointOfInterest] = Seq(other_shopPoi).toSet
+
+  protected val nextDestinationPoi: Map[
+    PoiEnums.CategoricalLocationDictionary.Value,
+    ProbabilityDensityFunction[PointOfInterest]
+  ] = PoiUtils.createPoiPdf(
+    nextPoi.map { poi =>
+      poi.categoricalLocation -> Set(poi)
+    }.toMap
+  )
+
   private val speedFunction: SpeedFunction =
     SpeedFunction(50, 0, Quantities.getQuantity(50, KILOMETRE_PER_HOUR))
 
