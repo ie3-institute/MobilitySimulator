@@ -24,7 +24,7 @@ import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
 
 import javax.measure.quantity.Energy
 
-trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
+trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val zero: ComparableQuantity[Energy] =
     Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
   protected val half: ComparableQuantity[Energy] =

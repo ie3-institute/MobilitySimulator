@@ -10,13 +10,13 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
-import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationData}
+import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationTestData}
 import edu.ie3.test.common.UnitSpec
 
 class PoiEnumsSpec
     extends UnitSpec
     with ElectricVehicleTestData
-    with TripSimulationData {
+    with TripSimulationTestData {
 
   "PoiEnums" should {
     // testing PoiTypeDictionary.apply(token: String)

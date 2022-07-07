@@ -16,7 +16,7 @@ import tech.units.indriya.unit.Units.METRE
 
 import scala.collection.mutable
 
-class TripSimulationSpec extends UnitSpec with TripSimulationData {
+class TripSimulationSpec extends UnitSpec with TripSimulationTestData {
 
   "The TripSimulation" should {
     // testing makeTripToChargingHub

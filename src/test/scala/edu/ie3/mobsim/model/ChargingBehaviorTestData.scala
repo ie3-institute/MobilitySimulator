@@ -8,7 +8,7 @@ package edu.ie3.mobsim.model
 
 import java.util.UUID
 
-trait ChargingBehaviorTestData extends TripSimulationData {
+trait ChargingBehaviorTestData extends TripSimulationTestData {
   protected val currentlyAvailableChargingPoints: Map[UUID, Integer] = {
     chargingStations.map { chargingStations =>
       chargingStations.getUuid -> Integer.valueOf(
