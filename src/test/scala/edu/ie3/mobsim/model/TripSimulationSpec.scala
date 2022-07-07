@@ -24,7 +24,7 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
 
       val updatedEv: ElectricVehicle = TripSimulation.makeTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
-        ev,
+        ev1,
         givenSimulationStart,
         poisWithSizes,
         0.5,
@@ -59,9 +59,9 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev.getUuid
-          id shouldBe ev.getId
-          model shouldBe ev.model
+          uuid shouldBe ev1.getUuid
+          id shouldBe ev1.getId
+          model shouldBe ev1.model
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
           dcChargingPower shouldBe givenModel.dcPower
@@ -94,7 +94,7 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
       val updatedEv: ElectricVehicle =
         TripSimulation.makeModifiedTripToChargingHub(
           PoiTypeDictionary.CHARGING_HUB_TOWN,
-          ev,
+          ev1,
           givenSimulationStart,
           poisWithSizes,
           0.2,
@@ -128,9 +128,9 @@ class TripSimulationSpec extends UnitSpec with TripSimulationData {
               chargingPricesMemory
             ) =>
           simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev.getUuid
-          id shouldBe ev.id
-          model shouldBe ev.model
+          uuid shouldBe ev1.getUuid
+          id shouldBe ev1.id
+          model shouldBe ev1.model
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
           dcChargingPower shouldBe givenModel.dcPower
