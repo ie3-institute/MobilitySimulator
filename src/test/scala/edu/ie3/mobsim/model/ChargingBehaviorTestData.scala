@@ -16,4 +16,10 @@ trait ChargingBehaviorTestData extends TripSimulationData {
       )
     }.toMap
   }
+
+  protected val availableChargingPoints: Map[UUID, Int] = {
+    chargingStations.map { chargingStations =>
+      chargingStations.getUuid -> chargingStations.getChargingPoints
+    }.toMap
+  }
 }
