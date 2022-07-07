@@ -94,7 +94,12 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write electric vehicle charging stations correctly" in {
-      ioUtils.writeEvcs(cs6,currentlyAvailableChargingPoints,currentTime, uuid)
+      ioUtils.writeEvcs(
+        cs6,
+        currentlyAvailableChargingPoints,
+        currentTime,
+        uuid
+      )
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileFolder + "evcs"))
@@ -109,18 +114,18 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       }
 
       val chargingPoints: String = cs6.getChargingPoints.toString
-      val occupiedChargingPoints = (cs6.getChargingPoints - currentlyAvailableChargingPoints
-        .getOrElse(cs6.getUuid, 0)
-        .asInstanceOf[Integer]).toString
+      val occupiedChargingPoints =
+        (cs6.getChargingPoints - currentlyAvailableChargingPoints
+          .getOrElse(cs6.getUuid, 0)
+          .asInstanceOf[Integer]).toString
 
       val entry: String = (s"${uuid.toString}," +
         s"${currentTime.toString}," +
         s"${cs6.getUuid.toString}," +
         s"$chargingPoints," +
-        s"$occupiedChargingPoints").replaceAll(",",";")
+        s"$occupiedChargingPoints").replaceAll(",", ";")
 
-
-      list.get(list.size()-1) shouldBe entry
+      list.get(list.size() - 1) shouldBe entry
     }
 
     "write pois correctly" in {

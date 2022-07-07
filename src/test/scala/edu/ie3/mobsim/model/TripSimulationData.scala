@@ -30,7 +30,6 @@ trait TripSimulationData extends ElectricVehicleTestData with PoiTestData {
   protected val half: ComparableQuantity[Energy] =
     Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR)
 
-
   val ev1: ElectricVehicle = ElectricVehicle.buildEv(
     "car_1",
     givenModel,
