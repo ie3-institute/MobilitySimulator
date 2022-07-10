@@ -40,9 +40,9 @@ object ChargingStation extends LazyLogging {
   def loadChargingStationsWithPSDM(
       gridSource: RawGridSource,
       participantSource: SystemParticipantSource
-  ): Set[ChargingStation] = {
+  ): Seq[ChargingStation] = {
 
-    val evcsInput = participantSource.getEvCS().asScala.toSet
+    val evcsInput = participantSource.getEvCS().asScala.toSeq
 
     val chargingStations = evcsInput.map { evcs =>
       ChargingStation(

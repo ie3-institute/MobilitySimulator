@@ -64,13 +64,13 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "prepare the charging stations" should {
       val prepareChargingStations =
-        PrivateMethod[Map[EvcsLocationType, Set[ChargingStation]]](
+        PrivateMethod[Map[EvcsLocationType, Seq[ChargingStation]]](
           Symbol("prepareChargingStations")
         )
 
       "filter out unsuitable assets" in {
         val actual = PointOfInterest invokePrivate prepareChargingStations(
-          Set(cs0, cs1, cs2, cs3, cs4, cs5)
+          Seq(cs0, cs1, cs2, cs3, cs4, cs5)
         )
 
         actual.keys should contain theSameElementsAs Seq(
@@ -189,13 +189,13 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "determining the nearest charging stations" should {
       val nearbyChargingStations =
-        PrivateMethod[Set[(ChargingStation, ComparableQuantity[Length])]](
+        PrivateMethod[Seq[(ChargingStation, ComparableQuantity[Length])]](
           Symbol("nearbyChargingStations")
         )
 
       "find the nearest ones with correct distance" in {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
-          Set(cs0, cs1, cs2),
+          Seq(cs0, cs1, cs2),
           coordinate,
           Quantities.getQuantity(1000d, Units.METRE)
         )
@@ -223,7 +223,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
       "filter out cs, that are too far away" in {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
-          Set(cs0, cs1, cs2),
+          Seq(cs0, cs1, cs2),
           coordinate,
           Quantities.getQuantity(100d, Units.METRE)
         )
@@ -239,7 +239,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
       PointOfInterest.getFromFile(
         testFileName,
         ",",
-        Set(cs0),
+        Seq(cs0),
         Quantities.getQuantity(50d, Units.METRE),
         Quantities.getQuantity(30d, Units.METRE)
       ) match {

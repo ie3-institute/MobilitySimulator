@@ -70,10 +70,10 @@ case object PointOfInterest {
   def getFromFile(
       filePath: String,
       csvSep: String,
-      evcs: Set[ChargingStation],
+      evcs: Seq[ChargingStation],
       maxDistanceFromPoi: ComparableQuantity[Length],
       maxDistanceFromHomePoi: ComparableQuantity[Length]
-  ): Try[Set[PointOfInterest]] =
+  ): Try[Seq[PointOfInterest]] =
     Using(Source.fromFile(filePath).bufferedReader()) { reader =>
       /* Determine order of headline */
       val header = reader.readLine().trim.toLowerCase.split(csvSep)
@@ -124,7 +124,6 @@ case object PointOfInterest {
                 )
               )
               .seq
-              .toSet
           )
 
           Await.result(
@@ -169,8 +168,8 @@ case object PointOfInterest {
     *   A mapping from [[EvcsLocationType]] to charging stations
     */
   private def prepareChargingStations(
-      chargingStations: Set[ChargingStation]
-  ): Map[EvcsLocationType, Set[ChargingStation]] =
+      chargingStations: Seq[ChargingStation]
+  ): Map[EvcsLocationType, Seq[ChargingStation]] =
     chargingStations
       .filterNot { evcs =>
         evcs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY ||
@@ -200,9 +199,9 @@ case object PointOfInterest {
   private def parseHomePoi(
       entries: ParSeq[Array[String]],
       colToIndex: Map[String, Int],
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       maxDistance: ComparableQuantity[Length]
-  ): Future[Set[PointOfInterest]] =
+  ): Future[Seq[PointOfInterest]] =
     Future {
       /* Build mapping from POI to distance asynchronously */
       entries.map { values =>
@@ -241,7 +240,7 @@ case object PointOfInterest {
             SortedSet[(ChargingStation, ComparableQuantity[Length])]
         )
       ]
-  ): Set[PointOfInterest] =
+  ): Seq[PointOfInterest] =
     poiWithNearbyChargingStations
       .sortBy { case (poi, _) =>
         poi.id
@@ -266,7 +265,7 @@ case object PointOfInterest {
               (alreadyAssignedChargingStations, adaptedPois :+ poi)
           }
       } match {
-      case (_, pois) => pois.toSet
+      case (_, pois) => pois
     }
 
   /** Parse a given amount of String entries to a [[PointOfInterest]]
@@ -285,7 +284,7 @@ case object PointOfInterest {
   private def parse(
       entries: Array[String],
       colToIndex: Map[String, Int],
-      locationToChargingStations: Map[EvcsLocationType, Set[ChargingStation]],
+      locationToChargingStations: Map[EvcsLocationType, Seq[ChargingStation]],
       maxDistance: ComparableQuantity[Length]
   ): PointOfInterest = {
     val (uuid, identifier, sze, coordinate, catLoc) = parse(entries, colToIndex)
@@ -389,17 +388,15 @@ case object PointOfInterest {
     */
   private def suitableChargingStations(
       categoricalLocation: CategoricalLocationDictionary.Value,
-      locationToChargingStations: Map[EvcsLocationType, Set[ChargingStation]]
-  ): Set[ChargingStation] =
+      locationToChargingStations: Map[EvcsLocationType, Seq[ChargingStation]]
+  ): Seq[ChargingStation] =
     categoricalLocation match {
       case CategoricalLocationDictionary.HOME =>
         locationToChargingStations
-          .getOrElse(EvcsLocationType.HOME, List.empty[ChargingStation])
-          .toSet
+          .getOrElse(EvcsLocationType.HOME, Seq.empty[ChargingStation])
       case CategoricalLocationDictionary.WORK =>
         locationToChargingStations
-          .getOrElse(EvcsLocationType.WORK, List.empty[ChargingStation])
-          .toSet
+          .getOrElse(EvcsLocationType.WORK, Seq.empty[ChargingStation])
       case _ =>
         locationToChargingStations
           .filterNot { case (locationType, _) =>
@@ -407,7 +404,7 @@ case object PointOfInterest {
           }
           .values
           .flatten
-          .toSet
+          .toSeq
     }
 
   /** Among the allowed charging stations, find all that are within range of the
@@ -422,10 +419,10 @@ case object PointOfInterest {
     *   all allowed charging stations within range of the POI
     */
   private def nearbyChargingStations(
-      allowedChargingStations: Set[ChargingStation],
+      allowedChargingStations: Seq[ChargingStation],
       poiCoordinate: Coordinate,
       maxDistance: Quantity[Length]
-  ): Set[(ChargingStation, ComparableQuantity[Length])] =
+  ): Seq[(ChargingStation, ComparableQuantity[Length])] =
     allowedChargingStations
       .map { evcs =>
         evcs -> GeoUtils.calcHaversine(

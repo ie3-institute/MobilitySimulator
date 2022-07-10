@@ -200,7 +200,7 @@ case object ElectricVehicle extends LazyLogging {
       numberOfEvsInArea: Int,
       homePOIsWithSizes: Map[PointOfInterest, Double],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
       evModelPdf: ProbabilityDensityFunction[EvTypeInput],
@@ -251,7 +251,7 @@ case object ElectricVehicle extends LazyLogging {
     */
   private def determineHomePoiPdf(
       homePoisWithSizes: Map[PointOfInterest, Double],
-      chargingStations: Set[ChargingStation]
+      chargingStations: Seq[ChargingStation]
   ): (
       ProbabilityDensityFunction[PointOfInterest],
       ProbabilityDensityFunction[PointOfInterest]
@@ -304,7 +304,7 @@ case object ElectricVehicle extends LazyLogging {
     */
   private def chargingAtHomePossibleForHomePOI(
       homePoi: PointOfInterest,
-      chargingStations: Set[ChargingStation]
+      chargingStations: Seq[ChargingStation]
   ): Boolean = {
     homePoi.nearestChargingStations.foldLeft(false)(
       (

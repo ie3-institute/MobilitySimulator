@@ -53,7 +53,7 @@ import scala.util.{Failure, Random, Success}
 
 final class MobilitySimulator(
     evData: ExtEvData,
-    chargingStations: Set[ChargingStation],
+    chargingStations: Seq[ChargingStation],
     poisWithSizes: Map[
       CategoricalLocationDictionary.Value,
       ProbabilityDensityFunction[PointOfInterest]
