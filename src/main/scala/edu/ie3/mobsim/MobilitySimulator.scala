@@ -178,9 +178,10 @@ final class MobilitySimulator(
     )
     arrivals.foreach { case Movement(cs, updatedEv) =>
       builder.addArrival(cs, updatedEv)
-
-      updateElectricVehicle(Movement(cs, updatedEv))
     }
+
+    updateElectricVehicles(arrivals)
+
     val finalTakenChargingPoints =
       updateFreeLots(updatedChargingPoints, takenChargingPoints)
 
@@ -248,9 +249,10 @@ final class MobilitySimulator(
       handleDepartingEvs(evs)
     departures.foreach { case Movement(cs, updatedEv) =>
       builder.addDeparture(cs, updatedEv.getUuid)
-
-      updateElectricVehicle(Movement(cs, updatedEv))
     }
+
+    updateElectricVehicles(departures)
+
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
 
@@ -581,12 +583,16 @@ final class MobilitySimulator(
     timeUntilNextEvent
   }
 
-  private def updateElectricVehicle(movement: Movement): Unit = {
-    val updatedEv: ElectricVehicle = movement.ev
+  private def updateElectricVehicles(movements: Seq[Movement]): Unit = {
+    val movementMap: Map[UUID, ElectricVehicle] = movements.map {
+      movement => movement.ev.uuid -> movement.ev
+    }.toMap
 
-    electricVehicles.zipWithIndex.par.foreach { sortedEv =>
-      if (sortedEv._1.uuid.equals(updatedEv.uuid)) {
-        electricVehicles.drop(sortedEv._2) + updatedEv
+    electricVehicles = electricVehicles.map { ev =>
+      if (movementMap.contains(ev.uuid)) {
+        movementMap(ev.uuid)
+      } else {
+        ev
       }
     }
   }
