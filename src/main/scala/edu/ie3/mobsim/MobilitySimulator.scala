@@ -584,8 +584,8 @@ final class MobilitySimulator(
   }
 
   private def updateElectricVehicles(movements: Seq[Movement]): Unit = {
-    val movementMap: Map[UUID, ElectricVehicle] = movements.map {
-      movement => movement.ev.uuid -> movement.ev
+    val movementMap: Map[UUID, ElectricVehicle] = movements.map { movement =>
+      movement.ev.uuid -> movement.ev
     }.toMap
 
     electricVehicles = electricVehicles.map { ev =>
