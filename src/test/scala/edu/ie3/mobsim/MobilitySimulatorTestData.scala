@@ -19,7 +19,6 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
   def electricVehicles(seq: Seq[ElectricVehicle]): SortedSet[ElectricVehicle] =
     SortedSet.empty[ElectricVehicle] ++ seq.toSet
 
-
   def evIsParking(ev: ElectricVehicle): ElectricVehicle = {
     ev.copyWith(
       storedEnergy = half,
@@ -31,7 +30,6 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
     )
   }
 
-
   def evIsDeparting(ev: ElectricVehicle): ElectricVehicle = {
     ev.copyWith(
       storedEnergy = half,
@@ -39,7 +37,7 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
       destinationCategoricalLocation = workPoi.categoricalLocation,
       destinationPoi = workPoi,
       parkingTimeStart = givenSimulationStart.plusHours(-4),
-      departureTime= givenSimulationStart
+      departureTime = givenSimulationStart
     )
   }
 
@@ -48,13 +46,12 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
   protected val ev2parking: ElectricVehicle = evIsParking(ev2)
   protected val ev2departing: ElectricVehicle = evIsDeparting(ev2)
 
-
   val mobSim: MobilitySimulator = new MobilitySimulator(
     evData = evData,
     chargingStations = chargingStations,
     poisWithSizes = poisWithSizes,
     startTime = givenSimulationStart,
-    electricVehicles = electricVehicles(Seq(ev1,ev2,ev3,ev4,ev5)),
+    electricVehicles = electricVehicles(Seq(ev1, ev2, ev3, ev4, ev5)),
     chargingHubTownIsPresent = true,
     chargingHubHighwayIsPresent = true,
     ioUtils = ioUtils,
