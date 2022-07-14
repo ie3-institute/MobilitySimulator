@@ -30,7 +30,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case ElectricVehicle(
                 simulationStart,
@@ -92,7 +92,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
             model.getSRatedDC shouldBe givenModel.acPower
@@ -107,7 +107,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenSimulationStart,
-          true
+          isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
             model.getDepartureTime shouldBe givenSimulationStart.plusMinutes(1L)

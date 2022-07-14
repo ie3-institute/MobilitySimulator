@@ -17,7 +17,7 @@ import tech.units.indriya.quantity.Quantities.getQuantity
 
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import javax.measure.quantity.{Energy, Length, Power}
+import javax.measure.quantity.Length
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
