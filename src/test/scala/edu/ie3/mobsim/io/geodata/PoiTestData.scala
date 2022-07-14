@@ -43,7 +43,7 @@ trait PoiTestData {
     1
   )
   protected val cs2: ChargingStation = ChargingStation(
-    UUID.randomUUID(),
+    UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81"),
     "cs_2",
     new Coordinate(7.4115482, 51.4833281),
     csType,
@@ -180,6 +180,15 @@ trait PoiTestData {
     new Coordinate(7.370586, 51.5234725),
     1498.211731553507,
     Map.empty[ChargingStation, ComparableQuantity[Length]]
+  )
+
+  protected val supermarket: PointOfInterest = PointOfInterest(
+    UUID.fromString("0d50248c-eedd-4170-bbae-24bab064b121"),
+    "supermarket_01",
+    CategoricalLocationDictionary.SUPERMARKET,
+    new Coordinate(7.4115482, 51.4833281),
+    10424.542,
+    Map(cs2 -> Quantities.getQuantity(0, METRE))
   )
 
   protected val charging_hub_townPoi: PointOfInterest = PointOfInterest(
