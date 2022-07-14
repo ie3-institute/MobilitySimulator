@@ -54,7 +54,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         maxDistance
       )
 
-      uuid.isDefined shouldBe false
+      uuid shouldBe None
     }
 
     "check if ev wants to charge" in {
@@ -62,7 +62,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
       val cases = Table(
         (
-          "SoC",
+          "soc",
           "destinationPoiTyp",
           "destinationPoi",
           "isChargingAtHomePossible",
@@ -81,7 +81,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging possible has
-          // SoC under lower threshold and stays long enough -> wants to charge
+          // soc under lower threshold and stays long enough -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -91,7 +91,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging possible has
-          // SoC over upper threshold -> does not want to charge
+          // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -121,7 +121,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging possible has
-          // SoC under lower threshold -> wants to charge
+          // soc under lower threshold -> wants to charge
           Quantities.getQuantity(29, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -131,7 +131,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging possible has
-          // SoC over upper threshold -> does not want to charge
+          // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(51, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -141,7 +141,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging not possible has
-          // SoC has SoC under lower threshold -> wants to charge
+          // soc has soc under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -151,7 +151,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging not possible has
-          // SoC over upper threshold -> does not want to charge
+          // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -161,7 +161,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination work and home charging not possible has
-          // SoC under lower threshold -> wants to charge
+          // soc under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
           workPoi,
@@ -171,7 +171,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination work and home charging not possible has
-          // SoC over upper threshold -> does not want to charge
+          // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
           workPoi,
@@ -181,7 +181,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging not possible has
-          // SoC under lower threshold -> wants to charge
+          // soc under lower threshold -> wants to charge
           Quantities.getQuantity(29, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -191,7 +191,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging not possible has
-          // SoC over upper threshold -> does not want to charge
+          // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(76, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -201,7 +201,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging possible has
-          // SoC = lower thresholds -> wants to charge
+          // soc = lower thresholds -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -211,7 +211,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging possible has
-          // SoC = upper thresholds -> does not want to charge
+          // soc = upper thresholds -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -221,7 +221,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination work and home charging possible has
-          // SoC = lower thresholds -> wants to charge
+          // soc = lower thresholds -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
           workPoi,
@@ -231,7 +231,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination work and home charging possible has
-          // SoC = upper thresholds -> does not want to charge
+          // soc = upper thresholds -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
           workPoi,
@@ -241,7 +241,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging possible has
-          // SoC = lower thresholds -> wants to charge
+          // soc = lower thresholds -> wants to charge
           Quantities.getQuantity(30, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -251,7 +251,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging possible has
-          // SoC = upper thresholds -> does not want to charge
+          // soc = upper thresholds -> does not want to charge
           Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -261,7 +261,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging not possible has
-          // SoC = lower threshold -> wants to charge
+          // soc = lower threshold -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -271,7 +271,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination home and home charging not possible has
-          // SoC = upper threshold -> does not want to charge
+          // soc = upper threshold -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
           poiHome,
@@ -281,7 +281,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination work and home charging not possible has
-          // SoC = lower threshold -> wants to charge
+          // soc = lower threshold -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
           workPoi,
@@ -291,7 +291,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination work and home charging not possible has
-          // SoC = upper threshold -> does not want to charge
+          // soc = upper threshold -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
           workPoi,
@@ -301,7 +301,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging not possible has
-          // SoC = lower threshold -> wants to charge
+          // soc = lower threshold -> wants to charge
           Quantities.getQuantity(30, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -311,7 +311,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         ),
         (
           // EV with destination supermarket and home charging not possible has
-          // SoC = upper threshold -> does not want to charge
+          // soc = upper threshold -> does not want to charge
           Quantities.getQuantity(75, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
           supermarketPoi,
@@ -323,7 +323,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
       forAll(cases) {
         (
-            SoC,
+            soc,
             destinationPoiTyp,
             destinationPoi,
             isChargingAtHomePossible,
@@ -341,7 +341,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
               isChargingAtHomePossible
             )
             .copyWith(
-              SoC,
+              soc,
               destinationPoiTyp,
               destinationPoi.categoricalLocation,
               destinationPoi,
