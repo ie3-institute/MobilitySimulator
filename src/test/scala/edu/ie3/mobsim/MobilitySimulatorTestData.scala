@@ -10,41 +10,54 @@ import akka.actor.ActorRef
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary.WORK
 import edu.ie3.mobsim.model.{ChargingBehaviorTestData, ElectricVehicle}
 import edu.ie3.simona.api.data.ev.ExtEvData
+import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
 
-import scala.collection.immutable.SortedSet
+import java.util.UUID
+import scala.collection.immutable.{SortedSet, TreeSet}
 
 trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
   val evData: ExtEvData = new ExtEvData(ActorRef.noSender, ActorRef.noSender)
+  val builder = new EvMovementsMessageBuilder
 
   def electricVehicles(seq: Seq[ElectricVehicle]): SortedSet[ElectricVehicle] =
     SortedSet.empty[ElectricVehicle] ++ seq.toSet
 
-  def evIsParking(ev: ElectricVehicle): ElectricVehicle = {
-    ev.copyWith(
-      storedEnergy = half,
-      destinationPoiType = WORK,
-      destinationCategoricalLocation = workPoi.categoricalLocation,
-      destinationPoi = workPoi,
-      parkingTimeStart = givenSimulationStart,
-      departureTime = givenSimulationStart.plusHours(5)
-    )
+  def evIsParking(evs: Seq[ElectricVehicle]): SortedSet[ElectricVehicle] = {
+    evs.foreach { ev =>
+      ev.copyWith(
+        storedEnergy = half,
+        destinationPoiType = WORK,
+        destinationCategoricalLocation = workPoi.categoricalLocation,
+        destinationPoi = workPoi,
+        parkingTimeStart = givenSimulationStart,
+        departureTime = givenSimulationStart.plusHours(5)
+      )
+    }
+
+    TreeSet.empty[ElectricVehicle] ++ evs.toSet
   }
 
-  def evIsDeparting(ev: ElectricVehicle): ElectricVehicle = {
-    ev.copyWith(
-      storedEnergy = half,
-      destinationPoiType = WORK,
-      destinationCategoricalLocation = workPoi.categoricalLocation,
-      destinationPoi = workPoi,
-      parkingTimeStart = givenSimulationStart.plusHours(-4),
-      departureTime = givenSimulationStart
-    )
+  def evIsDeparting(evs: Seq[ElectricVehicle]): SortedSet[ElectricVehicle] = {
+    evs.foreach { ev =>
+      ev.copyWith(
+        storedEnergy = half,
+        destinationPoiType = WORK,
+        destinationCategoricalLocation = workPoi.categoricalLocation,
+        destinationPoi = workPoi,
+        parkingTimeStart = givenSimulationStart.plusHours(-4),
+        departureTime = givenSimulationStart
+      )
+
+      ev.setChargingAtSimona(true)
+      ev.setChosenChargingStation(Some(cs6.getUuid))
+    }
+
+    TreeSet.empty[ElectricVehicle] ++ evs.toSet
   }
 
-  protected val ev1parking: ElectricVehicle = evIsParking(ev1)
-  protected val ev1departing: ElectricVehicle = evIsDeparting(ev1)
-  protected val ev2parking: ElectricVehicle = evIsParking(ev2)
-  protected val ev2departing: ElectricVehicle = evIsDeparting(ev2)
+  protected val chargingPointsAllTaken: Map[UUID, Integer] = {
+    Map(cs6.getUuid -> Integer.valueOf(0))
+  }
 
   val mobSim: MobilitySimulator = new MobilitySimulator(
     evData = evData,

@@ -9,13 +9,11 @@ package edu.ie3.mobsim
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
+import java.util.UUID
 import scala.collection.immutable.{SortedSet, TreeSet}
 
 class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
   "MobilitySimulator" should {
-    "do activity correctly" in {
-      // val nextTick = mobSim.doActivity(0L)
-    }
 
     "define movement correctly" in {
       val defineMovements =
@@ -24,26 +22,54 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
 
       val cases = Table(
-        ("evs", "parkingEvs", "departingEvs"),
+        ("parkingEvs", "departingEvs"),
         (
-          Seq(ev1parking, ev2parking),
-          Seq(ev1parking, ev2parking),
-          Seq.empty[ElectricVehicle]
+          evIsParking(Seq(ev1, ev2, ev3)),
+          TreeSet.empty[ElectricVehicle]
+        ),
+        (
+          evIsParking(Seq(ev1, ev2)),
+          evIsDeparting(Seq(ev3))
+        ),
+        (
+          evIsParking(Seq(ev1)),
+          evIsDeparting(Seq(ev2, ev3))
+        ),
+        (
+          TreeSet.empty[ElectricVehicle],
+          evIsDeparting(Seq(ev1, ev2, ev3))
         )
       )
 
-      forAll(cases) { (evs, parkingEvs, departingEvs) =>
-        val evSet: SortedSet[ElectricVehicle] =
-          SortedSet.empty[ElectricVehicle] ++ evs.toSet
+      forAll(cases) { (parkingEvs, departingEvs) =>
+        val evs: SortedSet[ElectricVehicle] = parkingEvs ++ departingEvs
 
-        mobSim invokePrivate defineMovements(
-          evSet,
-          givenSimulationStart
-        ) shouldBe (TreeSet.empty[ElectricVehicle] ++ parkingEvs, TreeSet
-          .empty[ElectricVehicle] ++ departingEvs.toSet)
+        val (resultParking, resultDeparting) =
+          mobSim invokePrivate defineMovements(
+            evs,
+            givenSimulationStart
+          )
+
+        resultParking shouldBe parkingEvs
+        resultDeparting shouldBe departingEvs
       }
     }
 
-  }
+    "handle departures" in {
+      val handleDepartures =
+        PrivateMethod[Map[UUID, Integer]](Symbol("handleDepartures"))
 
+      val resultingMap: Map[UUID, Integer] =
+        mobSim invokePrivate handleDepartures(
+          evIsDeparting(Seq(ev1, ev2, ev3)),
+          chargingPointsAllTaken,
+          builder
+        )
+
+      resultingMap shouldBe Map(
+        cs6.getUuid -> Integer.valueOf(cs6.getChargingPoints)
+      )
+    }
+
+  }
 }
