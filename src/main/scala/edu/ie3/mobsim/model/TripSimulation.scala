@@ -96,7 +96,7 @@ object TripSimulation extends LazyLogging {
       ],
       chargingHubTownIsPresent: Boolean,
       chargingHubHighwayIsPresent: Boolean,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       ioUtils: IoUtils,
       categoricalLocation: CategoricalLocation,
       drivingSpeed: DrivingSpeed,
@@ -722,7 +722,7 @@ object TripSimulation extends LazyLogging {
       plannedDrivingDistance: ComparableQuantity[Length],
       plannedDestinationPoi: PointOfInterest,
       plannedDestinationPoiType: PoiTypeDictionary.Value,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       drivingSpeed: DrivingSpeed
   ): ElectricVehicle = {
 
@@ -842,7 +842,7 @@ object TripSimulation extends LazyLogging {
       plannedDrivingDistance: ComparableQuantity[Length],
       plannedDestinationPoi: PointOfInterest,
       plannedDestinationPoiType: PoiTypeDictionary.Value,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       drivingSpeed: DrivingSpeed
   ): ElectricVehicle = {
 
@@ -1073,7 +1073,7 @@ object TripSimulation extends LazyLogging {
   private def doNotDepartAndStayLongerAtDestination(
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       firstDepartureOfDay: FirstDepartureOfDay,
       lastTripOfDay: LastTripOfDay,
       parkingTime: ParkingTime
@@ -1244,7 +1244,7 @@ object TripSimulation extends LazyLogging {
       ev: ElectricVehicle,
       destinationPoi: PointOfInterest,
       storedEnergyAtChargingStart: ComparableQuantity[Energy],
-      chargingStations: Set[ChargingStation]
+      chargingStations: Seq[ChargingStation]
   ): Long = {
     val chargingHub = destinationPoi.nearestChargingStations.headOption
       .flatMap { case (closestChargingStation, _) =>
@@ -1257,12 +1257,12 @@ object TripSimulation extends LazyLogging {
       )
 
     val chargingPowerOfChargingHub =
-      chargingHub.getEvcsType
+      chargingHub.evcsType
         .getsRated()
         .to(KILOWATT)
 
     val availableChargingPowerForEV =
-      chargingHub.getEvcsType.getElectricCurrentType match {
+      chargingHub.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
           ev.getSRatedAC.min(chargingPowerOfChargingHub).to(KILOWATT)
         case ElectricCurrentType.DC =>

@@ -11,8 +11,8 @@ import edu.ie3.datamodel.models.ElectricCurrentType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
-import tech.units.indriya.ComparableQuantity
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
+import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities.getQuantity
 
 import java.time.temporal.ChronoUnit
@@ -60,7 +60,7 @@ object ChargingBehavior extends LazyLogging {
   def chooseChargingStation(
       ev: ElectricVehicle,
       currentPricesAtChargingStations: Map[UUID, java.lang.Double],
-      currentlyAvailableChargingPoints: Map[UUID, Integer],
+      currentlyAvailableChargingPoints: Map[UUID, Int],
       seed: Random,
       maxDistance: ComparableQuantity[Length]
   ): Option[UUID] = {
@@ -75,12 +75,12 @@ object ChargingBehavior extends LazyLogging {
           s"${ev.getId} arrives at charging hub and wants to start charging."
         )
         ev.getDestinationPoi.nearestChargingStations.keys.headOption
-          .map(_.getUuid)
+          .map(_.uuid)
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
         ev.getDestinationPoi.nearestChargingStations.keys.foreach { cs =>
           currentPricesAtChargingStations
-            .get(cs.getUuid)
+            .get(cs.uuid)
             .map(ev.updateChargingPricesMemory(_))
         }
 
@@ -180,14 +180,14 @@ object ChargingBehavior extends LazyLogging {
   def createRatingsForChargingStations(
       ev: ElectricVehicle,
       currentPricesAtChargingStations: Map[UUID, java.lang.Double],
-      currentlyAvailableChargingPoints: Map[UUID, Integer],
+      currentlyAvailableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Map[UUID, Double] =
     ev.getDestinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
         /* Check if free charging spots are even available */
-        val freeSpots: Integer =
-          currentlyAvailableChargingPoints.getOrElse(cs.getUuid, 0)
+        val freeSpots =
+          currentlyAvailableChargingPoints.getOrElse(cs.uuid, 0)
 
         /* If no spots are available, the rating is 0. Otherwise, calculate a rating */
         val rating = if (freeSpots < 1) {
@@ -207,7 +207,7 @@ object ChargingBehavior extends LazyLogging {
           // TODO: Improve weighting of ratings based on literature or testing?
           ratingForDistance + ratingForChargeableEnergy * 2 + ratingForPrice * 2
         }
-        cs.getUuid -> rating
+        cs.uuid -> rating
       }
       .seq
       .toMap
@@ -226,11 +226,11 @@ object ChargingBehavior extends LazyLogging {
       ev: ElectricVehicle
   ): Double = {
     val availableChargingPowerForEV =
-      cs.getEvcsType.getElectricCurrentType match {
+      cs.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
-          ev.getSRatedAC.min(cs.getEvcsType.getsRated()).to(KILOWATT)
+          ev.getSRatedAC.min(cs.evcsType.getsRated()).to(KILOWATT)
         case ElectricCurrentType.DC =>
-          ev.getSRatedDC.min(cs.getEvcsType.getsRated()).to(KILOWATT)
+          ev.getSRatedDC.min(cs.evcsType.getsRated()).to(KILOWATT)
       }
     val parkingTime =
       ev.getParkingTimeStart
@@ -255,7 +255,7 @@ object ChargingBehavior extends LazyLogging {
       cs: ChargingStation,
       ev: ElectricVehicle,
       currentPrices: Map[UUID, java.lang.Double]
-  ): Double = currentPrices.get(cs.getUuid) match {
+  ): Double = currentPrices.get(cs.uuid) match {
     case Some(price) =>
       ev.getChargingPricesMemory.maxOption.zip(
         ev.getChargingPricesMemory.minOption

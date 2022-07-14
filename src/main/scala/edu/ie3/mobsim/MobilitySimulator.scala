@@ -48,15 +48,12 @@ import java.util.UUID
 import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Random, Success}
 
 final class MobilitySimulator(
     evData: ExtEvData,
-    chargingStations: Set[ChargingStation],
+    chargingStations: Seq[ChargingStation],
     poisWithSizes: Map[
       CategoricalLocationDictionary.Value,
       ProbabilityDensityFunction[PointOfInterest]
@@ -85,8 +82,13 @@ final class MobilitySimulator(
     )
 
     /* Receive available charging points of evcs from SIMONA */
-    val availableChargingPoints: Map[UUID, Integer] =
-      evData.requestAvailablePublicEvCs().asScala.toMap
+    val availableChargingPoints: Map[UUID, Int] =
+      evData
+        .requestAvailablePublicEvCs()
+        .asScala
+        .view
+        .mapValues(_.toInt)
+        .toMap
 
     /* Receive current prices for public evcs situation */
     val currentPricesAtChargingStations: Map[UUID, java.lang.Double] =
@@ -95,7 +97,7 @@ final class MobilitySimulator(
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
       departedEvsFromSimona: SortedSet[ElectricVehicle],
-      availableChargingPointsAfterMovements: Map[UUID, Integer]
+      availableChargingPointsAfterMovements: Map[UUID, Int]
     ) = sendEvMovementsToSimona(
       currentTime,
       availableChargingPoints,
@@ -154,10 +156,10 @@ final class MobilitySimulator(
     */
   private def sendEvMovementsToSimona(
       currentTime: ZonedDateTime,
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, java.lang.Double],
       maxDistance: ComparableQuantity[Length]
-  ): (SortedSet[ElectricVehicle], Map[UUID, Integer]) = {
+  ): (SortedSet[ElectricVehicle], Map[UUID, Int]) = {
     val builder = new EvMovementsMessageBuilder
 
     /* Determine parking and departing evs in this tick */
@@ -240,9 +242,9 @@ final class MobilitySimulator(
     */
   private def handleDepartures(
       evs: Set[ElectricVehicle],
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       builder: EvMovementsMessageBuilder
-  ): Map[UUID, Integer] = {
+  ): Map[UUID, Int] = {
     val (additionallyFreeChargingPoints, departures) =
       handleDepartingEvs(evs)
     departures.foreach { case Movement(cs, ev) =>
@@ -263,23 +265,19 @@ final class MobilitySimulator(
     */
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
-  ): (Map[UUID, Integer], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence(evs.toSeq.map(handleDepartingEv))
-        .map {
-          _.flatten.unzip match {
-            case (uuids, movements) =>
-              (
-                uuids.groupBy(identity).map { case (uuid, uuids) =>
-                  uuid -> uuids.size
-                },
-                movements
-              )
-          }
-        },
-      Duration("1h")
-    )
+  ): (Map[UUID, Int], Seq[Movement]) =
+    evs.par.flatMap(handleDepartingEv).unzip match {
+      case (uuids, movements) =>
+        (
+          uuids
+            .groupBy(identity)
+            .map { case (uuid, uuids) =>
+              uuid -> uuids.size
+            }
+            .seq,
+          movements.seq.toSeq
+        )
+    }
 
   /** Handle a single departing ev. Empty information are handed back, if the
     * car either does not charge in SIMONA or there is no target charging
@@ -288,32 +286,30 @@ final class MobilitySimulator(
     * @param ev
     *   The car to handle
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the target charging stations' UUID as well as
+    *   information about the movement
     */
   private def handleDepartingEv(
       ev: ElectricVehicle
-  ): Future[Option[(UUID, Movement)]] =
-    Future {
-      /* Determine the charging station, the car currently is connected to */
-      ev.getChosenChargingStation.map { cs =>
-        /* Register departure */
-        val movement = MobilitySimulator.Movement(cs, ev)
-        logger.debug(
-          s"${ev.getId} departs from $cs."
+  ): Option[(UUID, Movement)] =
+    /* Determine the charging station, the car currently is connected to */
+    ev.getChosenChargingStation.map { cs =>
+      /* Register departure */
+      val movement = MobilitySimulator.Movement(cs, ev)
+      logger.debug(
+        s"${ev.getId} departs from $cs."
+      )
+      cs -> movement
+    } match {
+      case result @ Some(_) =>
+        ev.setChargingAtSimona(false)
+        ev.setChosenChargingStation(None)
+        result
+      case result @ None =>
+        logger.warn(
+          s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
         )
-        cs -> movement
-      } match {
-        case result @ Some(_) =>
-          ev.setChargingAtSimona(false)
-          ev.setChosenChargingStation(None)
-          result
-        case result @ None =>
-          logger.warn(
-            s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
-          )
-          result
-      }
+        result
     }
 
   /** Update the free charging lots per charging station.
@@ -326,12 +322,12 @@ final class MobilitySimulator(
     *   Updated overview of free lots
     */
   private def updateFreeLots(
-      freeLots: Map[UUID, Integer],
-      change: Map[UUID, Integer]
-  ): Map[UUID, Integer] =
+      freeLots: Map[UUID, Int],
+      change: Map[UUID, Int]
+  ): Map[UUID, Int] =
     freeLots.map { case (uuid, freeLots) =>
-      val lotDiff: Integer = change.getOrElse(uuid, 0)
-      val newLots: Integer = freeLots + lotDiff
+      val lotDiff = change.getOrElse(uuid, 0)
+      val newLots = freeLots + lotDiff
       uuid -> newLots
     } ++ change
       .filter { case (uuid, _) =>
@@ -339,7 +335,7 @@ final class MobilitySimulator(
       }
       .map { uuidToDifference =>
         val uuid = uuidToDifference._1
-        val lotDifference: Integer = uuidToDifference._2
+        val lotDifference = uuidToDifference._2
         uuid -> lotDifference
       }
 
@@ -363,35 +359,29 @@ final class MobilitySimulator(
   private def handleParkingEvs(
       evs: SortedSet[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, java.lang.Double],
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): (Map[UUID, Integer], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence {
-          evs.toSeq.map {
-            /* Lets the EV choose whether and at which charging station it wants to charge */
-            handleArrivingEv(
-              _,
-              pricesAtChargingStation,
-              availableChargingPoints,
-              maxDistance
-            )
-          }
-        }
-        .map {
-          _.flatten.unzip match {
-            case (uuids, movements) =>
-              (
-                uuids.groupBy(uuid => uuid).map { case (uuid, uuids) =>
-                  uuid -> -uuids.size
-                },
-                movements
-              )
-          }
-        },
-      Duration("1h")
-    )
+  ): (Map[UUID, Int], Seq[Movement]) =
+    evs.par.flatMap {
+      /* Lets the EV choose whether and at which charging station it wants to charge */
+      handleArrivingEv(
+        _,
+        pricesAtChargingStation,
+        availableChargingPoints,
+        maxDistance
+      )
+    }.unzip match {
+      case (uuids, movements) =>
+        (
+          uuids
+            .groupBy(uuid => uuid)
+            .map { case (uuid, uuids) =>
+              uuid -> -uuids.size
+            }
+            .seq,
+          movements.seq.toSeq
+        )
+    }
 
   /** Handle a single arriving ev, that wants to charge
     *
@@ -405,15 +395,15 @@ final class MobilitySimulator(
     *   Maximum permissible distance between point of interest and charging
     *   station
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the target charging stations' UUID as well as
+    *   information about the movement
     */
   private def handleArrivingEv(
       ev: ElectricVehicle,
       pricesAtChargingStation: Map[UUID, java.lang.Double],
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): Future[Option[(UUID, Movement)]] = Future {
+  ): Option[(UUID, Movement)] =
     chooseChargingStation(
       ev,
       pricesAtChargingStation,
@@ -421,7 +411,7 @@ final class MobilitySimulator(
       MobilitySimulator.seed,
       maxDistance
     ).map { cs =>
-      val availableChargingPointsAtStation: Integer =
+      val availableChargingPointsAtStation =
         availableChargingPoints.getOrElse(cs, 0)
       if (availableChargingPointsAtStation > 0) {
         ev.setChargingAtSimona(true)
@@ -446,7 +436,6 @@ final class MobilitySimulator(
       )
       None
     }
-  }
 
   /** Update and simulate EVs which are ending their parking at current time.
     * <p> First, the battery level is updated with the data returned from
@@ -765,21 +754,21 @@ object MobilitySimulator
           cs: ChargingStation
       ) => {
         (
-          totalNumberOfChargingPoints._1 + cs.getChargingPoints,
-          if (cs.getEvcsLocationType == EvcsLocationType.HOME)
-            totalNumberOfChargingPoints._2 + cs.getChargingPoints
+          totalNumberOfChargingPoints._1 + cs.chargingPoints,
+          if (cs.evcsLocationType == EvcsLocationType.HOME)
+            totalNumberOfChargingPoints._2 + cs.chargingPoints
           else totalNumberOfChargingPoints._2,
           if (
-            cs.getEvcsLocationType == EvcsLocationType.WORK || cs.getEvcsLocationType == EvcsLocationType.STREET
-            || cs.getEvcsLocationType == EvcsLocationType.CUSTOMER_PARKING
+            cs.evcsLocationType == EvcsLocationType.WORK || cs.evcsLocationType == EvcsLocationType.STREET
+            || cs.evcsLocationType == EvcsLocationType.CUSTOMER_PARKING
           )
-            totalNumberOfChargingPoints._3 + cs.getChargingPoints
+            totalNumberOfChargingPoints._3 + cs.chargingPoints
           else totalNumberOfChargingPoints._3,
           if (
-            cs.getEvcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN
-            || cs.getEvcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY
+            cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN
+            || cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY
           )
-            totalNumberOfChargingPoints._4 + cs.getChargingPoints
+            totalNumberOfChargingPoints._4 + cs.chargingPoints
           else totalNumberOfChargingPoints._4
         )
       }

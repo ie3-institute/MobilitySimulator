@@ -84,7 +84,6 @@ trait ElectricVehicleTestData {
       ElectricCurrentType.AC
     ),
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = true
+    1
   )
 }

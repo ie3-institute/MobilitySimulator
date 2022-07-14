@@ -263,7 +263,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
               targetAmount,
               homePoisWithSizes,
               givenWorkPoiPdf,
-              Set(givenChargingStation),
+              Seq(givenChargingStation),
               givenSimulationStart,
               targetShare,
               givenModelPdf,

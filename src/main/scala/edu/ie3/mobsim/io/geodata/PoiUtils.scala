@@ -29,7 +29,7 @@ object PoiUtils extends LazyLogging {
     *   A mapping from categorical location type to Points of Interest
     */
   def loadPOIs(
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       poiPath: String,
       maxDistanceFromPoi: ComparableQuantity[Length],
       maxDistanceFromHomePoi: ComparableQuantity[Length]

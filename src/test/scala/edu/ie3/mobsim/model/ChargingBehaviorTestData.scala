@@ -64,21 +64,19 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
 
   protected val currentPricesAtChargingStations: Map[UUID, java.lang.Double] = {
     chargingStations.map { chargingStations =>
-      chargingStations.getUuid -> java.lang.Double.valueOf(0.0)
+      chargingStations.uuid -> java.lang.Double.valueOf(0.0)
     }.toMap
   }
 
-  protected val currentlyAvailableChargingPoints: Map[UUID, Integer] = {
+  protected val currentlyAvailableChargingPoints: Map[UUID, Int] = {
     chargingStations.map { chargingStations =>
-      chargingStations.getUuid -> Integer.valueOf(
-        chargingStations.getChargingPoints
-      )
+      chargingStations.uuid -> chargingStations.chargingPoints
     }.toMap
   }
 
-  protected val noAvailableChargingPoints: Map[UUID, Integer] = {
+  protected val noAvailableChargingPoints: Map[UUID, Int] = {
     chargingStations.map { chargingStations =>
-      chargingStations.getUuid -> Integer.valueOf(0)
+      chargingStations.uuid -> 0
     }.toMap
   }
 
