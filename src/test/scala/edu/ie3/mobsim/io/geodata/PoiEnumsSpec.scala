@@ -10,13 +10,9 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
-import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationData}
 import edu.ie3.test.common.UnitSpec
 
-class PoiEnumsSpec
-    extends UnitSpec
-    with ElectricVehicleTestData
-    with TripSimulationData {
+class PoiEnumsSpec extends UnitSpec {
 
   "PoiEnums" should {
     // testing PoiTypeDictionary.apply(token: String)
@@ -49,7 +45,6 @@ class PoiEnumsSpec
 
     // testing CategoricalLocationDictionary.apply(token: String)
     "parse CategoricalLocation correctly" in {
-
       val cases = Table(
         ("categoricalLocation", "expectedResult"),
         ("home", CategoricalLocationDictionary.HOME),
