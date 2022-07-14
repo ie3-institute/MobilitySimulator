@@ -190,7 +190,7 @@ trait PoiTestData {
   )
 
   protected val supermarket: PointOfInterest = PointOfInterest(
-    UUID.fromString("63dd665f-ac0b-4386-a4a9-bebf42ecdaf8"),
+    UUID.fromString("0d50248c-eedd-4170-bbae-24bab064b121"),
     "supermarket_01",
     CategoricalLocationDictionary.SUPERMARKET,
     new Coordinate(7.4115482, 51.4833281),
