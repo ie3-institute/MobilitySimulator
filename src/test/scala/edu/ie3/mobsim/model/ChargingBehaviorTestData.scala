@@ -82,5 +82,5 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
     }.toMap
   }
 
-  protected val seed: Random = new scala.util.Random(6)
+  protected def random: Random = new scala.util.Random(6)
 }

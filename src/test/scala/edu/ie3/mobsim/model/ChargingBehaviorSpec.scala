@@ -26,24 +26,23 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         evChargingNeeded,
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
-        seed,
+        random,
         maxDistance
       )
 
-      uuid.isDefined shouldBe true
-      uuid.map(_.toString) shouldBe Some("7537c0b6-3137-4e30-8a95-db1c0f9d9b81")
+      uuid shouldBe Some(cs2.getUuid)
     }
 
     "choose no chargingStation if charging is not needed" in {
       val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
-        ev1.copyWith(ev1.getEStorage),
+        ev1,
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
-        seed,
+        random,
         maxDistance
       )
 
-      uuid.isDefined shouldBe false
+      uuid shouldBe None
     }
 
     "choose no chargingStation if no station is nearby" in {
@@ -51,7 +50,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         evNoChargingStations,
         currentPricesAtChargingStations,
         noAvailableChargingPoints,
-        seed,
+        random,
         maxDistance
       )
 
@@ -63,276 +62,272 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
       val cases = Table(
         (
-          "energy",
+          "SoC",
           "destinationPoiTyp",
-          "destinationCategoricalLocation",
           "destinationPoi",
           "isChargingAtHomePossible",
           "departureTime",
-          "seed",
           "expectedResult"
         ),
         (
+          // EV with destination home and home charging possible stays
+          // not long enough -> does not want to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           true,
           parkingTimeStart.plusMinutes(14),
-          seed,
           false
         ),
         (
+          // EV with destination home and home charging possible has
+          // SoC under lower threshold and stays long enough -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
           true
         ),
         (
+          // EV with destination home and home charging possible has
+          // SoC over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
           false
         ),
         (
+          // EV with destination work and home charging possible stays long enough and
+          // is under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
           true
         ),
         (
+          // EV with destination work and home charging possible and stays long enough
+          // is over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
           false
         ),
         (
+          // EV with destination supermarket and home charging possible has
+          // SoC under lower threshold -> wants to charge
           Quantities.getQuantity(29, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
           true
         ),
         (
+          // EV with destination supermarket and home charging possible has
+          // SoC over upper threshold -> does not want to charge
           Quantities.getQuantity(51, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
           false
         ),
         (
+          // EV with destination home and home charging not possible has
+          // SoC has SoC under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
           true
         ),
         (
+          // EV with destination home and home charging not possible has
+          // SoC over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
           false
         ),
         (
+          // EV with destination work and home charging not possible has
+          // SoC under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
           true
         ),
         (
+          // EV with destination work and home charging not possible has
+          // SoC over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
           false
         ),
         (
+          // EV with destination supermarket and home charging not possible has
+          // SoC under lower threshold -> wants to charge
           Quantities.getQuantity(29, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
           true
         ),
         (
+          // EV with destination supermarket and home charging not possible has
+          // SoC over upper threshold -> does not want to charge
           Quantities.getQuantity(76, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
           false
         ),
         (
+          // EV with destination home and home charging possible has
+          // SoC = lower thresholds -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 1
+          true
         ),
         (
+          // EV with destination home and home charging possible has
+          // SoC = upper thresholds -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 0
+          false
         ),
         (
+          // EV with destination work and home charging possible has
+          // SoC = lower thresholds -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 1
+          true
         ),
         (
+          // EV with destination work and home charging possible has
+          // SoC = upper thresholds -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 0
+          false
         ),
         (
+          // EV with destination supermarket and home charging possible has
+          // SoC = lower thresholds -> wants to charge
           Quantities.getQuantity(30, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 1
+          true
         ),
         (
+          // EV with destination supermarket and home charging possible has
+          // SoC = upper thresholds -> does not want to charge
           Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           true,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 0
+          false
         ),
         (
+          // EV with destination home and home charging not possible has
+          // SoC = lower threshold -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 1
+          true
         ),
         (
+          // EV with destination home and home charging not possible has
+          // SoC = upper threshold -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.HOME,
-          CategoricalLocationDictionary.HOME,
           poiHome,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 0
+          false
         ),
         (
+          // EV with destination work and home charging not possible has
+          // SoC = lower threshold -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 1
+          true
         ),
         (
+          // EV with destination work and home charging not possible has
+          // SoC = upper threshold -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.WORK,
-          CategoricalLocationDictionary.WORK,
           workPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 0
+          false
         ),
         (
+          // EV with destination supermarket and home charging not possible has
+          // SoC = lower threshold -> wants to charge
           Quantities.getQuantity(30, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 1
+          true
         ),
         (
+          // EV with destination supermarket and home charging not possible has
+          // SoC = upper threshold -> does not want to charge
           Quantities.getQuantity(75, PowerSystemUnits.KILOWATTHOUR),
           PoiTypeDictionary.SHOPPING,
-          CategoricalLocationDictionary.SUPERMARKET,
           supermarketPoi,
           false,
           parkingTimeStart.plusMinutes(15),
-          seed,
-          seed.nextDouble() < 0
+          false
         )
       )
 
       forAll(cases) {
         (
-            energy,
+            SoC,
             destinationPoiTyp,
-            destinationCategoricalLocation,
             destinationPoi,
             isChargingAtHomePossible,
             departureTime,
-            seed,
             expectedResult
         ) =>
           val ev: ElectricVehicle = ElectricVehicle
@@ -346,15 +341,18 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
               isChargingAtHomePossible
             )
             .copyWith(
-              energy,
+              SoC,
               destinationPoiTyp,
-              destinationCategoricalLocation,
+              destinationPoi.categoricalLocation,
               destinationPoi,
               parkingTimeStart,
               departureTime
             )
 
-          ChargingBehavior.doesEvWantToCharge(ev, seed) shouldBe expectedResult
+          ChargingBehavior.doesEvWantToCharge(
+            ev,
+            random
+          ) shouldBe expectedResult
       }
     }
 
