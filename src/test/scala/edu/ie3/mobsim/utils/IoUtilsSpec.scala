@@ -49,7 +49,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         s"${firstEv.departureTime.toString}," +
         s"${firstEv.chargingAtSimona.toString}").replaceAll(",", ";")
 
-      list.get(list.size() - 1) shouldBe compareString
+      list.get(list.size() - 2) shouldBe compareString
     }
 
     "write evs correctly" in {
