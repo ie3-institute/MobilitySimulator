@@ -49,7 +49,11 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         s"${firstEv.departureTime.toString}," +
         s"${firstEv.chargingAtSimona.toString}").replaceAll(",", ";")
 
-      list.get(list.size() - 2) shouldBe compareString
+      list.forEach { str =>
+        if (str.contains(uuid.toString)) {
+          str shouldBe compareString
+        }
+      }
     }
 
     "write evs correctly" in {
@@ -150,12 +154,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
             evcsUuid.toString + "," + distance.getValue.doubleValue().toString
         }.toString
 
-      val entry: String = (s"${charging_hub_townPoi.id}," +
+      val compareString: String = (s"${charging_hub_townPoi.id}," +
         s"${charging_hub_townPoi.getPoiType.toString}," +
         s"${charging_hub_townPoi.size.toString}," +
         s"$string").replaceAll(",", ";")
 
-      list.get(list.size() - 1) contains entry
+      list.forEach { str =>
+        if (str.contains(uuid.toString)) {
+          str shouldBe compareString
+        }
+      }
     }
 
     "write positions correctly" in {
@@ -183,12 +191,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           )
         }
 
-      val entry: String = (s"$uuid," +
+      val compareString: String = (s"$uuid," +
         s"${firstEv.uuid.toString}," +
         s"$location,").replaceAll(",", ";") +
         s"$destinationPoi"
 
-      list.get(list.size() - 1) shouldBe entry
+      list.forEach { str =>
+        if (str.contains(uuid.toString)) {
+          str shouldBe compareString
+        }
+      }
     }
   }
 }
