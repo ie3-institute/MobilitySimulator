@@ -36,7 +36,6 @@ import edu.ie3.mobsim.io.probabilities.{
   ProbabilityDensityFunction,
   TripDistance
 }
-import edu.ie3.mobsim.utils.IoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
@@ -162,17 +161,6 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
 
   protected val maxDistance: ComparableQuantity[Length] =
     Quantities.getQuantity(5000, METRE)
-
-  protected val ioUtils: IoUtils = IoUtils(
-    new java.io.File(
-      "."
-    ).getCanonicalPath + File.separator + "out" + File.separator,
-    "movements",
-    "evs",
-    "evcs",
-    "positions",
-    "pois"
-  )
 
   private val basePath: String = Seq(
     Paths.get("").toAbsolutePath.toString,

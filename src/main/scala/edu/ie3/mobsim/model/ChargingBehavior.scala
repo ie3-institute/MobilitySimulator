@@ -18,6 +18,7 @@ import tech.units.indriya.quantity.Quantities.getQuantity
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.measure.quantity.Length
+import scala.collection.mutable
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
@@ -65,7 +66,7 @@ object ChargingBehavior extends LazyLogging {
       maxDistance: ComparableQuantity[Length]
   ): Option[UUID] = {
     /* If there are charging stations nearby */
-    if (ev.getDestinationPoi.nearestChargingStations.nonEmpty) {
+    if (ev.destinationPoi.nearestChargingStations.nonEmpty) {
       /* Always charge if the EV makes charging stop at charging hub */
       if (
         ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN
@@ -74,15 +75,18 @@ object ChargingBehavior extends LazyLogging {
         logger.debug(
           s"${ev.getId} arrives at charging hub and wants to start charging."
         )
-        ev.getDestinationPoi.nearestChargingStations.keys.headOption
+        ev.destinationPoi.nearestChargingStations.keys.headOption
           .map(_.getUuid)
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
-        ev.getDestinationPoi.nearestChargingStations.keys.foreach { cs =>
+        val priceQueue: mutable.Queue[Double] = mutable.Queue.empty
+
+        ev.destinationPoi.nearestChargingStations.keys.foreach { cs =>
           currentPricesAtChargingStations
             .get(cs.getUuid)
-            .map(ev.updateChargingPricesMemory(_))
+            .map(priceQueue += _)
         }
+        ev.updateChargingPricesMemory(priceQueue)
 
         /* If EV wants to charge, rank available charging stations and choose the best */
         val evWantsToCharge = doesEvWantToCharge(ev, seed)
@@ -120,32 +124,26 @@ object ChargingBehavior extends LazyLogging {
     *   Decision as boolean, whether the EV wants to charge
     */
   def doesEvWantToCharge(ev: ElectricVehicle, seed: Random): Boolean = {
-    val staysLongEnough = ev.getParkingTimeStart
-      .until(ev.getDepartureTime, ChronoUnit.MINUTES) >= 15
+    val staysLongEnough = ev.parkingTimeStart
+      .until(ev.departureTime, ChronoUnit.MINUTES) >= 15
     if (staysLongEnough) {
       val soc = ev.getStoredEnergy.divide(ev.getEStorage).getValue.doubleValue()
 
       /* Probability that the EV wants to charge based on its SoC.
       Distinguish between home and work and elsewhere for threshold for charging */
       val (lowerThreshold, upperThreshold) = {
-        if (ev.isChargingAtHomePossible) {
-          if (
-            ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.HOME
-            || ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.WORK
-          ) {
-            (0.4, 0.85)
-          } else {
-            (0.3, 0.5)
-          }
-        } else {
-          if (
-            ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.HOME
-            || ev.getDestinationCategoricalLocation == CategoricalLocationDictionary.WORK
-          ) {
-            (0.4, 0.85)
-          } else {
-            (0.3, 0.75)
-          }
+        val categoricalLocation: CategoricalLocationDictionary.Value =
+          ev.destinationPoi.categoricalLocation
+
+        (
+          ev.chargingAtHomePossible,
+          categoricalLocation == CategoricalLocationDictionary.HOME
+            || categoricalLocation == CategoricalLocationDictionary.WORK
+        ) match {
+          case (true, true)   => (0.4, 0.85)
+          case (true, false)  => (0.3, 0.5)
+          case (false, true)  => (0.4, 0.85)
+          case (false, false) => (0.3, 0.75)
         }
       }
 
@@ -183,7 +181,7 @@ object ChargingBehavior extends LazyLogging {
       currentlyAvailableChargingPoints: Map[UUID, Integer],
       maxDistance: ComparableQuantity[Length]
   ): Map[UUID, Double] =
-    ev.getDestinationPoi.nearestChargingStations.par
+    ev.destinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
         /* Check if free charging spots are even available */
         val freeSpots: Integer =
@@ -233,8 +231,8 @@ object ChargingBehavior extends LazyLogging {
           ev.getSRatedDC.min(cs.getEvcsType.getsRated()).to(KILOWATT)
       }
     val parkingTime =
-      ev.getParkingTimeStart
-        .until(ev.getDepartureTime, ChronoUnit.MINUTES)
+      ev.parkingTimeStart
+        .until(ev.departureTime, ChronoUnit.MINUTES)
     val possibleChargeableEnergy =
       getQuantity(
         availableChargingPowerForEV
@@ -257,8 +255,8 @@ object ChargingBehavior extends LazyLogging {
       currentPrices: Map[UUID, java.lang.Double]
   ): Double = currentPrices.get(cs.getUuid) match {
     case Some(price) =>
-      ev.getChargingPricesMemory.maxOption.zip(
-        ev.getChargingPricesMemory.minOption
+      ev.chargingPricesMemory.maxOption.zip(
+        ev.chargingPricesMemory.minOption
       ) match {
         case Some((maxPrice, minPrice)) =>
           if (math.abs(maxPrice - minPrice) < 0.001)

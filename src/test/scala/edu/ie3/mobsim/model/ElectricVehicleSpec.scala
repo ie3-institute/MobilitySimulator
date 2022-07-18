@@ -13,17 +13,20 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
+import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units
 
+import java.time.ZonedDateTime
+import javax.measure.quantity.Energy
 import scala.collection.mutable
 
-class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
+class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
   "Building and assigning evs" when {
 
     "building the car models" should {
       "assign the correct properties" in {
-        ElectricVehicle.buildEv(
+        val ev: ElectricVehicle = ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
@@ -31,10 +34,12 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           givenSimulationStart,
           givenFirstDeparture,
           isChargingAtHomePossible = true
-        ) match {
+        )
+
+        ev match {
           case ElectricVehicle(
                 simulationStart,
-                _,
+                uuid,
                 id,
                 model,
                 batteryCapacity,
@@ -44,38 +49,36 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
                 homePoi,
                 workPoi,
                 storedEnergy,
-                destinationPoiType,
-                destinationCategoricalLocation,
                 destinationPoi,
                 parkingTimeStart,
                 departureTime,
                 chargingAtHomePossible,
                 chosenChargingStation,
                 chargingAtSimona,
-                finalDestinationPoiType,
                 finalDestinationPoi,
                 remainingDistanceAfterChargingHub,
                 chargingPricesMemory
               ) =>
             simulationStart shouldBe givenSimulationStart
+            uuid shouldBe ev.getUuid
             id shouldBe "test_car"
             model shouldBe "cool_producer cool_model"
             batteryCapacity shouldBe givenModel.capacity
             acChargingPower shouldBe givenModel.acPower
             dcChargingPower shouldBe givenModel.dcPower
             consumption shouldBe givenModel.consumption
-            homePoi shouldBe givenHomePoi
-            workPoi shouldBe givenWorkPoi
+            homePoi shouldBe ev.homePoi
+            workPoi shouldBe ev.workPoi
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
-            destinationPoiType shouldBe PoiTypeDictionary.HOME
-            destinationCategoricalLocation shouldBe CategoricalLocationDictionary.HOME
+            ev.destinationPoi.getPoiType shouldBe PoiTypeDictionary.HOME
+            ev.destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.HOME
             destinationPoi shouldBe givenHomePoi
             parkingTimeStart shouldBe simulationStart
             departureTime shouldBe givenFirstDeparture
             chosenChargingStation shouldBe None
             chargingAtHomePossible shouldBe true
-            finalDestinationPoiType shouldBe None
+            ev.getFinalDestinationPoiType shouldBe None
             finalDestinationPoi shouldBe None
             remainingDistanceAfterChargingHub shouldBe None
             chargingPricesMemory shouldBe mutable.Queue[Double]()
@@ -110,7 +113,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
           isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
-            model.getDepartureTime shouldBe givenSimulationStart.plusMinutes(1L)
+            model.departureTime shouldBe givenSimulationStart.plusMinutes(1L)
         }
       }
     }
@@ -223,7 +226,7 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
 
             additionalCars should have size expectedOverallAmount
             additionalCars.count(
-              _.isChargingAtHomePossible
+              _.chargingAtHomePossible
             ) shouldBe expectedHomeChargingAmount
         }
       }
@@ -272,9 +275,92 @@ class ElectricVehicleSpec extends UnitSpec with ElectricVehicleTestData {
 
             evs should have size targetAmount
             evs.count(
-              _.isChargingAtHomePossible
+              _.chargingAtHomePossible
             ) shouldBe expectedAmountOfHomeCharging
         }
+      }
+    }
+
+    "An electricVehicle" should {
+      "check if home charging is possible" in {
+        evWithHomeCharging.chargingAtHomePossible shouldBe true
+        evWithoutHomeCharging.chargingAtHomePossible shouldBe false
+      }
+
+      "copy object with new stored energy" in {
+        val evFull: ElectricVehicle =
+          evWithHomeCharging.copyWith(evWithHomeCharging.getStoredEnergy)
+        evFull.getStoredEnergy shouldBe givenModel.capacity
+
+        val zero: ComparableQuantity[Energy] =
+          Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
+        val evEmpty: ElectricVehicle = evWithHomeCharging.copyWith(zero)
+        evEmpty.getStoredEnergy shouldBe zero
+      }
+
+      "copy object with updated charging at simona information" in {
+        val evChargingAtSimona: ElectricVehicle =
+          evWithHomeCharging.setChargingAtSimona()
+        evChargingAtSimona.chargingAtSimona shouldBe true
+
+        val evNotChargingAtSimona: ElectricVehicle =
+          evWithHomeCharging.removeChargingAtSimona()
+        evNotChargingAtSimona.chargingAtSimona shouldBe false
+      }
+
+      "copy object with chosen charging station" in {
+        val evSetChargingStation: ElectricVehicle =
+          evWithHomeCharging.setChosenChargingStation(Some(cs6.getUuid))
+        evSetChargingStation.chosenChargingStation shouldBe Some(cs6.getUuid)
+
+        val evNoChargingStation: ElectricVehicle =
+          evWithHomeCharging.setChosenChargingStation(None)
+        evNoChargingStation.chosenChargingStation shouldBe None
+      }
+
+      "return the correct poiType for the destinationPoi" in {
+        val ev: ElectricVehicle = ev1.copyWith(
+          storedEnergy = ev1.storedEnergy,
+          bbpgPoi,
+          parkingTimeStart = ev1.parkingTimeStart,
+          departureTime = ev1.departureTime
+        )
+
+        ev.getDestinationPoiType shouldBe bbpgPoi.getPoiType
+      }
+
+      "return the correct departure tick" in {
+        val time: ZonedDateTime = ZonedDateTime.now().plusHours(1)
+
+        val ev: ElectricVehicle = ev1.copyWith(
+          storedEnergy = ev1.storedEnergy,
+          destinationPoi = ev1.destinationPoi,
+          parkingTimeStart = ev1.parkingTimeStart,
+          time
+        )
+
+        ev.departureTime shouldBe time
+      }
+
+      "update charging price memory correctly" in {
+        val evNoQueue: ElectricVehicle = ev1
+        val queue: mutable.Queue[Double] = mutable.Queue.empty
+
+        for (n <- 0 to 10) {
+          queue.enqueue(n.doubleValue())
+        }
+
+        var updatedEv: ElectricVehicle =
+          evNoQueue.updateChargingPricesMemory(queue)
+        updatedEv.chargingPricesMemory shouldBe queue
+
+        for (n <- 11 to 20) {
+          queue.enqueue(n.doubleValue())
+        }
+
+        updatedEv = updatedEv.updateChargingPricesMemory(queue)
+        updatedEv.chargingPricesMemory shouldBe queue.drop(2)
+
       }
     }
   }

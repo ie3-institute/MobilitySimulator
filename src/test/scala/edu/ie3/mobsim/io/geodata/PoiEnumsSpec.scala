@@ -10,9 +10,13 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
+import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationTestData}
 import edu.ie3.test.common.UnitSpec
 
-class PoiEnumsSpec extends UnitSpec {
+class PoiEnumsSpec
+    extends UnitSpec
+    with ElectricVehicleTestData
+    with TripSimulationTestData {
 
   "PoiEnums" should {
     // testing PoiTypeDictionary.apply(token: String)
@@ -41,6 +45,37 @@ class PoiEnumsSpec extends UnitSpec {
       }
 
       exception.getMessage shouldBe "PoiType 'wrong_poi' not known"
+    }
+
+    // testing PoiTypeDictionary.apply(categoricalLocation: CategoricalLocationDictionary.Value)
+    "convert CategoricalLocations to PoiTypeDictionary" in {
+
+      val cases = Table(
+        ("categoricalLocation", "expectedResult"),
+        (CategoricalLocationDictionary.HOME, PoiTypeDictionary.HOME),
+        (CategoricalLocationDictionary.WORK, PoiTypeDictionary.WORK),
+        (CategoricalLocationDictionary.SUPERMARKET, PoiTypeDictionary.SHOPPING),
+        (CategoricalLocationDictionary.SERVICES, PoiTypeDictionary.SHOPPING),
+        (CategoricalLocationDictionary.OTHER_SHOP, PoiTypeDictionary.SHOPPING),
+        (CategoricalLocationDictionary.RESTAURANT, PoiTypeDictionary.LEISURE),
+        (CategoricalLocationDictionary.CULTURE, PoiTypeDictionary.LEISURE),
+        (CategoricalLocationDictionary.SPORTS, PoiTypeDictionary.LEISURE),
+        (CategoricalLocationDictionary.RELIGIOUS, PoiTypeDictionary.LEISURE),
+        (CategoricalLocationDictionary.MEDICINAL, PoiTypeDictionary.OTHER),
+        (CategoricalLocationDictionary.BBPG, PoiTypeDictionary.OTHER),
+        (
+          CategoricalLocationDictionary.CHARGING_HUB_TOWN,
+          PoiTypeDictionary.CHARGING_HUB_TOWN
+        ),
+        (
+          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY,
+          PoiTypeDictionary.CHARGING_HUB_HIGHWAY
+        )
+      )
+
+      forAll(cases) { (categoricalLocation, expectedResult) =>
+        PoiTypeDictionary.apply(categoricalLocation) shouldBe expectedResult
+      }
     }
 
     // testing CategoricalLocationDictionary.apply(token: String)

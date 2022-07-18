@@ -8,7 +8,10 @@ package edu.ie3.mobsim.io.geodata
 
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
-import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.geo.GeoUtils
 import org.locationtech.jts.geom.Coordinate
@@ -53,6 +56,9 @@ final case class PointOfInterest(
     else if (this.id > that.id) 1
     else -1
   }
+
+  def getPoiType: PoiTypeDictionary.Value =
+    PoiTypeDictionary.apply(categoricalLocation)
 }
 
 case object PointOfInterest {
@@ -301,8 +307,6 @@ case object PointOfInterest {
             case Some((cs, distance)) =>
               val updatedPoi =
                 poi.copy(nearestChargingStations = Map(cs -> distance))
-              // TODO: Replace side-effect with proper copy
-              cs.setHomeChargingStationAssignedToPOI(true)
               (
                 alreadyAssignedChargingStations :+ cs,
                 adaptedPois :+ updatedPoi
