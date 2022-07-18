@@ -22,9 +22,7 @@ import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
 import scala.collection.mutable
 
-class TripSimulationSpec
-    extends UnitSpec
-    with IoUtilsTestData {
+class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
 
   "TripSimulation" should {
     "not simulate a new trip and keep charging when SoC < 70 %" in {
