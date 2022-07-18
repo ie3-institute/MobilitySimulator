@@ -169,7 +169,6 @@ object TripSimulation extends LazyLogging {
         }
         /* Get planned POI information and distance for the trip */
         val (
-          plannedDestinationCategoricalLocation,
           plannedDestinationPoi,
           plannedDrivingDistance,
           changedEv
@@ -182,12 +181,11 @@ object TripSimulation extends LazyLogging {
           tripDistance
         ) match {
           case TargetProperties(
-                categoricalLocation,
                 poi,
                 distance,
                 alteredEv
               ) =>
-            (categoricalLocation, poi, distance, alteredEv)
+            (poi, distance, alteredEv)
         }
 
         /* Simulate the planned trip */
@@ -211,7 +209,7 @@ object TripSimulation extends LazyLogging {
           doesEvWantToChargeAtChargingHub(
             changedEv,
             plannedStoredEnergyEndOfTrip,
-            plannedDestinationCategoricalLocation,
+            plannedDestinationPoi.categoricalLocation,
             plannedParkingTimeStart,
             plannedDepartureTime
           )
@@ -248,7 +246,6 @@ object TripSimulation extends LazyLogging {
                 keepOriginalTrip(
                   changedEv,
                   plannedStoredEnergyEndOfTrip,
-                  plannedDestinationCategoricalLocation,
                   plannedDestinationPoi,
                   plannedParkingTimeStart,
                   plannedDepartureTime
@@ -292,7 +289,6 @@ object TripSimulation extends LazyLogging {
                 keepOriginalTrip(
                   changedEv,
                   plannedStoredEnergyEndOfTrip,
-                  plannedDestinationCategoricalLocation,
                   plannedDestinationPoi,
                   plannedParkingTimeStart,
                   plannedDepartureTime
@@ -306,7 +302,6 @@ object TripSimulation extends LazyLogging {
             keepOriginalTrip(
               changedEv,
               plannedStoredEnergyEndOfTrip,
-              plannedDestinationCategoricalLocation,
               plannedDestinationPoi,
               plannedParkingTimeStart,
               plannedDepartureTime
@@ -369,15 +364,12 @@ object TripSimulation extends LazyLogging {
 
   /** Properties of a target for a trip
     *
-    * @param categoricalLocation
-    *   Type of categorical location
     * @param poi
     *   Actual target POI
     * @param distance
     *   Distance to be driven
     */
   private final case class TargetProperties(
-      categoricalLocation: CategoricalLocationDictionary.Value,
       poi: PointOfInterest,
       distance: ComparableQuantity[Length],
       updatedEv: ElectricVehicle
@@ -410,7 +402,6 @@ object TripSimulation extends LazyLogging {
 
         /* Return the determined values */
         TargetProperties(
-          destinationPoi.categoricalLocation,
           destinationPoi,
           remainingDistance,
           updatedEv
@@ -480,7 +471,6 @@ object TripSimulation extends LazyLogging {
             destinationPoiType
           )
         TargetProperties(
-          categoricalLocation,
           poi,
           drivingDistance,
           ev
@@ -973,8 +963,6 @@ object TripSimulation extends LazyLogging {
     *   The EV for which the trip shall be simulated
     * @param plannedStoredEnergyEndOfTrip
     *   planned stored energy at end of the trip
-    * @param plannedDestinationCategoricalLocation
-    *   planned destination categorical location
     * @param plannedDestinationPoi
     *   planned destination POI
     * @param plannedParkingTimeStart
@@ -986,7 +974,6 @@ object TripSimulation extends LazyLogging {
   def keepOriginalTrip(
       ev: ElectricVehicle,
       plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy],
-      plannedDestinationCategoricalLocation: CategoricalLocationDictionary.Value,
       plannedDestinationPoi: PointOfInterest,
       plannedParkingTimeStart: ZonedDateTime,
       plannedDepartureTime: ZonedDateTime
@@ -1070,13 +1057,12 @@ object TripSimulation extends LazyLogging {
       }
 
     /* Create updated EV */
-    val updatedEv: ElectricVehicle = ev.copyWith(
+    ev.copyWith(
       ev.getStoredEnergy,
       ev.destinationPoi,
       parkingTimeStart,
       departureTime
     )
-    updatedEv
   }
 
   /** Calculate stored energy at the end of the trip based on the trip distance.

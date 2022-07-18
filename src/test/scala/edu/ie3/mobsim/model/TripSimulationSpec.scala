@@ -6,10 +6,12 @@
 
 package edu.ie3.mobsim.model
 
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN
 import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
+import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
@@ -20,8 +22,10 @@ import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
 import scala.collection.mutable
 
-class TripSimulationSpec extends UnitSpec with TripSimulationTestData {
-class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
+class TripSimulationSpec
+    extends UnitSpec
+    with ChargingBehaviorTestData
+    with IoUtilsTestData {
 
   "TripSimulation" should {
     "not simulate a new trip and keep charging when SoC < 70 %" in {
@@ -56,15 +60,12 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               homePoi,
               workPoi,
               storedEnergy,
-              destinationPoiType,
-              destinationCategoricalLocation,
               destinationPoi,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
-              finalDestinationPoiType,
               finalDestinationPoi,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
@@ -81,14 +82,14 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe half
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          destinationPoi.getPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe charging_hub_townPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(4).plusMinutes(33)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe None
+          finalDestinationPoi.map(_.getPoiType) shouldBe None
           finalDestinationPoi shouldBe None
           remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
@@ -127,15 +128,12 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               homePoi,
               workPoi,
               storedEnergy,
-              destinationPoiType,
-              destinationCategoricalLocation,
               destinationPoi,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
-              finalDestinationPoiType,
               finalDestinationPoi,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
@@ -152,14 +150,14 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe zero
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe PoiTypeDictionary.SHOPPING
-          destinationCategoricalLocation shouldBe CategoricalLocationDictionary.SUPERMARKET
+          destinationPoi.getPoiType shouldBe PoiTypeDictionary.SHOPPING
+          destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.SUPERMARKET
           destinationPoi shouldBe supermarket
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(1).plusMinutes(1)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe None
+          finalDestinationPoi.map(_.getPoiType) shouldBe None
           finalDestinationPoi shouldBe None
           remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
@@ -172,7 +170,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
 
       val updatedEv: ElectricVehicle = TripSimulation.makeTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
-        ev1,
+        ev,
         givenSimulationStart,
         poisWithSizes,
         0.5,
@@ -208,7 +206,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
             ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev.getUuid
-          id shouldBe"car_4"
+          id shouldBe "car_4"
           model shouldBe "cool_producer cool_model"
           batteryCapacity shouldBe givenModel.capacity
           acChargingPower shouldBe givenModel.acPower
@@ -225,10 +223,8 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi.map(_.getPoiType) shouldBe Some(
-            supermarketPoi.getPoiType
-          )
-          finalDestinationPoi shouldBe Some(supermarketPoi)
+          finalDestinationPoi.map(_.getPoiType) shouldBe Some(CHARGING_HUB_TOWN)
+          finalDestinationPoi shouldBe Some(charging_hub_townPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(-7000, METRE)
           )
@@ -248,7 +244,7 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           poisWithSizes,
           0.2,
           Quantities.getQuantity(1000, METRE),
-          plannedDestinationPoi,
+          supermarketPoi,
           chargingStations,
           speed
         )
@@ -312,8 +308,6 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
       TripSimulation.keepOriginalTrip(
         ev,
         plannedStoredEnergyEndOfTrip,
-        plannedDestinationPoiType,
-        plannedDestinationCategoricalLocation,
         plannedDestinationPoi,
         plannedParkingTimeStart,
         plannedDepartureTime
@@ -336,7 +330,6 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
-
               finalDestinationPoi,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
@@ -353,14 +346,14 @@ class TripSimulationSpec extends UnitSpec with ChargingBehaviorTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe plannedStoredEnergyEndOfTrip
           chargingAtSimona shouldBe false
-          destinationPoiType shouldBe plannedDestinationPoiType
-          destinationCategoricalLocation shouldBe plannedDestinationCategoricalLocation
+          destinationPoi.getPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
+          destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.CHARGING_HUB_TOWN
           destinationPoi shouldBe plannedDestinationPoi
           parkingTimeStart shouldBe plannedParkingTimeStart
           departureTime shouldBe plannedDepartureTime
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoiType shouldBe None
+          finalDestinationPoi.map(_.getPoiType) shouldBe None
           finalDestinationPoi shouldBe None
           remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
