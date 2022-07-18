@@ -462,7 +462,7 @@ object TripSimulation extends LazyLogging {
       categoricalLocation,
       categoricalLocationToPdf
     ) match {
-      case (categoricalLocation, poi) =>
+      case poi =>
         /* Sample driving distance */
         val drivingDistance: ComparableQuantity[Length] =
           tripDistance.sample(
@@ -508,14 +508,14 @@ object TripSimulation extends LazyLogging {
           PointOfInterest
         ]
       ]
-  ): (PoiEnums.CategoricalLocationDictionary.Value, PointOfInterest) = {
+  ): PointOfInterest = {
     destinationPoiType match {
       case HOME =>
         /* POI type "Home" is directly mapped to a fixed home POI */
-        (CategoricalLocationDictionary.HOME, homePoi)
+        homePoi
       case WORK =>
         /* POI type "Work" is directly mapped to a fixed work POI */
-        (CategoricalLocationDictionary.WORK, workPoi)
+        workPoi
       case _ =>
         /* Any other POI type. Sample a random categorical location and based on that a specific POI. */
         sampleDestinationCategoricalLocationAndPoi(
@@ -559,11 +559,11 @@ object TripSimulation extends LazyLogging {
       ],
       depth: Int = 0,
       maxDepth: Int = 4
-  ): (PoiEnums.CategoricalLocationDictionary.Value, PointOfInterest) = {
+  ): PointOfInterest = {
     val nextCategoricalLocation =
       categoricalLocation.sample(time, destinationPoiType)
     categoricalLocationToPdf.get(nextCategoricalLocation) match {
-      case Some(pdf) => nextCategoricalLocation -> pdf.sample()
+      case Some(pdf) => pdf.sample()
       case None =>
         if (depth > maxDepth) {
           throw TripException(
