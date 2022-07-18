@@ -17,6 +17,7 @@ import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
+import scala.collection.mutable
 
 class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
   "The ChargingBehavior" should {
@@ -367,6 +368,34 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       x shouldBe Map(
         UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81") -> 5.0
       )
+    }
+
+    "return the correct price rating" in {
+      val priceRating = PrivateMethod[Double](Symbol("priceRating"))
+
+      val evWithLowPriceMemory: ElectricVehicle = ev1
+      evWithLowPriceMemory.updateChargingPricesMemory(0.0)
+
+      val evWithHighPriceMemory: ElectricVehicle = ev1
+      evWithHighPriceMemory.updateChargingPricesMemory(0.0)
+      evWithHighPriceMemory.updateChargingPricesMemory(1.0)
+
+      val cases = Table(
+        ("chargingStation", "ev", "prices", "resultingRating"),
+        (cs6, ev1, Map.empty[UUID, Double], 1.0),
+        (cs6, ev1, Map(cs6.getUuid -> 0.0), 1.0),
+        (cs6, evWithLowPriceMemory, Map(cs6.getUuid -> 0.0), 0.5),
+        (cs6, evWithHighPriceMemory, Map(cs6.getUuid -> 0.0), 1.0)
+      )
+
+      forAll(cases) { (chargingStation, ev, prices, resultingRating) =>
+        val result: Double = ChargingBehavior invokePrivate priceRating(
+          chargingStation,
+          ev,
+          prices
+        )
+        result shouldBe resultingRating
+      }
     }
   }
 }

@@ -85,17 +85,23 @@ final class MobilitySimulator(
     )
 
     /* Receive available charging points of evcs from SIMONA */
-    val availableChargingPoints: Map[UUID, Integer] =
-      evData.requestAvailablePublicEvCs().asScala.toMap
+    val availableChargingPoints: Map[UUID, Int] = {
+      evData.requestAvailablePublicEvCs().asScala.toMap.map { case (k, v) =>
+        (k, v.intValue())
+      }
+    }
 
     /* Receive current prices for public evcs situation */
-    val currentPricesAtChargingStations: Map[UUID, java.lang.Double] =
-      evData.requestCurrentPrices().asScala.toMap
+    val currentPricesAtChargingStations: Map[UUID, Double] = {
+      evData.requestCurrentPrices().asScala.toMap.map { case (k, v) =>
+        (k, v.doubleValue())
+      }
+    }
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
       departedEvsFromSimona: SortedSet[ElectricVehicle],
-      availableChargingPointsAfterMovements: Map[UUID, Integer]
+      availableChargingPointsAfterMovements: Map[UUID, Int]
     ) = sendEvMovementsToSimona(
       currentTime,
       availableChargingPoints,
@@ -154,10 +160,10 @@ final class MobilitySimulator(
     */
   private def sendEvMovementsToSimona(
       currentTime: ZonedDateTime,
-      availableChargingPoints: Map[UUID, Integer],
-      currentPricesAtChargingStations: Map[UUID, java.lang.Double],
+      availableChargingPoints: Map[UUID, Int],
+      currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: ComparableQuantity[Length]
-  ): (SortedSet[ElectricVehicle], Map[UUID, Integer]) = {
+  ): (SortedSet[ElectricVehicle], Map[UUID, Int]) = {
     val builder = new EvMovementsMessageBuilder
 
     /* Determine parking and departing evs in this tick */
@@ -240,9 +246,9 @@ final class MobilitySimulator(
     */
   private def handleDepartures(
       evs: Set[ElectricVehicle],
-      availableChargingPoints: Map[UUID, Integer],
+      availableChargingPoints: Map[UUID, Int],
       builder: EvMovementsMessageBuilder
-  ): Map[UUID, Integer] = {
+  ): Map[UUID, Int] = {
     val (additionallyFreeChargingPoints, departures) =
       handleDepartingEvs(evs)
     departures.foreach { case Movement(cs, ev) =>
@@ -263,7 +269,7 @@ final class MobilitySimulator(
     */
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
-  ): (Map[UUID, Integer], Seq[Movement]) =
+  ): (Map[UUID, Int], Seq[Movement]) =
     Await.result(
       Future
         .sequence(evs.toSeq.map(handleDepartingEv))
@@ -326,12 +332,12 @@ final class MobilitySimulator(
     *   Updated overview of free lots
     */
   private def updateFreeLots(
-      freeLots: Map[UUID, Integer],
-      change: Map[UUID, Integer]
-  ): Map[UUID, Integer] =
+      freeLots: Map[UUID, Int],
+      change: Map[UUID, Int]
+  ): Map[UUID, Int] =
     freeLots.map { case (uuid, freeLots) =>
-      val lotDiff: Integer = change.getOrElse(uuid, 0)
-      val newLots: Integer = freeLots + lotDiff
+      val lotDiff: Int = change.getOrElse(uuid, 0)
+      val newLots: Int = freeLots + lotDiff
       uuid -> newLots
     } ++ change
       .filter { case (uuid, _) =>
@@ -339,7 +345,7 @@ final class MobilitySimulator(
       }
       .map { uuidToDifference =>
         val uuid = uuidToDifference._1
-        val lotDifference: Integer = uuidToDifference._2
+        val lotDifference: Int = uuidToDifference._2
         uuid -> lotDifference
       }
 
@@ -362,10 +368,10 @@ final class MobilitySimulator(
     */
   private def handleParkingEvs(
       evs: SortedSet[ElectricVehicle],
-      pricesAtChargingStation: Map[UUID, java.lang.Double],
-      availableChargingPoints: Map[UUID, Integer],
+      pricesAtChargingStation: Map[UUID, Double],
+      availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): (Map[UUID, Integer], Seq[Movement]) =
+  ): (Map[UUID, Int], Seq[Movement]) =
     Await.result(
       Future
         .sequence {
@@ -410,8 +416,8 @@ final class MobilitySimulator(
     */
   private def handleArrivingEv(
       ev: ElectricVehicle,
-      pricesAtChargingStation: Map[UUID, java.lang.Double],
-      availableChargingPoints: Map[UUID, Integer],
+      pricesAtChargingStation: Map[UUID, Double],
+      availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Future[Option[(UUID, Movement)]] = Future {
     chooseChargingStation(
@@ -421,7 +427,7 @@ final class MobilitySimulator(
       MobilitySimulator.seed,
       maxDistance
     ).map { cs =>
-      val availableChargingPointsAtStation: Integer =
+      val availableChargingPointsAtStation: Int =
         availableChargingPoints.getOrElse(cs, 0)
       if (availableChargingPointsAtStation > 0) {
         ev.setChargingAtSimona(true)
