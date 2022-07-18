@@ -307,10 +307,8 @@ case object PointOfInterest {
             case Some((cs, distance)) =>
               val updatedPoi =
                 poi.copy(nearestChargingStations = Map(cs -> distance))
-              val newCs: ChargingStation =
-                cs.setHomeChargingStationAssignedToPOI(true)
               (
-                alreadyAssignedChargingStations :+ newCs,
+                alreadyAssignedChargingStations :+ cs,
                 adaptedPois :+ updatedPoi
               )
             case None =>

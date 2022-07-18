@@ -35,12 +35,6 @@ case class ChargingStation(
   def isHomeChargingStationAssignedToPOI: Boolean =
     homeChargingStationAssignedToPOI
 
-  def setHomeChargingStationAssignedToPOI(
-      assigned: Boolean
-  ): ChargingStation = {
-    copy(homeChargingStationAssignedToPOI = assigned)
-  }
-
 }
 
 case object ChargingStation extends LazyLogging {
