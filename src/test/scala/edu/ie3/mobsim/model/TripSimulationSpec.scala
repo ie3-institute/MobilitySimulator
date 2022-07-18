@@ -24,7 +24,6 @@ import scala.collection.mutable
 
 class TripSimulationSpec
     extends UnitSpec
-    with ChargingBehaviorTestData
     with IoUtilsTestData {
 
   "TripSimulation" should {
