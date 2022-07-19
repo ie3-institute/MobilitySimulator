@@ -59,6 +59,17 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
     Map(cs6.getUuid -> Integer.valueOf(0))
   }
 
+  protected val evChargingAtSimonaWithStation: ElectricVehicle = {
+    ev1
+    ev1.copy(chargingAtSimona = true)
+    ev1.copy(chosenChargingStation = Some(cs6.getUuid))
+  }
+
+  protected val evChargingAtSimonaWithoutStation: ElectricVehicle = {
+    ev1
+    ev1.copy(chargingAtSimona = true)
+  }
+
   val mobSim: MobilitySimulator = new MobilitySimulator(
     evData = evData,
     chargingStations = chargingStations,
