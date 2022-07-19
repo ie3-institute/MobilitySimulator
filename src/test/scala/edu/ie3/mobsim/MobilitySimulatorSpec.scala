@@ -6,7 +6,7 @@
 
 package edu.ie3.mobsim
 
-import edu.ie3.mobsim.MobilitySimulator.Movement
+import edu.ie3.mobsim.MobilitySimulator.{Movement, seed}
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
@@ -259,5 +259,32 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       }
     }
 
+    "update and simulate departed evs" in {}
+
+    "get time until next event" in {
+      val getTimeUntilNextEvent =
+        PrivateMethod[Long](Symbol("getTimeUntilNextEvent"))
+
+      val ev2: ElectricVehicle =
+        evChargingAtSimonaWithStation.copy(departureTime =
+          givenSimulationStart.plusMinutes(45)
+        )
+
+      val cases = Table(
+        ("evs", "result"),
+        (Seq(arrivingEv).toSet, 3600),
+        (Seq(ev2).toSet, 2700),
+        (Seq(arrivingEv, ev2).toSet, 2700)
+      )
+
+      forAll(cases) { (evs, result) =>
+        val nextEvent: Long = mobSim invokePrivate getTimeUntilNextEvent(
+          evs,
+          givenSimulationStart
+        )
+
+        nextEvent shouldBe result
+      }
+    }
   }
 }
