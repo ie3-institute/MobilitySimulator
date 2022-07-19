@@ -7,7 +7,11 @@
 package edu.ie3.mobsim
 
 import akka.actor.ActorRef
-import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary.WORK
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary.{
+  CHARGING_HUB_HIGHWAY,
+  CHARGING_HUB_TOWN,
+  WORK
+}
 import edu.ie3.mobsim.model.{ChargingBehaviorTestData, ElectricVehicle}
 import edu.ie3.simona.api.data.ev.ExtEvData
 import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
@@ -25,10 +29,11 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
   def evIsParking(evs: Seq[ElectricVehicle]): SortedSet[ElectricVehicle] = {
     evs.foreach { ev =>
       ev.copyWith(
-        storedEnergy = half,
-        destinationPoiType = WORK,
-        destinationCategoricalLocation = workPoi.categoricalLocation,
-        destinationPoi = workPoi,
+        storedEnergy = zero,
+        destinationPoiType = CHARGING_HUB_HIGHWAY,
+        destinationCategoricalLocation =
+          charging_hub_highwayPoi.categoricalLocation,
+        destinationPoi = charging_hub_highwayPoi,
         parkingTimeStart = givenSimulationStart,
         departureTime = givenSimulationStart.plusHours(5)
       )
@@ -57,6 +62,24 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
 
   protected val chargingPointsAllTaken: Map[UUID, Integer] = {
     Map(cs6.getUuid -> Integer.valueOf(0))
+  }
+
+  protected val chargingPointsAllFree: Map[UUID, Integer] = {
+    Map(cs6.getUuid -> cs6.getChargingPoints)
+  }
+
+  protected val pricesAtChargingStation: Map[UUID, Double] = {
+    Map(cs6.getUuid -> 0.0)
+  }
+
+  protected val arrivingEv: ElectricVehicle = {
+    ev1
+    ev1.copy(
+      destinationPoi = charging_hub_highwayPoi,
+      destinationPoiType = CHARGING_HUB_HIGHWAY,
+      destinationCategoricalLocation =
+        charging_hub_highwayPoi.categoricalLocation
+    )
   }
 
   protected val evChargingAtSimonaWithStation: ElectricVehicle = {
