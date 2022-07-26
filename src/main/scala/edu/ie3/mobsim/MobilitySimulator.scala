@@ -96,8 +96,8 @@ final class MobilitySimulator(
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
-      departedEvsFromSimona: SortedSet[ElectricVehicle],
-      availableChargingPointsAfterMovements: Map[UUID, Int]
+      departedEvsFromSimona,
+      chargingStationOccupancy
     ) = sendEvMovementsToSimona(
       currentTime,
       availableChargingPoints,
@@ -127,7 +127,7 @@ final class MobilitySimulator(
     chargingStations.foreach(cs =>
       ioUtils.writeEvcs(
         cs,
-        availableChargingPointsAfterMovements,
+        chargingStationOccupancy,
         currentTime
       )
     )
@@ -159,7 +159,7 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, java.lang.Double],
       maxDistance: ComparableQuantity[Length]
-  ): (SortedSet[ElectricVehicle], Map[UUID, Int]) = {
+  ): (SortedSet[ElectricVehicle], Map[UUID, Set[ElectricVehicle]]) = {
     val builder = new EvMovementsMessageBuilder
 
     /* Determine parking and departing evs in this tick */
@@ -172,7 +172,7 @@ final class MobilitySimulator(
       handleDepartures(departingEvs, availableChargingPoints, builder)
 
     /* Add EVs that start parking to movements and assign to Evcs UUID */
-    val (takenChargingPoints, arrivals) = handleParkingEvs(
+    val (_, arrivals) = handleParkingEvs(
       parkingEvs,
       currentPricesAtChargingStations,
       updatedChargingPoints,
@@ -181,8 +181,19 @@ final class MobilitySimulator(
     arrivals.foreach { case Movement(cs, ev) =>
       builder.addArrival(cs, ev)
     }
-    val finalTakenChargingPoints =
-      updateFreeLots(updatedChargingPoints, takenChargingPoints)
+
+    // compile map from evcs to their parked evs
+    val evcsToParkedEvs = electricVehicles
+      .flatMap {
+        case ev =>
+          ev.getChosenChargingStation.map(ev -> _)
+        case _ => None
+      }
+      .groupMap { case (_, cs) =>
+        cs
+      } { case (ev, _) =>
+        ev
+      }
 
     /* Send to SIMONA and receive departed EVs */
     val movements = builder.build()
@@ -197,7 +208,7 @@ final class MobilitySimulator(
     )
     val sortedSet = SortedSet
       .empty[ElectricVehicle] ++ departedEvs
-    (sortedSet, finalTakenChargingPoints)
+    (sortedSet, evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
