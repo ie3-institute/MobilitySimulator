@@ -186,7 +186,7 @@ case class ElectricVehicle(
   }
 
   override def toString: String =
-    s"EV(id=$id, eStorage=$batteryCapacity, storedEnergy=$storedEnergy, AC=$acChargingPower, DC=$dcChargingPower, departureTime=$departureTime"
+    s"EV(id=$id, eStorage=$batteryCapacity, storedEnergy=$storedEnergy, AC=$acChargingPower, DC=$dcChargingPower, departureTime=$departureTime)"
 
 }
 

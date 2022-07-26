@@ -104,7 +104,7 @@ object ChargingBehavior extends LazyLogging {
       /* If there are no charging stations nearby */
     } else {
       logger.debug(
-        s"${ev.getId} can't charge because there are no charging stations nearby."
+        s"${ev.getId} can't charge because POI ${ev.getDestinationPoi.id} does not have charging stations nearby."
       )
       None
     }
