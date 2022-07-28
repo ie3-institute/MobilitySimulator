@@ -47,7 +47,7 @@ import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedSet, TreeSet}
-import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
+import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Random, Success}
 
@@ -172,7 +172,7 @@ final class MobilitySimulator(
       handleDepartures(departingEvs, availableChargingPoints, builder)
 
     /* Add EVs that start parking to movements and assign to Evcs UUID */
-    val (_, arrivals) = handleParkingEvs(
+    val arrivals = handleParkingEvs(
       parkingEvs,
       currentPricesAtChargingStations,
       updatedChargingPoints,
@@ -277,7 +277,7 @@ final class MobilitySimulator(
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
   ): (Map[UUID, Int], Seq[Movement]) =
-    evs.par.flatMap(handleDepartingEv).unzip match {
+    evs.par.toSeq.flatMap(handleDepartingEv).unzip match {
       case (uuids, movements) =>
         (
           uuids
@@ -286,7 +286,7 @@ final class MobilitySimulator(
               uuid -> uuids.size
             }
             .seq,
-          movements.seq.toSeq
+          movements.seq
         )
     }
 
@@ -351,8 +351,7 @@ final class MobilitySimulator(
       }
 
   /** Handle parking evs. Based on given surrounding information, a target
-    * charging station is sampled. The newly taken charging points as well as
-    * the movements are tracked and handed back.
+    * charging station is sampled. The movements are tracked and handed back.
     *
     * @param evs
     *   Collection of parking evs
@@ -364,34 +363,36 @@ final class MobilitySimulator(
     *   Maximum permissible distance between an point of interest and a
     *   candidate charging station
     * @return
-    *   An overview of newly taken charging points as well as a collection of
-    *   movements
+    *   A collection of movements
     */
   private def handleParkingEvs(
       evs: SortedSet[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, java.lang.Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): (Map[UUID, Int], Seq[Movement]) =
-    evs.par.flatMap {
-      /* Lets the EV choose whether and at which charging station it wants to charge */
-      handleArrivingEv(
-        _,
-        pricesAtChargingStation,
-        availableChargingPoints,
-        maxDistance
-      )
-    }.unzip match {
-      case (uuids, movements) =>
-        (
-          uuids
-            .groupBy(uuid => uuid)
-            .map { case (uuid, uuids) =>
-              uuid -> -uuids.size
+  ): Seq[Movement] =
+    evs.toSeq.foldLeft((availableChargingPoints, Seq.empty[Movement])) {
+      case ((updatedAvailableChargingPoints, movements), ev) =>
+        /* Lets the EV choose whether and at which charging station it wants to charge */
+        handleArrivingEv(
+          ev,
+          pricesAtChargingStation,
+          updatedAvailableChargingPoints,
+          maxDistance
+        ).flatMap {
+          // in case of a successful start of charging,
+          // remove the charging point from available points
+          // so that it won't be chosen more than once
+          case movement @ Movement(cs, _) =>
+            updatedAvailableChargingPoints.get(cs).map { count =>
+              (
+                updatedAvailableChargingPoints + (cs -> (count - 1)),
+                movements :+ movement
+              )
             }
-            .seq,
-          movements.seq.toSeq
-        )
+        }.getOrElse((updatedAvailableChargingPoints, movements))
+    } match {
+      case (_, movements) => movements
     }
 
   /** Handle a single arriving ev, that wants to charge
@@ -406,15 +407,15 @@ final class MobilitySimulator(
     *   Maximum permissible distance between point of interest and charging
     *   station
     * @return
-    *   An [[Option]] of the target charging stations' UUID as well as
-    *   information about the movement
+    *   An [[Option]] of the movement towards a charging station, if one was
+    *   made
     */
   private def handleArrivingEv(
       ev: ElectricVehicle,
       pricesAtChargingStation: Map[UUID, java.lang.Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): Option[(UUID, Movement)] =
+  ): Option[Movement] =
     chooseChargingStation(
       ev,
       pricesAtChargingStation,
@@ -432,7 +433,7 @@ final class MobilitySimulator(
           s"${ev.getId} starts charging at $cs."
         )
 
-        Some((cs, Movement(cs, ev)))
+        Some(Movement(cs, ev))
       } else {
         logger.debug(
           s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi} " +
