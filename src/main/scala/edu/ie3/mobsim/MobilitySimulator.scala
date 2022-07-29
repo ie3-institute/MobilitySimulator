@@ -341,8 +341,8 @@ final class MobilitySimulator(
       change: Map[UUID, Integer]
   ): Map[UUID, Integer] =
     freeLots.map { case (uuid, freeLots) =>
-      val lotDiff = change.getOrElse(uuid, 0)
-      val newLots = freeLots + lotDiff
+      val lotDiff: Integer = change.getOrElse(uuid, 0)
+      val newLots: Integer = freeLots + lotDiff
       uuid -> newLots
     } ++ change
       .filter { case (uuid, _) =>
