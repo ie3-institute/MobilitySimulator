@@ -6,10 +6,6 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
@@ -19,14 +15,14 @@ import tech.units.indriya.unit.Units
 
 import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
 class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
   "Building and assigning evs" when {
 
     "building the car models" should {
       "assign the correct properties" in {
-        val ev: ElectricVehicle = ElectricVehicle.buildEv(
+        ElectricVehicle.buildEv(
           "test_car",
           givenModel,
           givenHomePoi,
@@ -34,9 +30,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           givenSimulationStart,
           givenFirstDeparture,
           isChargingAtHomePossible = true
-        )
-
-        ev match {
+        ) match {
           case ElectricVehicle(
                 simulationStart,
                 uuid,
@@ -60,28 +54,24 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 chargingPricesMemory
               ) =>
             simulationStart shouldBe givenSimulationStart
-            uuid shouldBe ev.getUuid
             id shouldBe "test_car"
             model shouldBe "cool_producer cool_model"
             batteryCapacity shouldBe givenModel.capacity
             acChargingPower shouldBe givenModel.acPower
             dcChargingPower shouldBe givenModel.dcPower
             consumption shouldBe givenModel.consumption
-            homePoi shouldBe ev.homePoi
-            workPoi shouldBe ev.workPoi
+            homePoi shouldBe givenHomePoi
+            workPoi shouldBe givenWorkPoi
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
-            ev.destinationPoi.getPoiType shouldBe PoiTypeDictionary.HOME
-            ev.destinationPoi.categoricalLocation shouldBe CategoricalLocationDictionary.HOME
             destinationPoi shouldBe givenHomePoi
             parkingTimeStart shouldBe simulationStart
             departureTime shouldBe givenFirstDeparture
             chosenChargingStation shouldBe None
             chargingAtHomePossible shouldBe true
-            ev.getFinalDestinationPoiType shouldBe None
             finalDestinationPoi shouldBe None
             remainingDistanceAfterChargingHub shouldBe None
-            chargingPricesMemory shouldBe mutable.Queue[Double]()
+            chargingPricesMemory shouldBe immutable.Queue[Double]()
         }
       }
 
@@ -310,8 +300,8 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
 
       "copy object with chosen charging station" in {
         val evSetChargingStation: ElectricVehicle =
-          evWithHomeCharging.setChosenChargingStation(Some(cs6.getUuid))
-        evSetChargingStation.chosenChargingStation shouldBe Some(cs6.getUuid)
+          evWithHomeCharging.setChosenChargingStation(Some(cs6.uuid))
+        evSetChargingStation.chosenChargingStation shouldBe Some(cs6.uuid)
 
         val evNoChargingStation: ElectricVehicle =
           evWithHomeCharging.setChosenChargingStation(None)

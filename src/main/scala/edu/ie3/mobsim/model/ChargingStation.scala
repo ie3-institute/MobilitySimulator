@@ -18,24 +18,14 @@ import java.util.UUID
 import scala.jdk.CollectionConverters._
 
 case class ChargingStation(
-    private val uuid: UUID,
-    private val id: String,
-    private val geoPosition: Coordinate,
-    private val evcsType: ChargingPointType,
-    private val evcsLocationType: EvcsLocationType,
-    private val chargingPoints: Int,
-    private val homeChargingStationAssignedToPOI: Boolean
-) {
-
-  def getUuid: UUID = uuid
-  def getGeoPosition: Coordinate = geoPosition
-  def getChargingPoints: Int = chargingPoints
-  def getEvcsType: ChargingPointType = evcsType
-  def getEvcsLocationType: EvcsLocationType = evcsLocationType
-  def isHomeChargingStationAssignedToPOI: Boolean =
-    homeChargingStationAssignedToPOI
-
-}
+    uuid: UUID,
+    id: String,
+    geoPosition: Coordinate,
+    evcsType: ChargingPointType,
+    evcsLocationType: EvcsLocationType,
+    chargingPoints: Int,
+    homeChargingStationAssignedToPOI: Boolean
+)
 
 case object ChargingStation extends LazyLogging {
 

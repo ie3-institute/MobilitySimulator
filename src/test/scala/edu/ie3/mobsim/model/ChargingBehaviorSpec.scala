@@ -27,7 +27,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         maxDistance
       )
 
-      uuid shouldBe Some(cs2.getUuid)
+      uuid shouldBe Some(cs2.uuid)
     }
 
     "choose no chargingStation if charging is not needed" in {

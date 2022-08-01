@@ -584,16 +584,13 @@ final class MobilitySimulator(
   }
 
   private def updateElectricVehicles(movements: Seq[Movement]): Unit = {
-    val movementMap: Map[UUID, ElectricVehicle] = movements.map { movement =>
+    val movementMap = movements.map { movement =>
       movement.ev.uuid -> movement.ev
     }.toMap
 
+    // updates all ev in electricVehicles that are departing or arriving
     electricVehicles = electricVehicles.map { ev =>
-      if (movementMap.contains(ev.uuid)) {
-        movementMap(ev.uuid)
-      } else {
-        ev
-      }
+      movementMap.getOrElse(ev.uuid, ev)
     }
   }
 }
@@ -787,21 +784,21 @@ object MobilitySimulator
           cs: ChargingStation
       ) => {
         (
-          totalNumberOfChargingPoints._1 + cs.getChargingPoints,
-          if (cs.getEvcsLocationType == EvcsLocationType.HOME)
-            totalNumberOfChargingPoints._2 + cs.getChargingPoints
+          totalNumberOfChargingPoints._1 + cs.chargingPoints,
+          if (cs.evcsLocationType == EvcsLocationType.HOME)
+            totalNumberOfChargingPoints._2 + cs.chargingPoints
           else totalNumberOfChargingPoints._2,
           if (
-            cs.getEvcsLocationType == EvcsLocationType.WORK || cs.getEvcsLocationType == EvcsLocationType.STREET
-            || cs.getEvcsLocationType == EvcsLocationType.CUSTOMER_PARKING
+            cs.evcsLocationType == EvcsLocationType.WORK || cs.evcsLocationType == EvcsLocationType.STREET
+            || cs.evcsLocationType == EvcsLocationType.CUSTOMER_PARKING
           )
-            totalNumberOfChargingPoints._3 + cs.getChargingPoints
+            totalNumberOfChargingPoints._3 + cs.chargingPoints
           else totalNumberOfChargingPoints._3,
           if (
-            cs.getEvcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN
-            || cs.getEvcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY
+            cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN
+            || cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY
           )
-            totalNumberOfChargingPoints._4 + cs.getChargingPoints
+            totalNumberOfChargingPoints._4 + cs.chargingPoints
           else totalNumberOfChargingPoints._4
         )
       }

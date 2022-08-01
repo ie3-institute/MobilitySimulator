@@ -55,7 +55,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val half: ComparableQuantity[Energy] =
     Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR)
 
-  def ev1: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev1: ElectricVehicle = ElectricVehicle.buildEv(
     "car_1",
     givenModel,
     givenHomePoi,
@@ -65,7 +65,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev2: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev2: ElectricVehicle = ElectricVehicle.buildEv(
     "car_2",
     givenModel,
     givenHomePoi,
@@ -75,7 +75,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev3: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev3: ElectricVehicle = ElectricVehicle.buildEv(
     "car_3",
     givenModel,
     givenHomePoi,
@@ -85,7 +85,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev4: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev4: ElectricVehicle = ElectricVehicle.buildEv(
     "car_4",
     givenModel,
     givenHomePoi,
@@ -95,7 +95,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev5: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev5: ElectricVehicle = ElectricVehicle.buildEv(
     "car_5",
     givenModel,
     givenHomePoi,

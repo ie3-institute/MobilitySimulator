@@ -82,7 +82,7 @@ final case class IoUtils private (
       "max_charging_power_dc" ->
         ev.getSRatedDC.to(KILOWATT).getValue.doubleValue().toString,
       "consumption" ->
-        ev.getConsumption
+        ev.consumption
           .to(KILOWATTHOUR_PER_KILOMETRE)
           .getValue
           .doubleValue()
@@ -116,10 +116,10 @@ final case class IoUtils private (
     val fieldData = Map(
       "uuid" -> uuid.toString,
       "time" -> currentTime.toString,
-      "evcs" -> cs.getUuid.toString,
-      "charging_points" -> cs.getChargingPoints.toString,
-      "occupied_charging_points" -> (cs.getChargingPoints - availableChargingPoints
-        .getOrElse(cs.getUuid, 0)
+      "evcs" -> cs.uuid.toString,
+      "charging_points" -> cs.chargingPoints.toString,
+      "occupied_charging_points" -> (cs.chargingPoints - availableChargingPoints
+        .getOrElse(cs.uuid, 0)
         .asInstanceOf[Integer]).toString
     ).asJava
 

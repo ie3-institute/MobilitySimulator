@@ -76,14 +76,14 @@ object ChargingBehavior extends LazyLogging {
           s"${ev.getId} arrives at charging hub and wants to start charging."
         )
         ev.destinationPoi.nearestChargingStations.keys.headOption
-          .map(_.getUuid)
+          .map(_.uuid)
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
         val priceQueue: mutable.Queue[Double] = mutable.Queue.empty
 
         ev.destinationPoi.nearestChargingStations.keys.foreach { cs =>
           currentPricesAtChargingStations
-            .get(cs.getUuid)
+            .get(cs.uuid)
             .map(priceQueue += _)
         }
         ev.updateChargingPricesMemory(priceQueue)
@@ -185,7 +185,7 @@ object ChargingBehavior extends LazyLogging {
       .map { case (cs, distance) =>
         /* Check if free charging spots are even available */
         val freeSpots: Integer =
-          currentlyAvailableChargingPoints.getOrElse(cs.getUuid, 0)
+          currentlyAvailableChargingPoints.getOrElse(cs.uuid, 0)
 
         /* If no spots are available, the rating is 0. Otherwise, calculate a rating */
         val rating = if (freeSpots < 1) {
@@ -205,7 +205,7 @@ object ChargingBehavior extends LazyLogging {
           // TODO: Improve weighting of ratings based on literature or testing?
           ratingForDistance + ratingForChargeableEnergy * 2 + ratingForPrice * 2
         }
-        cs.getUuid -> rating
+        cs.uuid -> rating
       }
       .seq
       .toMap
@@ -224,11 +224,11 @@ object ChargingBehavior extends LazyLogging {
       ev: ElectricVehicle
   ): Double = {
     val availableChargingPowerForEV =
-      cs.getEvcsType.getElectricCurrentType match {
+      cs.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
-          ev.getSRatedAC.min(cs.getEvcsType.getsRated()).to(KILOWATT)
+          ev.getSRatedAC.min(cs.evcsType.getsRated()).to(KILOWATT)
         case ElectricCurrentType.DC =>
-          ev.getSRatedDC.min(cs.getEvcsType.getsRated()).to(KILOWATT)
+          ev.getSRatedDC.min(cs.evcsType.getsRated()).to(KILOWATT)
       }
     val parkingTime =
       ev.parkingTimeStart
@@ -253,7 +253,7 @@ object ChargingBehavior extends LazyLogging {
       cs: ChargingStation,
       ev: ElectricVehicle,
       currentPrices: Map[UUID, java.lang.Double]
-  ): Double = currentPrices.get(cs.getUuid) match {
+  ): Double = currentPrices.get(cs.uuid) match {
     case Some(price) =>
       ev.chargingPricesMemory.maxOption.zip(
         ev.chargingPricesMemory.minOption

@@ -171,11 +171,11 @@ case object PointOfInterest {
   ): Map[EvcsLocationType, Set[ChargingStation]] =
     chargingStations
       .filterNot { evcs =>
-        evcs.getEvcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY ||
-        evcs.getEvcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN ||
-        evcs.isHomeChargingStationAssignedToPOI
+        evcs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY ||
+        evcs.evcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN ||
+        evcs.homeChargingStationAssignedToPOI
       }
-      .groupBy(_.getEvcsLocationType)
+      .groupBy(_.evcsLocationType)
 
   /** Parse Points of Interest of type home. First, all distances between POI
     * coordinates and charging stations are calculated asynchronously, filtered
@@ -275,8 +275,8 @@ case object PointOfInterest {
     chargingStation -> GeoUtils.calcHaversine(
       coordinate.y,
       coordinate.x,
-      chargingStation.getGeoPosition.y,
-      chargingStation.getGeoPosition.x
+      chargingStation.geoPosition.y,
+      chargingStation.geoPosition.x
     )
   }
 
@@ -468,7 +468,7 @@ case object PointOfInterest {
       case CategoricalLocationDictionary.HOME =>
         locationToChargingStations
           .getOrElse(EvcsLocationType.HOME, List.empty[ChargingStation])
-          .filterNot(_.isHomeChargingStationAssignedToPOI)
+          .filterNot(_.homeChargingStationAssignedToPOI)
           .toSet
       case CategoricalLocationDictionary.WORK =>
         locationToChargingStations
@@ -505,8 +505,8 @@ case object PointOfInterest {
         evcs -> GeoUtils.calcHaversine(
           poiCoordinate.y,
           poiCoordinate.x,
-          evcs.getGeoPosition.y,
-          evcs.getGeoPosition.x
+          evcs.geoPosition.y,
+          evcs.geoPosition.x
         )
       }
       .filter(_._2.isLessThan(maxDistance))

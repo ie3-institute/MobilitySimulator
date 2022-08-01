@@ -68,8 +68,6 @@ final case class ElectricVehicle(
 
   def getSRatedDC: ComparableQuantity[Power] = dcChargingPower
 
-  def getConsumption: ComparableQuantity[SpecificEnergy] = consumption
-
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
   def getDestinationPoiType: PoiTypeDictionary.Value = destinationPoi.getPoiType
@@ -283,7 +281,7 @@ case object ElectricVehicle extends LazyLogging {
         val evcsIsHomeType: Boolean =
           chargingStations
             .find(_ == cs._1)
-            .exists(_.getEvcsLocationType == EvcsLocationType.HOME)
+            .exists(_.evcsLocationType == EvcsLocationType.HOME)
         chargeAtHome || evcsIsHomeType
       }
     )

@@ -88,7 +88,7 @@ trait ElectricVehicleTestData {
     homeChargingStationAssignedToPOI = true
   )
 
-  val evWithHomeCharging: ElectricVehicle = ElectricVehicle.buildEv(
+  protected val evWithHomeCharging: ElectricVehicle = ElectricVehicle.buildEv(
     "test_car",
     givenModel,
     givenHomePoi,
@@ -97,13 +97,14 @@ trait ElectricVehicleTestData {
     givenFirstDeparture,
     isChargingAtHomePossible = true
   )
-  val evWithoutHomeCharging: ElectricVehicle = ElectricVehicle.buildEv(
-    "test_car",
-    givenModel,
-    givenHomePoi,
-    givenWorkPoi,
-    givenSimulationStart,
-    givenFirstDeparture,
-    isChargingAtHomePossible = false
-  )
+  protected val evWithoutHomeCharging: ElectricVehicle =
+    ElectricVehicle.buildEv(
+      "test_car",
+      givenModel,
+      givenHomePoi,
+      givenWorkPoi,
+      givenSimulationStart,
+      givenFirstDeparture,
+      isChargingAtHomePossible = false
+    )
 }

@@ -15,7 +15,6 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
 
 import java.io.{BufferedReader, File, FileReader}
 import java.util
-import scala.jdk.CollectionConverters._
 
 class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
   "IoUtils" should {
@@ -117,16 +116,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val chargingPoints: String = cs6.getChargingPoints.toString
+      val chargingPoints: Int = cs6.chargingPoints
       val occupiedChargingPoints: String =
-        (cs6.getChargingPoints - availableChargingPoints.getOrElse(
-          cs6.getUuid,
+        (chargingPoints - availableChargingPoints.getOrElse(
+          cs6.uuid,
           0
         )).toString
 
-      val entry: String = (s"${uuid.toString}," +
-        s"${currentTime.toString}," +
-        s"${cs6.getUuid.toString}," +
+      val entry: String = (s"$uuid," +
+        s"$currentTime," +
+        s"${cs6.uuid}," +
         s"$chargingPoints," +
         s"$occupiedChargingPoints").replaceAll(",", ";")
 
