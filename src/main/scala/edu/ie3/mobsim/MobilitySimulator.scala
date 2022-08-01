@@ -584,8 +584,8 @@ final class MobilitySimulator(
   }
 
   private def updateElectricVehicles(movements: Seq[Movement]): Unit = {
-    val movementMap = movements.map { movement =>
-      movement.ev.uuid -> movement.ev
+    val movementMap = movements.map { case Movement(_, ev) =>
+      ev.uuid -> ev
     }.toMap
 
     // updates all ev in electricVehicles that are departing or arriving

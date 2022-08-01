@@ -27,7 +27,7 @@ case class ChargingStation(
     homeChargingStationAssignedToPOI: Boolean
 )
 
-case object ChargingStation extends LazyLogging {
+object ChargingStation extends LazyLogging {
 
   /** Create a list of charging stations to be used by the mobility simulator.
     * Charging stations have information on their UUID and their geographical
