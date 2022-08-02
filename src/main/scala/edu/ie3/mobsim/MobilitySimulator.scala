@@ -85,8 +85,8 @@ final class MobilitySimulator(
 
     /* Receive current prices for public evcs situation and converting them to scala values */
     val currentPricesAtChargingStations =
-      evData.requestCurrentPrices().asScala.toMap.map { case (cs, prices) =>
-        (cs, prices.doubleValue())
+      evData.requestCurrentPrices().asScala.toMap.map { case (cs, price) =>
+        (cs, price.doubleValue())
       }
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */

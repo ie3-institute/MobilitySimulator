@@ -391,12 +391,8 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         (ev1, Map(cs6.getUuid -> 0.0), 1.0),
         (evWithLowPriceMemory, Map(cs6.getUuid -> 0.0), 0.5),
         (evWithHighPriceMemory, Map(cs6.getUuid -> 0.0), 1.0),
-        (evOtherPriceMemory, Map(cs6.getUuid -> 0.6), 0.24999999999999997),
-        (
-          evOtherPriceMemory,
-          Map(cs6.getUuid -> 0.6, cs6.getUuid -> 0.4),
-          0.7499999999999999
-        )
+        (evOtherPriceMemory, Map(cs6.getUuid -> 0.6), 0.25),
+        (evOtherPriceMemory, Map(cs6.getUuid -> 0.4), 0.75)
       )
 
       forAll(cases) { (ev, prices, expectedRating) =>
@@ -405,7 +401,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           ev,
           prices
         )
-        result shouldBe expectedRating
+        assert(result === expectedRating +- 1e-6)
       }
     }
   }
