@@ -299,9 +299,6 @@ final class MobilitySimulator(
       ev.getChosenChargingStation.map { cs =>
         /* Register departure */
         val movement = MobilitySimulator.Movement(cs, ev)
-        logger.debug(
-          s"${ev.getId} departs from $cs."
-        )
         cs -> movement
       } match {
         case result @ Some(_) =>
@@ -426,10 +423,6 @@ final class MobilitySimulator(
       if (availableChargingPointsAtStation > 0) {
         ev.setChargingAtSimona(true)
         ev.setChosenChargingStation(Some(cs))
-
-        logger.debug(
-          s"${ev.getId} starts charging at $cs."
-        )
 
         Some((cs, Movement(cs, ev)))
       } else {
