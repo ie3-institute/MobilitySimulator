@@ -331,7 +331,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
             departureTime,
             expectedResult
         ) =>
-          val ev: ElectricVehicle = ElectricVehicle
+          val ev = ElectricVehicle
             .buildEv(
               "car",
               givenModel,
@@ -380,21 +380,32 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       evWithHighPriceMemory.updateChargingPricesMemory(0.0)
       evWithHighPriceMemory.updateChargingPricesMemory(1.0)
 
+      val evOtherPriceMemory: ElectricVehicle = ev1
+      evOtherPriceMemory.updateChargingPricesMemory(0.5)
+      evOtherPriceMemory.updateChargingPricesMemory(0.7)
+      evOtherPriceMemory.updateChargingPricesMemory(0.3)
+
       val cases = Table(
-        ("chargingStation", "ev", "prices", "resultingRating"),
-        (cs6, ev1, Map.empty[UUID, Double], 1.0),
-        (cs6, ev1, Map(cs6.getUuid -> 0.0), 1.0),
-        (cs6, evWithLowPriceMemory, Map(cs6.getUuid -> 0.0), 0.5),
-        (cs6, evWithHighPriceMemory, Map(cs6.getUuid -> 0.0), 1.0)
+        ("ev", "prices", "expectedRating"),
+        (ev1, Map.empty[UUID, Double], 1.0),
+        (ev1, Map(cs6.getUuid -> 0.0), 1.0),
+        (evWithLowPriceMemory, Map(cs6.getUuid -> 0.0), 0.5),
+        (evWithHighPriceMemory, Map(cs6.getUuid -> 0.0), 1.0),
+        (evOtherPriceMemory, Map(cs6.getUuid -> 0.6), 0.24999999999999997),
+        (
+          evOtherPriceMemory,
+          Map(cs6.getUuid -> 0.6, cs6.getUuid -> 0.4),
+          0.7499999999999999
+        )
       )
 
-      forAll(cases) { (chargingStation, ev, prices, resultingRating) =>
-        val result: Double = ChargingBehavior invokePrivate priceRating(
-          chargingStation,
+      forAll(cases) { (ev, prices, expectedRating) =>
+        val result = ChargingBehavior invokePrivate priceRating(
+          cs6,
           ev,
           prices
         )
-        result shouldBe resultingRating
+        result shouldBe expectedRating
       }
     }
   }
