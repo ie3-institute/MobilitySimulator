@@ -25,8 +25,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.io.Source
-import scala.util.{Try, Using}
 import scala.jdk.CollectionConverters._
+import scala.util.{Try, Using}
 
 /** A point of special interest (POI)
   *

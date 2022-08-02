@@ -16,25 +16,8 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   PoiTypeDictionary
 }
 import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
-import edu.ie3.mobsim.io.probabilities.{
-  CategoricalLocation,
-  DrivingSpeed,
-  FirstDepartureOfDay,
-  LastTripOfDay,
-  ParkingTime,
-  PoiTransition,
-  ProbabilityDensityFunction,
-  TripDistance
-}
-import edu.ie3.mobsim.utils.DefaultQuantities.{
-  REMAINING_DISTANCE_AFTER_MODIFIED_CHARGING_HUB_STOP,
-  SOC_OF_10_PERCENT,
-  SOC_OF_20_PERCENT_CHARGING_HUB_THRESHOLD,
-  SOC_OF_30_PERCENT,
-  SOC_OF_70_PERCENT,
-  ZERO_DISTANCE,
-  ZERO_ENERGY
-}
+import edu.ie3.mobsim.io.probabilities._
+import edu.ie3.mobsim.utils.DefaultQuantities._
 import edu.ie3.mobsim.utils.IoUtils
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOMETRE,
