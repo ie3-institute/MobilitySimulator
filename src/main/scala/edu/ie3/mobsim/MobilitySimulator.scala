@@ -180,9 +180,7 @@ final class MobilitySimulator(
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
       .flatMap {
-        case ev =>
-          ev.getChosenChargingStation.map(ev -> _)
-        case _ => None
+        ev => ev.getChosenChargingStation.map(ev -> _)
       }
       .groupMap { case (_, cs) =>
         cs
