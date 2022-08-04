@@ -56,7 +56,7 @@ object ChargingBehavior extends LazyLogging {
     *   Maximum permissible distance between a POI and a charging station
     * @return
     *   UUID of the charging station the EV wants to charge at, or None if it
-    *   doesn't want to charge anywhere
+    *   doesn't want to charge anywhere and the ev if the ev was updated
     */
   def chooseChargingStation(
       ev: ElectricVehicle,

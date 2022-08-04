@@ -10,7 +10,6 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
-import edu.ie3.mobsim.model.{ElectricVehicleTestData, TripSimulationTestData}
 import edu.ie3.test.common.UnitSpec
 
 class PoiEnumsSpec extends UnitSpec {

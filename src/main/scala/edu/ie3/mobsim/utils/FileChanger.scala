@@ -11,9 +11,9 @@ import edu.ie3.datamodel.io.csv.BufferedCsvWriter
 import java.io.{File => JavaFile}
 import java.util.UUID
 import scala.io.Source
+import scala.jdk.CollectionConverters._
 import scala.reflect.io.File
 import scala.util.{Failure, Success, Try, Using}
-import scala.jdk.CollectionConverters._
 
 object FileChanger extends App {
   private final case class SourceDefinition(

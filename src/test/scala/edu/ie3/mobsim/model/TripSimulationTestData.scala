@@ -17,25 +17,8 @@ import edu.ie3.mobsim.io.geodata.{
   PointOfInterest
 }
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.factories.{
-  CategoricalLocationFactory,
-  DrivingSpeedFactory,
-  FirstDepartureFactory,
-  LastTripFactory,
-  ParkingTimeFactory,
-  PoiTransitionFactory,
-  TripDistanceFactory
-}
-import edu.ie3.mobsim.io.probabilities.{
-  CategoricalLocation,
-  DrivingSpeed,
-  FirstDepartureOfDay,
-  LastTripOfDay,
-  ParkingTime,
-  PoiTransition,
-  ProbabilityDensityFunction,
-  TripDistance
-}
+import edu.ie3.mobsim.io.probabilities.factories._
+import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
