@@ -26,6 +26,10 @@ import tech.units.indriya.quantity.Quantities
 import java.lang
 import java.time.ZonedDateTime
 import java.util.UUID
+import edu.ie3.simona.api.data.ev.model.EvModel
+import edu.ie3.util.quantities.PowerSystemUnits
+import tech.units.indriya.quantity.Quantities
+
 import javax.measure.quantity.{Energy, Length, Power}
 import scala.collection.immutable.SortedSet
 import scala.collection.{immutable, mutable}
@@ -74,7 +78,7 @@ final case class ElectricVehicle(
   def getFinalDestinationPoiType: Option[PoiTypeDictionary.Value] =
     finalDestinationPoi.map(_.getPoiType)
 
-  def getDepartureTick: lang.Long = toTick(simulationStart, departureTime)
+  def getDepartureTick: java.lang.Long = toTick(simulationStart, departureTime)
 
   /** @param storedEnergy
     *   the new stored energy

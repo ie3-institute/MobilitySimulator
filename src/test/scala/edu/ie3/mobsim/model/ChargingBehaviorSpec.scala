@@ -7,13 +7,13 @@
 package edu.ie3.mobsim.model
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
-
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
+import scala.collection.mutable
 
 class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
   "The ChargingBehavior" should {
@@ -327,7 +327,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
             departureTime,
             expectedResult
         ) =>
-          val ev: ElectricVehicle = ElectricVehicle
+          val ev = ElectricVehicle
             .buildEv(
               "car",
               givenModel,
@@ -362,6 +362,41 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       x shouldBe Map(
         UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81") -> 5.0
       )
+    }
+
+    "return the correct price rating" in {
+      val priceRating = PrivateMethod[Double](Symbol("priceRating"))
+
+      val evWithLowPriceMemory: ElectricVehicle = ev1
+      evWithLowPriceMemory.updateChargingPricesMemory(0.0)
+
+      val evWithHighPriceMemory: ElectricVehicle = ev1
+      evWithHighPriceMemory.updateChargingPricesMemory(0.0)
+      evWithHighPriceMemory.updateChargingPricesMemory(1.0)
+
+      val evOtherPriceMemory: ElectricVehicle = ev1
+      evOtherPriceMemory.updateChargingPricesMemory(0.5)
+      evOtherPriceMemory.updateChargingPricesMemory(0.7)
+      evOtherPriceMemory.updateChargingPricesMemory(0.3)
+
+      val cases = Table(
+        ("ev", "prices", "expectedRating"),
+        (ev1, Map.empty[UUID, Double], 1.0),
+        (ev1, Map(cs6.uuid -> 0.0), 1.0),
+        (evWithLowPriceMemory, Map(cs6.uuid -> 0.0), 0.5),
+        (evWithHighPriceMemory, Map(cs6.uuid -> 0.0), 1.0),
+        (evOtherPriceMemory, Map(cs6.uuid -> 0.6), 0.25),
+        (evOtherPriceMemory, Map(cs6.uuid -> 0.4), 0.75)
+      )
+
+      forAll(cases) { (ev, prices, expectedRating) =>
+        val result = ChargingBehavior invokePrivate priceRating(
+          cs6,
+          ev,
+          prices
+        )
+        assert(result === expectedRating +- 1e-6)
+      }
     }
   }
 }

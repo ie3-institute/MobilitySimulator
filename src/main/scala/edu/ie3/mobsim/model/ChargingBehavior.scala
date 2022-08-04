@@ -25,7 +25,7 @@ import scala.util.Random
 
 object ChargingBehavior extends LazyLogging {
 
-  /* Probabilities for starting a charging session for EvcsLocationTypes, baed on [Windt.2020] */
+  /* Probabilities for starting a charging session for EvcsLocationTypes, based on [Windt.2020] */
   val PROB_WITH_HOME_CHARGING: Map[EvcsLocationType, Double] = Map(
     EvcsLocationType.HOME -> 1d,
     EvcsLocationType.WORK -> 0.48d,
@@ -60,8 +60,8 @@ object ChargingBehavior extends LazyLogging {
     */
   def chooseChargingStation(
       ev: ElectricVehicle,
-      currentPricesAtChargingStations: Map[UUID, java.lang.Double],
-      currentlyAvailableChargingPoints: Map[UUID, Integer],
+      currentPricesAtChargingStations: Map[UUID, Double],
+      currentlyAvailableChargingPoints: Map[UUID, Int],
       seed: Random,
       maxDistance: ComparableQuantity[Length]
   ): Option[UUID] = {
@@ -177,14 +177,14 @@ object ChargingBehavior extends LazyLogging {
     */
   def createRatingsForChargingStations(
       ev: ElectricVehicle,
-      currentPricesAtChargingStations: Map[UUID, java.lang.Double],
-      currentlyAvailableChargingPoints: Map[UUID, Integer],
+      currentPricesAtChargingStations: Map[UUID, Double],
+      currentlyAvailableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Map[UUID, Double] =
     ev.destinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
         /* Check if free charging spots are even available */
-        val freeSpots: Integer =
+        val freeSpots: Int =
           currentlyAvailableChargingPoints.getOrElse(cs.uuid, 0)
 
         /* If no spots are available, the rating is 0. Otherwise, calculate a rating */
@@ -252,7 +252,7 @@ object ChargingBehavior extends LazyLogging {
   private def priceRating(
       cs: ChargingStation,
       ev: ElectricVehicle,
-      currentPrices: Map[UUID, java.lang.Double]
+      currentPrices: Map[UUID, Double]
   ): Double = currentPrices.get(cs.uuid) match {
     case Some(price) =>
       ev.chargingPricesMemory.maxOption.zip(
@@ -262,7 +262,7 @@ object ChargingBehavior extends LazyLogging {
           if (math.abs(maxPrice - minPrice) < 0.001)
             0.5 // if all prices are the same; avoid dividing by 0
           else
-            (maxPrice - price.toDouble) / (maxPrice - minPrice)
+            (maxPrice - price) / (maxPrice - minPrice)
         case None => 1
       }
     case None => 1
