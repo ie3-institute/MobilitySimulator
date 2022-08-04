@@ -419,38 +419,45 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Future[Option[(UUID, Movement)]] = Future {
-    chooseChargingStation(
+    val (ratingMap, evOption) = chooseChargingStation(
       ev,
       pricesAtChargingStation,
       availableChargingPoints,
       MobilitySimulator.seed,
       maxDistance
-    ).map { cs =>
-      val availableChargingPointsAtStation: Int =
-        availableChargingPoints.getOrElse(cs, 0)
-      if (availableChargingPointsAtStation > 0) {
-        var updatedEv: ElectricVehicle = ev.setChargingAtSimona()
-        updatedEv = updatedEv.setChosenChargingStation(Some(cs))
+    )
 
-        logger.debug(
-          s"${ev.getId} starts charging at $cs."
-        )
+    ratingMap
+      .map { cs =>
+        val availableChargingPointsAtStation: Int =
+          availableChargingPoints.getOrElse(cs, 0)
+        if (availableChargingPointsAtStation > 0) {
 
-        Some((cs, Movement(cs, updatedEv)))
-      } else {
+          val updatedEv = evOption
+            .getOrElse(ev)
+            .setChargingAtSimona()
+            .setChosenChargingStation(Some(cs))
+
+          logger.debug(
+            s"${ev.getId} starts charging at $cs."
+          )
+
+          Some((cs, Movement(cs, updatedEv)))
+        } else {
+          logger.debug(
+            s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
+              s"(${ev.getDestinationPoiType}) because all charging points " +
+              s"at $cs were taken."
+          )
+          None
+        }
+      }
+      .getOrElse {
         logger.debug(
-          s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
-            s"(${ev.getDestinationPoiType}) because all charging points " +
-            s"at $cs were taken."
+          s"${ev.getId} parks but does not charge."
         )
         None
       }
-    }.getOrElse {
-      logger.debug(
-        s"${ev.getId} parks but does not charge."
-      )
-      None
-    }
   }
 
   /** Update and simulate EVs which are ending their parking at current time.

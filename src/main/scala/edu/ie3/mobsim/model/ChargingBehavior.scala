@@ -64,7 +64,7 @@ object ChargingBehavior extends LazyLogging {
       currentlyAvailableChargingPoints: Map[UUID, Int],
       seed: Random,
       maxDistance: ComparableQuantity[Length]
-  ): Option[UUID] = {
+  ): (Option[UUID], Option[ElectricVehicle]) = {
     /* If there are charging stations nearby */
     if (ev.destinationPoi.nearestChargingStations.nonEmpty) {
       /* Always charge if the EV makes charging stop at charging hub */
@@ -75,8 +75,11 @@ object ChargingBehavior extends LazyLogging {
         logger.debug(
           s"${ev.getId} arrives at charging hub and wants to start charging."
         )
-        ev.destinationPoi.nearestChargingStations.keys.headOption
-          .map(_.uuid)
+        (
+          ev.destinationPoi.nearestChargingStations.keys.headOption
+            .map(_.uuid),
+          None
+        )
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
         val priceQueue: mutable.Queue[Double] = mutable.Queue.empty
@@ -86,23 +89,27 @@ object ChargingBehavior extends LazyLogging {
             .get(cs.uuid)
             .map(priceQueue += _)
         }
-        ev.updateChargingPricesMemory(priceQueue)
+        val evWithUpdatedPriceMemory = ev.updateChargingPricesMemory(priceQueue)
 
         /* If EV wants to charge, rank available charging stations and choose the best */
         val evWantsToCharge = doesEvWantToCharge(ev, seed)
         if (evWantsToCharge) {
           /* Create rating for each possible charging station */
-          createRatingsForChargingStations(
+          val ratingMap = createRatingsForChargingStations(
             ev,
             currentPricesAtChargingStations,
             currentlyAvailableChargingPoints,
             maxDistance
-          ).maxByOption(_._2).map(_._1)
+          )
+          (
+            ratingMap.maxByOption(_._2).map(_._1),
+            Some(evWithUpdatedPriceMemory)
+          )
         } else {
           logger.debug(
             s"${ev.getId} could charge but decides against charging."
           )
-          None
+          (None, None)
         }
       }
       /* If there are no charging stations nearby */
@@ -110,7 +117,7 @@ object ChargingBehavior extends LazyLogging {
       logger.debug(
         s"${ev.getId} can't charge because there are no charging stations nearby."
       )
-      None
+      (None, None)
     }
   }
 

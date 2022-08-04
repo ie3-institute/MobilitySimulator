@@ -19,7 +19,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
   "The ChargingBehavior" should {
 
     "choose a chargingStation if charging is needed" in {
-      val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
+      val (uuid, evOption) = ChargingBehavior.chooseChargingStation(
         evChargingNeeded,
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
@@ -28,10 +28,13 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       )
 
       uuid shouldBe Some(cs2.uuid)
+      evOption shouldBe Some(
+        evChargingNeeded.updateChargingPricesMemory(mutable.Queue.empty :+ 0.0)
+      )
     }
 
     "choose no chargingStation if charging is not needed" in {
-      val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
+      val (uuid, evOption) = ChargingBehavior.chooseChargingStation(
         ev1,
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
@@ -40,10 +43,11 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       )
 
       uuid shouldBe None
+      evOption shouldBe None
     }
 
     "choose no chargingStation if no station is nearby" in {
-      val uuid: Option[UUID] = ChargingBehavior.chooseChargingStation(
+      val (uuid, evOption) = ChargingBehavior.chooseChargingStation(
         evNoChargingStations,
         currentPricesAtChargingStations,
         noAvailableChargingPoints,
@@ -52,6 +56,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       )
 
       uuid shouldBe None
+      evOption shouldBe None
     }
 
     "check if ev wants to charge" in {
@@ -366,18 +371,14 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
     "return the correct price rating" in {
       val priceRating = PrivateMethod[Double](Symbol("priceRating"))
+      val queue = mutable.Queue.empty :+ 0.0
 
-      val evWithLowPriceMemory: ElectricVehicle = ev1
-      evWithLowPriceMemory.updateChargingPricesMemory(0.0)
-
-      val evWithHighPriceMemory: ElectricVehicle = ev1
-      evWithHighPriceMemory.updateChargingPricesMemory(0.0)
-      evWithHighPriceMemory.updateChargingPricesMemory(1.0)
-
-      val evOtherPriceMemory: ElectricVehicle = ev1
-      evOtherPriceMemory.updateChargingPricesMemory(0.5)
-      evOtherPriceMemory.updateChargingPricesMemory(0.7)
-      evOtherPriceMemory.updateChargingPricesMemory(0.3)
+      val evWithLowPriceMemory: ElectricVehicle =
+        ev1.updateChargingPricesMemory(queue)
+      val evWithHighPriceMemory: ElectricVehicle =
+        ev1.updateChargingPricesMemory(queue :+ 1.0)
+      val evOtherPriceMemory: ElectricVehicle =
+        ev1.updateChargingPricesMemory(mutable.Queue.empty :+ 0.5 :+ 0.7 :+ 0.3)
 
       val cases = Table(
         ("ev", "prices", "expectedRating"),
