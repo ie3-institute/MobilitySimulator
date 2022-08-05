@@ -19,15 +19,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities._
-import edu.ie3.mobsim.io.probabilities.factories.{
-  CategoricalLocationFactory,
-  DrivingSpeedFactory,
-  FirstDepartureFactory,
-  LastTripFactory,
-  ParkingTimeFactory,
-  PoiTransitionFactory,
-  TripDistanceFactory
-}
+import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
@@ -81,18 +73,21 @@ final class MobilitySimulator(
       s"Simulation triggered with tick: $tick -- Current time: $currentTime"
     )
 
-    /* Receive available charging points of evcs from SIMONA */
-    val availableChargingPoints: Map[UUID, Int] =
-      evData
-        .requestAvailablePublicEvCs()
-        .asScala
-        .view
-        .mapValues(_.toInt)
-        .toMap
+    /* Receive available charging points of evcs from SIMONA and converting them to scala values */
+    val availableChargingPoints = evData
+      .requestAvailablePublicEvCs()
+      .asScala
+      .view
+      .mapValues(_.toInt)
+      .toMap
 
-    /* Receive current prices for public evcs situation */
-    val currentPricesAtChargingStations: Map[UUID, java.lang.Double] =
-      evData.requestCurrentPrices().asScala.toMap
+    /* Receive current prices for public evcs situation and converting them to scala values */
+    val currentPricesAtChargingStations = evData
+      .requestCurrentPrices()
+      .asScala
+      .view
+      .mapValues(_.toDouble)
+      .toMap
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
@@ -157,7 +152,7 @@ final class MobilitySimulator(
   private def sendEvMovementsToSimona(
       currentTime: ZonedDateTime,
       availableChargingPoints: Map[UUID, Int],
-      currentPricesAtChargingStations: Map[UUID, java.lang.Double],
+      currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: ComparableQuantity[Length]
   ): (SortedSet[ElectricVehicle], Map[UUID, Set[ElectricVehicle]]) = {
     val builder = new EvMovementsMessageBuilder
@@ -184,10 +179,8 @@ final class MobilitySimulator(
 
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
-      .flatMap {
-        case ev =>
-          ev.getChosenChargingStation.map(ev -> _)
-        case _ => None
+      .flatMap { ev =>
+        ev.getChosenChargingStation.map(ev -> _)
       }
       .groupMap { case (_, cs) =>
         cs
@@ -367,7 +360,7 @@ final class MobilitySimulator(
     */
   private def handleParkingEvs(
       evs: SortedSet[ElectricVehicle],
-      pricesAtChargingStation: Map[UUID, java.lang.Double],
+      pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Seq[Movement] =
@@ -412,7 +405,7 @@ final class MobilitySimulator(
     */
   private def handleArrivingEv(
       ev: ElectricVehicle,
-      pricesAtChargingStation: Map[UUID, java.lang.Double],
+      pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Option[Movement] =
