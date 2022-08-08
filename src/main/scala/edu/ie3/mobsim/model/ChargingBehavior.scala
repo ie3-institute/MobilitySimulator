@@ -78,7 +78,7 @@ object ChargingBehavior extends LazyLogging {
         (
           ev.destinationPoi.nearestChargingStations.keys.headOption
             .map(_.uuid),
-          Some(ev)
+          None
         )
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */

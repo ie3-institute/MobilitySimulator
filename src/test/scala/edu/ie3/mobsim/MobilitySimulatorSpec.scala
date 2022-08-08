@@ -79,7 +79,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           )
 
         mapWithFreePoints shouldBe Map(
-          cs6.getUuid -> Integer.valueOf(resultingChargingPoints)
+          cs6.uuid -> Integer.valueOf(resultingChargingPoints)
         )
       }
     }
@@ -92,17 +92,22 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("evs", "resultingMap"),
-        (SortedSet(ev1), Map(cs6.getUuid -> 1)),
-        (SortedSet(ev1, ev2), Map(cs6.getUuid -> 2)),
-        (SortedSet(ev1, ev2, ev3), Map(cs6.getUuid -> 3))
+        (SortedSet(ev1), Map(cs6.uuid -> 1)),
+        (SortedSet(ev1, ev2), Map(cs6.uuid -> 2)),
+        (SortedSet(ev1, ev2, ev3), Map(cs6.uuid -> 3))
       )
 
       forAll(cases) { (evs, resultingMap) =>
-        val (map, sequence) =
-          mobSim invokePrivate handleDepartingEvs(setEvsAsDeparting(evs))
+        val departedEvs = setEvsAsDeparting(evs)
 
-        val resultingSequence = evs.toSeq.map { ev =>
-          Movement(cs6.getUuid, ev)
+        val (map, sequence) =
+          mobSim invokePrivate handleDepartingEvs(departedEvs)
+
+        val resultingSequence = departedEvs.toSeq.map { ev =>
+          Movement(
+            cs6.uuid,
+            ev.removeChargingAtSimona().setChosenChargingStation(None)
+          )
         }
 
         map shouldBe resultingMap
@@ -120,8 +125,13 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           evChargingAtSimonaWithStation,
           Option(
-            cs6.getUuid,
-            Movement(cs6.getUuid, evChargingAtSimonaWithStation)
+            cs6.uuid,
+            Movement(
+              cs6.uuid,
+              evChargingAtSimonaWithStation
+                .removeChargingAtSimona()
+                .setChosenChargingStation(None)
+            )
           )
         ),
         (evChargingAtSimonaWithoutStation, None)
@@ -139,8 +149,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
               value match {
                 case Some(value) =>
                   val resultingEv: ElectricVehicle = value._2.ev
-                  resultingEv.getChosenChargingStation shouldBe None
-                  resultingEv.isChargingAtSimona shouldBe false
+                  resultingEv.chosenChargingStation shouldBe None
+                  resultingEv.chargingAtSimona shouldBe false
                 case None => None
               }
             case Failure(exception) => throw exception
@@ -156,14 +166,14 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val cases = Table(
         ("freeLots", "change", "resultingMap"),
         (
-          Map(cs6.getUuid -> 0, cs5.getUuid -> 0),
-          Map(cs6.getUuid -> 1),
-          Map(cs6.getUuid -> 1, cs5.getUuid -> 0)
+          Map(cs6.uuid -> 0, cs5.uuid -> 0),
+          Map(cs6.uuid -> 1),
+          Map(cs6.uuid -> 1, cs5.uuid -> 0)
         ),
         (
-          Map(cs6.getUuid -> 0, cs5.getUuid -> 0),
-          Map(cs6.getUuid -> 2, cs5.getUuid -> 1),
-          Map(cs6.getUuid -> 2, cs5.getUuid -> 1)
+          Map(cs6.uuid -> 0, cs5.uuid -> 0),
+          Map(cs6.uuid -> 2, cs5.uuid -> 1),
+          Map(cs6.uuid -> 2, cs5.uuid -> 1)
         )
       )
 
@@ -182,21 +192,27 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("evs", "resultingMap"),
-        (setEvsAsParking(SortedSet(ev1)), Map(cs6.getUuid -> -1)),
-        (setEvsAsParking(SortedSet(ev1, ev2)), Map(cs6.getUuid -> -2)),
-        (setEvsAsParking(SortedSet(ev1, ev2, ev3)), Map(cs6.getUuid -> -3))
+        (SortedSet(ev1), Map(cs6.uuid -> -1)),
+        (SortedSet(ev1, ev2), Map(cs6.uuid -> -2)),
+        (SortedSet(ev1, ev2, ev3), Map(cs6.uuid -> -3))
       )
 
       forAll(cases) { (evs, resultingMap) =>
+        val parkingEvs = setEvsAsParking(evs)
+
         val (map, sequence) = mobSim invokePrivate handleParkingEvs(
-          evs,
+          parkingEvs,
           pricesAtChargingStation,
           chargingPointsAllFree,
           maxDistance
         )
 
-        val resultingSequence: Seq[Movement] = evs.toSeq.map { ev =>
-          Movement(cs6.getUuid, ev)
+        val resultingSequence: Seq[Movement] = parkingEvs.toSeq.map { ev =>
+          Movement(
+            cs6.uuid,
+            ev.setChargingAtSimona()
+              .setChosenChargingStation(Some(cs6.uuid))
+          )
         }
 
         map shouldBe resultingMap
@@ -213,14 +229,22 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         ("ev", "prices", "availablePoints", "option"),
         (
           arrivingEv,
-          Map(cs6.getUuid -> 0.0),
-          Map(cs6.getUuid -> 1),
-          Option(cs6.getUuid, Movement(cs6.getUuid, arrivingEv))
+          Map(cs6.uuid -> 0.0),
+          Map(cs6.uuid -> 1),
+          Option(
+            cs6.uuid,
+            Movement(
+              cs6.uuid,
+              arrivingEv
+                .setChargingAtSimona()
+                .setChosenChargingStation(Some(cs6.uuid))
+            )
+          )
         ),
         (
           arrivingEv,
-          Map(cs6.getUuid -> 0.0),
-          Map(cs6.getUuid -> 0),
+          Map(cs6.uuid -> 0.0),
+          Map(cs6.uuid -> 0),
           None
         ),
         (
@@ -247,10 +271,10 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
               value match {
                 case Some(value) =>
                   val resultingEv: ElectricVehicle = value._2.ev
-                  resultingEv.getChosenChargingStation shouldBe Some(
-                    cs6.getUuid
+                  resultingEv.chosenChargingStation shouldBe Some(
+                    cs6.uuid
                   )
-                  resultingEv.isChargingAtSimona shouldBe true
+                  resultingEv.chargingAtSimona shouldBe true
                 case None => None
               }
             case Failure(exception) => throw exception

@@ -7,82 +7,65 @@
 package edu.ie3.mobsim
 
 import akka.actor.ActorRef
-import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary.{
-  CHARGING_HUB_HIGHWAY,
-  WORK
-}
-import edu.ie3.mobsim.model.{ChargingBehaviorTestData, ElectricVehicle}
+import edu.ie3.mobsim.model.ElectricVehicle
+import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
 import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
 
 import java.util.UUID
 import scala.collection.immutable.SortedSet
 
-trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
+trait MobilitySimulatorTestData extends IoUtilsTestData {
   val evData: ExtEvData = new ExtEvData(ActorRef.noSender, ActorRef.noSender)
   val builder = new EvMovementsMessageBuilder
 
   def setEvsAsParking(
       evs: SortedSet[ElectricVehicle]
-  ): SortedSet[ElectricVehicle] = {
-    evs.foreach { ev =>
-      ev.copyWith(
+  ): SortedSet[ElectricVehicle] =
+    evs.map { ev =>
+      ev.copy(
         storedEnergy = zero,
-        destinationPoiType = CHARGING_HUB_HIGHWAY,
-        destinationCategoricalLocation =
-          charging_hub_highwayPoi.categoricalLocation,
         destinationPoi = charging_hub_highwayPoi,
         parkingTimeStart = givenSimulationStart,
         departureTime = givenSimulationStart.plusHours(5)
       )
     }
-    evs
-  }
 
   def setEvsAsDeparting(
       evs: SortedSet[ElectricVehicle]
-  ): SortedSet[ElectricVehicle] = {
-    evs.foreach { ev =>
-      ev.copyWith(
+  ): SortedSet[ElectricVehicle] =
+    evs.map { ev =>
+      ev.copy(
         storedEnergy = half,
-        destinationPoiType = WORK,
-        destinationCategoricalLocation = workPoi.categoricalLocation,
         destinationPoi = workPoi,
         parkingTimeStart = givenSimulationStart.plusHours(-4),
         departureTime = givenSimulationStart
-      )
-
-      ev.setChargingAtSimona(true)
-      ev.setChosenChargingStation(Some(cs6.getUuid))
+      ).setChargingAtSimona()
+        .setChosenChargingStation(Some(cs6.uuid))
     }
-    evs
-  }
 
   protected val chargingPointsAllTaken: Map[UUID, Integer] = {
-    Map(cs6.getUuid -> Integer.valueOf(0))
+    Map(cs6.uuid -> Integer.valueOf(0))
   }
 
   protected val chargingPointsAllFree: Map[UUID, Integer] = {
-    Map(cs6.getUuid -> cs6.getChargingPoints)
+    Map(cs6.uuid -> cs6.chargingPoints)
   }
 
   protected val pricesAtChargingStation: Map[UUID, Double] = {
-    Map(cs6.getUuid -> 0.0)
+    Map(cs6.uuid -> 0.0)
   }
 
   protected val arrivingEv: ElectricVehicle = {
     ev1.copy(
-      destinationPoi = charging_hub_highwayPoi,
-      destinationPoiType = CHARGING_HUB_HIGHWAY,
-      destinationCategoricalLocation =
-        charging_hub_highwayPoi.categoricalLocation
+      destinationPoi = charging_hub_highwayPoi
     )
   }
 
   protected val evChargingAtSimonaWithStation: ElectricVehicle = {
     ev1.copy(
       chargingAtSimona = true,
-      chosenChargingStation = Some(cs6.getUuid)
+      chosenChargingStation = Some(cs6.uuid)
     )
   }
 
