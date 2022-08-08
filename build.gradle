@@ -64,7 +64,7 @@ dependencies {
   implementation 'org.scala-lang.modules:scala-parallel-collections_2.13:1.0.4'
 
   /* CORE Akka */
-  implementation "com.typesafe.akka:akka-actor_${scalaVersion}:${akkaVersion}"
+  testImplementation "com.typesafe.akka:akka-actor_${scalaVersion}:${akkaVersion}"
 
   /* Logging */
   implementation 'ch.qos.logback:logback-classic:1.2.11'

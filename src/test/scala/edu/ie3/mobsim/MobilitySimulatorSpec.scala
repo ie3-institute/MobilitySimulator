@@ -6,12 +6,12 @@
 
 package edu.ie3.mobsim
 
-import edu.ie3.mobsim.MobilitySimulator.{Movement, seed}
+import edu.ie3.mobsim.MobilitySimulator.Movement
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
 import java.util.UUID
-import scala.collection.immutable.{SortedSet, TreeSet}
+import scala.collection.immutable.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -28,25 +28,25 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val cases = Table(
         ("parkingEvs", "departingEvs"),
         (
-          evIsParking(Seq(ev1, ev2, ev3)),
-          TreeSet.empty[ElectricVehicle]
+          setEvsAsParking(SortedSet(ev1, ev2, ev3)),
+          SortedSet.empty[ElectricVehicle]
         ),
         (
-          evIsParking(Seq(ev1, ev2)),
-          evIsDeparting(Seq(ev3))
+          setEvsAsParking(SortedSet(ev1, ev2)),
+          setEvsAsDeparting(SortedSet(ev3))
         ),
         (
-          evIsParking(Seq(ev1)),
-          evIsDeparting(Seq(ev2, ev3))
+          setEvsAsParking(SortedSet(ev1)),
+          setEvsAsDeparting(SortedSet(ev2, ev3))
         ),
         (
-          TreeSet.empty[ElectricVehicle],
-          evIsDeparting(Seq(ev1, ev2, ev3))
+          SortedSet.empty[ElectricVehicle],
+          setEvsAsDeparting(SortedSet(ev1, ev2, ev3))
         )
       )
 
       forAll(cases) { (parkingEvs, departingEvs) =>
-        val evs: SortedSet[ElectricVehicle] = parkingEvs ++ departingEvs
+        val evs = parkingEvs ++ departingEvs
 
         val (resultParking, resultDeparting) =
           mobSim invokePrivate defineMovements(
@@ -65,15 +65,15 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("departingEvs", "resultingChargingPoints"),
-        (Seq(ev1), 1),
-        (Seq(ev1, ev2), 2),
-        (Seq(ev1, ev2, ev3), 3)
+        (SortedSet(ev1), 1),
+        (SortedSet(ev1, ev2), 2),
+        (SortedSet(ev1, ev2, ev3), 3)
       )
 
       forAll(cases) { (departingEvs, resultingChargingPoints) =>
-        val mapWithFreePoints: Map[UUID, Integer] =
+        val mapWithFreePoints =
           mobSim invokePrivate handleDepartures(
-            evIsDeparting(departingEvs),
+            setEvsAsDeparting(departingEvs),
             chargingPointsAllTaken,
             builder
           )
@@ -92,16 +92,16 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("evs", "resultingMap"),
-        (Seq(ev1), Map(cs6.getUuid -> 1)),
-        (Seq(ev1, ev2), Map(cs6.getUuid -> 2)),
-        (Seq(ev1, ev2, ev3), Map(cs6.getUuid -> 3))
+        (SortedSet(ev1), Map(cs6.getUuid -> 1)),
+        (SortedSet(ev1, ev2), Map(cs6.getUuid -> 2)),
+        (SortedSet(ev1, ev2, ev3), Map(cs6.getUuid -> 3))
       )
 
       forAll(cases) { (evs, resultingMap) =>
         val (map, sequence) =
-          mobSim invokePrivate handleDepartingEvs(evIsDeparting(evs))
+          mobSim invokePrivate handleDepartingEvs(setEvsAsDeparting(evs))
 
-        val resultingSequence: Seq[Movement] = evs.map { ev =>
+        val resultingSequence = evs.toSeq.map { ev =>
           Movement(cs6.getUuid, ev)
         }
 
@@ -128,7 +128,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (ev, option) =>
-        val result: Future[Option[(UUID, Movement)]] =
+        val result =
           mobSim invokePrivate handleDepartingEv(ev)
 
         result.onComplete(
@@ -168,7 +168,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (freeLots, change, resultingMap) =>
-        val map: Map[UUID, Integer] =
+        val map =
           mobSim invokePrivate updateFreeLots(freeLots, change)
 
         map shouldBe resultingMap
@@ -182,9 +182,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("evs", "resultingMap"),
-        (evIsParking(Seq(ev1)), Map(cs6.getUuid -> -1)),
-        (evIsParking(Seq(ev1, ev2)), Map(cs6.getUuid -> -2)),
-        (evIsParking(Seq(ev1, ev2, ev3)), Map(cs6.getUuid -> -3))
+        (setEvsAsParking(SortedSet(ev1)), Map(cs6.getUuid -> -1)),
+        (setEvsAsParking(SortedSet(ev1, ev2)), Map(cs6.getUuid -> -2)),
+        (setEvsAsParking(SortedSet(ev1, ev2, ev3)), Map(cs6.getUuid -> -3))
       )
 
       forAll(cases) { (evs, resultingMap) =>
@@ -259,8 +259,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       }
     }
 
-    "update and simulate departed evs" in {}
-
     "get time until next event" in {
       val getTimeUntilNextEvent =
         PrivateMethod[Long](Symbol("getTimeUntilNextEvent"))
@@ -278,7 +276,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (evs, result) =>
-        val nextEvent: Long = mobSim invokePrivate getTimeUntilNextEvent(
+        val nextEvent = mobSim invokePrivate getTimeUntilNextEvent(
           evs,
           givenSimulationStart
         )
