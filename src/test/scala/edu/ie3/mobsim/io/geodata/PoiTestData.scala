@@ -86,7 +86,7 @@ trait PoiTestData {
     new Coordinate(7.41153842, 51.4834251),
     csType,
     EvcsLocationType.CHARGING_HUB_HIGHWAY,
-    1,
+    3,
     homeChargingStationAssignedToPOI = false
   )
 
