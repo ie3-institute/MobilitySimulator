@@ -383,8 +383,9 @@ object TripSimulation extends LazyLogging {
             Some(remainingDistance)
           ) =>
         /* Reset saved values */
-        var updatedEv: ElectricVehicle = ev.setFinalDestinationPoi(None)
-        updatedEv = updatedEv.setRemainingDistanceAfterChargingHub(None)
+        val updatedEv: ElectricVehicle = ev
+          .setFinalDestinationPoi(None)
+          .setRemainingDistanceAfterChargingHub(None)
 
         /* Return the determined values */
         TargetProperties(

@@ -307,8 +307,8 @@ final class MobilitySimulator(
         cs -> movement
       } match {
         case result @ Some(_) =>
-          var updatedEv: ElectricVehicle = ev.removeChargingAtSimona()
-          updatedEv = updatedEv.setChosenChargingStation(None)
+          val updatedEv: ElectricVehicle =
+            ev.removeChargingAtSimona().setChosenChargingStation(None)
 
           val cs: UUID = result.value._1
 
