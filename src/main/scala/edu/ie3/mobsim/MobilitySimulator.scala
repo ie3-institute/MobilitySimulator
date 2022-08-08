@@ -93,7 +93,7 @@ final class MobilitySimulator(
     val (
       departedEvsFromSimona,
       chargingStationOccupancy
-    ) = sendEvMovementsToSimona(
+    ) = exchangeEvMovementsWithSimona(
       currentTime,
       availableChargingPoints,
       currentPricesAtChargingStations,
@@ -132,7 +132,7 @@ final class MobilitySimulator(
     newTicks
   }
 
-  /** Handover EVs to SIMONA which arrive at their destination POI or depart
+  /** Hand over EVs to SIMONA which arrive at their destination POI or depart
     * from their POI at current time, but only if there is a charging point
     * available at the charging station. Otherwise, the EV is not sent to
     * SIMONA. <p> Get updated EV models for all EVs that depart from a charging
@@ -149,7 +149,7 @@ final class MobilitySimulator(
     * @return
     *   Returned EV models from SIMONA as set of Electric Vehicles
     */
-  private def sendEvMovementsToSimona(
+  private def exchangeEvMovementsWithSimona(
       currentTime: ZonedDateTime,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
@@ -199,9 +199,8 @@ final class MobilitySimulator(
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
-    val sortedSet = SortedSet
-      .empty[ElectricVehicle] ++ departedEvs
-    (sortedSet, evcsToParkedEvs)
+
+    (SortedSet(departedEvs), evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
