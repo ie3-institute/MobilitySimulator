@@ -195,11 +195,12 @@ final class MobilitySimulator(
         .sendEvPositions(movements)
         .asScala
         .map(ev => ev.asInstanceOf[ElectricVehicle])
-        .toSet
+        .to(SortedSet)
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
-    (SortedSet(departedEvs), evcsToParkedEvs)
+
+    (departedEvs, evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
