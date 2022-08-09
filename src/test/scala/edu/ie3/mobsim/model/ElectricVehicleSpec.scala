@@ -15,7 +15,7 @@ import tech.units.indriya.unit.Units
 
 import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
-import scala.collection.{immutable, mutable}
+import scala.collection.immutable
 
 class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
   "Building and assigning evs" when {
@@ -334,7 +334,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
 
       "update charging price memory correctly" in {
         val evNoQueue: ElectricVehicle = ev1
-        val queue: mutable.Queue[Double] = mutable.Queue.empty
+        val queue: immutable.Queue[Double] = immutable.Queue.empty
 
         for (n <- 0 to 10) {
           queue.enqueue(n.doubleValue())
@@ -344,13 +344,12 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           evNoQueue.updateChargingPricesMemory(queue)
         updatedEv.chargingPricesMemory shouldBe queue
 
-        for (n <- 11 to 20) {
+        for (n <- 11 to 25) {
           queue.enqueue(n.doubleValue())
         }
 
         updatedEv = updatedEv.updateChargingPricesMemory(queue)
-        updatedEv.chargingPricesMemory shouldBe queue.drop(2)
-
+        updatedEv.chargingPricesMemory shouldBe queue.drop(7)
       }
     }
   }

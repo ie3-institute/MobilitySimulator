@@ -12,7 +12,7 @@ import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
-import scala.collection.mutable
+import scala.collection.immutable
 
 class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
   "The ChargingBehavior" should {
@@ -28,7 +28,9 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
       uuid shouldBe Some(cs2.uuid)
       evOption shouldBe Some(
-        evChargingNeeded.updateChargingPricesMemory(mutable.Queue.empty :+ 0.0)
+        evChargingNeeded.updateChargingPricesMemory(
+          immutable.Queue.empty :+ 0.0
+        )
       )
     }
 
@@ -343,14 +345,16 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
     "return the correct price rating" in {
       val priceRating = PrivateMethod[Double](Symbol("priceRating"))
-      val queue = mutable.Queue.empty :+ 0.0
+      val queue = immutable.Queue.empty :+ 0.0
 
       val evWithLowPriceMemory: ElectricVehicle =
         ev1.updateChargingPricesMemory(queue)
       val evWithHighPriceMemory: ElectricVehicle =
         ev1.updateChargingPricesMemory(queue :+ 1.0)
       val evOtherPriceMemory: ElectricVehicle =
-        ev1.updateChargingPricesMemory(mutable.Queue.empty :+ 0.5 :+ 0.7 :+ 0.3)
+        ev1.updateChargingPricesMemory(
+          immutable.Queue.empty :+ 0.5 :+ 0.7 :+ 0.3
+        )
 
       val cases = Table(
         ("ev", "prices", "expectedRating"),

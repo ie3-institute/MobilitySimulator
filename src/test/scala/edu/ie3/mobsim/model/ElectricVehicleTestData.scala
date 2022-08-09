@@ -97,14 +97,7 @@ trait ElectricVehicleTestData {
     givenFirstDeparture,
     isChargingAtHomePossible = true
   )
-  protected val evWithoutHomeCharging: ElectricVehicle =
-    ElectricVehicle.buildEv(
-      "test_car",
-      givenModel,
-      givenHomePoi,
-      givenWorkPoi,
-      givenSimulationStart,
-      givenFirstDeparture,
-      isChargingAtHomePossible = false
-    )
+  protected val evWithoutHomeCharging: ElectricVehicle = {
+    evWithHomeCharging.copy(chargingAtHomePossible = false)
+  }
 }

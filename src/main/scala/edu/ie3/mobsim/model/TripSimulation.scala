@@ -481,7 +481,7 @@ object TripSimulation extends LazyLogging {
     * @param categoricalLocation
     *   Meta-information to determine the next categorical location
     * @return
-    *   An optional tuple of categorical location and actual POI
+    *   The resulting POI
     */
   private def sampleNextPoi(
       destinationPoiType: PoiTypeDictionary.Value,
@@ -531,7 +531,7 @@ object TripSimulation extends LazyLogging {
     * @param maxDepth
     *   Max recursion depth (defaults to 4)
     * @return
-    *   A pair of categorical location and actual destination POI
+    *   The resulting destination POI
     */
   @tailrec
   private def sampleDestinationCategoricalLocationAndPoi(

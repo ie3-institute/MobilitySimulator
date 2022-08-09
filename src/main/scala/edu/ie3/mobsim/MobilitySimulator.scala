@@ -270,12 +270,15 @@ final class MobilitySimulator(
       Future
         .sequence(evs.toSeq.map(handleDepartingEv))
         .map {
-          _.flatten.unzip match {
-            case (uuids, movements) =>
+          _.flatten match {
+            case movements =>
               (
-                uuids.groupBy(identity).map { case (uuid, uuids) =>
-                  uuid -> uuids.size
-                },
+                movements
+                  .map { movement => movement.cs }
+                  .groupBy(identity)
+                  .map { case (uuid, uuids) =>
+                    uuid -> uuids.size
+                  },
                 movements
               )
           }
@@ -295,29 +298,25 @@ final class MobilitySimulator(
     */
   private def handleDepartingEv(
       ev: ElectricVehicle
-  ): Future[Option[(UUID, Movement)]] =
+  ): Future[Option[Movement]] =
     Future {
       /* Determine the charging station, the car currently is connected to */
-      ev.chosenChargingStation.map { cs =>
-        /* Register departure */
-        val movement = MobilitySimulator.Movement(cs, ev)
-        logger.debug(
-          s"${ev.getId} departs from $cs."
-        )
-        cs -> movement
-      } match {
-        case result @ Some(_) =>
+      ev.chosenChargingStation match {
+        case Some(cs) =>
+          /* Register departure */
+          logger.debug(
+            s"${ev.getId} departs from $cs."
+          )
+
           val updatedEv: ElectricVehicle =
             ev.removeChargingAtSimona().setChosenChargingStation(None)
 
-          val cs: UUID = result.value._1
-
-          Some(cs, MobilitySimulator.Movement(cs, updatedEv))
-        case result @ None =>
+          Some(MobilitySimulator.Movement(cs, updatedEv))
+        case None =>
           logger.warn(
             s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
           )
-          result
+          None
       }
     }
 
@@ -385,12 +384,15 @@ final class MobilitySimulator(
           }
         }
         .map {
-          _.flatten.unzip match {
-            case (uuids, movements) =>
+          _.flatten match {
+            case movements =>
               (
-                uuids.groupBy(uuid => uuid).map { case (uuid, uuids) =>
-                  uuid -> -uuids.size
-                },
+                movements
+                  .map { movement => movement.cs }
+                  .groupBy(uuid => uuid)
+                  .map { case (uuid, uuids) =>
+                    uuid -> -uuids.size
+                  },
                 movements
               )
           }
@@ -418,7 +420,7 @@ final class MobilitySimulator(
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): Future[Option[(UUID, Movement)]] = Future {
+  ): Future[Option[Movement]] = Future {
     val (ratingMap, evOption) = chooseChargingStation(
       ev,
       pricesAtChargingStation,
@@ -442,7 +444,7 @@ final class MobilitySimulator(
             s"${ev.getId} starts charging at $cs."
           )
 
-          Some((cs, Movement(cs, updatedEv)))
+          Some(Movement(cs, updatedEv))
         } else {
           logger.debug(
             s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +

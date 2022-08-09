@@ -18,7 +18,7 @@ import tech.units.indriya.quantity.Quantities.getQuantity
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.mutable
+import scala.collection.immutable
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
@@ -82,14 +82,14 @@ object ChargingBehavior extends LazyLogging {
         )
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
-        val priceQueue: mutable.Queue[Double] = mutable.Queue.empty
 
-        ev.destinationPoi.nearestChargingStations.keys.foreach { cs =>
-          currentPricesAtChargingStations
-            .get(cs.uuid)
-            .map(priceQueue += _)
-        }
-        val evWithUpdatedPriceMemory = ev.updateChargingPricesMemory(priceQueue)
+        val prices = immutable.Queue.from(
+          ev.destinationPoi.nearestChargingStations.keys.map { cs =>
+            currentPricesAtChargingStations(cs.uuid)
+          }
+        )
+
+        val evWithUpdatedPriceMemory = ev.updateChargingPricesMemory(prices)
 
         /* If EV wants to charge, rank available charging stations and choose the best */
         val evWantsToCharge = doesEvWantToCharge(ev, seed)
@@ -102,7 +102,9 @@ object ChargingBehavior extends LazyLogging {
             maxDistance
           )
           (
-            ratingMap.maxByOption(_._2).map(_._1),
+            ratingMap.maxByOption { case (_, rating) => rating }.map {
+              case (cs, _) => cs
+            },
             Some(evWithUpdatedPriceMemory)
           )
         } else {

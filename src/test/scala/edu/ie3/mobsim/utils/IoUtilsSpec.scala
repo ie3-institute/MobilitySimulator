@@ -38,15 +38,15 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val compareString: String = (s"${uuid.toString}," +
-        s"${currentTime.toString}," +
-        s"${firstEv.uuid.toString},$status," +
-        s"${(firstEv.storedEnergy.getValue.doubleValue() / firstEv.batteryCapacity.getValue
-          .doubleValue()).toString}," +
-        s"${firstEv.destinationPoi.id}," +
-        s"${firstEv.destinationPoi.categoricalLocation.toString}," +
-        s"${firstEv.departureTime.toString}," +
-        s"${firstEv.chargingAtSimona.toString}").replaceAll(",", ";")
+      val compareString: String = (s"$uuid;" +
+        s"$currentTime;" +
+        s"${firstEv.uuid},$status;" +
+        s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.batteryCapacity.getValue
+          .doubleValue()};" +
+        s"${firstEv.destinationPoi.id};" +
+        s"${firstEv.destinationPoi.categoricalLocation};" +
+        s"${firstEv.departureTime};" +
+        s"${firstEv.chargingAtSimona}").replaceAll(",", ";")
 
       list.forEach { str =>
         if (str.contains(uuid.toString)) {
@@ -70,27 +70,27 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val firstEvString: String = (s"${firstEv.uuid.toString}," +
-        s"${firstEv.id}," +
-        s"${firstEv.model}," +
-        s"${firstEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue().toString}," +
-        s"${firstEv.acChargingPower.to(KILOWATT).getValue.doubleValue().toString}," +
-        s"${firstEv.dcChargingPower.to(KILOWATT).getValue.doubleValue().toString}," +
-        s"${firstEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue().toString}," +
-        s"${firstEv.homePoi.id}," +
-        s"${firstEv.workPoi.id}," +
-        s"${firstEv.chargingAtHomePossible.toString}").replaceAll(",", ";")
+      val firstEvString: String = (s"${firstEv.uuid};" +
+        s"${firstEv.id};" +
+        s"${firstEv.model};" +
+        s"${firstEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
+        s"${firstEv.acChargingPower.to(KILOWATT).getValue.doubleValue()};" +
+        s"${firstEv.dcChargingPower.to(KILOWATT).getValue.doubleValue()};" +
+        s"${firstEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
+        s"${firstEv.homePoi.id};" +
+        s"${firstEv.workPoi.id};" +
+        s"${firstEv.chargingAtHomePossible}").replaceAll(",", ";")
 
-      val secondEvString: String = (s"${secondEv.uuid.toString}," +
-        s"${secondEv.id}," +
-        s"${secondEv.model}," +
-        s"${secondEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue().toString}," +
-        s"${secondEv.acChargingPower.to(KILOWATT).getValue.doubleValue().toString}," +
-        s"${secondEv.dcChargingPower.to(KILOWATT).getValue.doubleValue().toString}," +
-        s"${secondEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue().toString}," +
-        s"${secondEv.homePoi.id}," +
-        s"${secondEv.workPoi.id}," +
-        s"${secondEv.chargingAtHomePossible.toString}").replaceAll(",", ";")
+      val secondEvString: String = (s"${secondEv.uuid};" +
+        s"${secondEv.id};" +
+        s"${secondEv.model};" +
+        s"${secondEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
+        s"${secondEv.acChargingPower.to(KILOWATT).getValue.doubleValue()};" +
+        s"${secondEv.dcChargingPower.to(KILOWATT).getValue.doubleValue()};" +
+        s"${secondEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
+        s"${secondEv.homePoi.id};" +
+        s"${secondEv.workPoi.id};" +
+        s"${secondEv.chargingAtHomePossible}").replaceAll(",", ";")
 
       list.get(list.size() - 2) shouldBe firstEvString
       list.get(list.size() - 1) shouldBe secondEvString
@@ -123,10 +123,10 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           0
         )).toString
 
-      val entry: String = (s"$uuid," +
-        s"$currentTime," +
-        s"${cs6.uuid}," +
-        s"$chargingPoints," +
+      val entry: String = (s"$uuid;" +
+        s"$currentTime;" +
+        s"${cs6.uuid};" +
+        s"$chargingPoints;" +
         s"$occupiedChargingPoints").replaceAll(",", ";")
 
       list.get(list.size() - 1) shouldBe entry
@@ -153,9 +153,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
             evcsUuid.toString + "," + distance.getValue.doubleValue().toString
         }.toString
 
-      val compareString: String = (s"${charging_hub_townPoi.id}," +
-        s"${charging_hub_townPoi.getPoiType.toString}," +
-        s"${charging_hub_townPoi.size.toString}," +
+      val compareString: String = (s"${charging_hub_townPoi.id};" +
+        s"${charging_hub_townPoi.getPoiType.toString};" +
+        s"${charging_hub_townPoi.size.toString};" +
         s"$string").replaceAll(",", ";")
 
       list.forEach { str =>
@@ -191,8 +191,8 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         }
 
       val compareString: String = (s"$uuid," +
-        s"${firstEv.uuid.toString}," +
-        s"$location,").replaceAll(",", ";") +
+        s"${firstEv.uuid.toString};" +
+        s"$location;").replaceAll(",", ";") +
         s"$destinationPoi"
 
       list.forEach { str =>

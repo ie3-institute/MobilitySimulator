@@ -13,7 +13,6 @@ import edu.ie3.mobsim.model.{ChargingBehaviorTestData, ElectricVehicle}
 import java.io.File
 import java.time.ZonedDateTime
 import java.util.UUID
-import scala.collection.immutable.TreeSet
 
 trait IoUtilsTestData extends ChargingBehaviorTestData {
   protected val outputFileFolder: String = new java.io.File(
@@ -42,7 +41,7 @@ trait IoUtilsTestData extends ChargingBehaviorTestData {
     val poiSet: Set[PointOfInterest] = Seq(charging_hub_townPoi).toSet
 
     poiSet.groupBy(_.categoricalLocation).map { case (catLoc, poi) =>
-      catLoc -> TreeSet.from(poi)
+      catLoc -> Set.from(poi)
     }
   }
 }

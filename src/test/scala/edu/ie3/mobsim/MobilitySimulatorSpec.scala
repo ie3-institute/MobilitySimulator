@@ -116,7 +116,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "handle departing ev" in {
-      val handleDepartingEv = PrivateMethod[Future[Option[(UUID, Movement)]]](
+      val handleDepartingEv = PrivateMethod[Future[Option[Movement]]](
         Symbol("handleDepartingEv")
       )
 
@@ -125,7 +125,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           evChargingAtSimonaWithStation,
           Option(
-            cs6.uuid,
             Movement(
               cs6.uuid,
               evChargingAtSimonaWithStation
@@ -148,7 +147,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
               value match {
                 case Some(value) =>
-                  val resultingEv: ElectricVehicle = value._2.ev
+                  val resultingEv: ElectricVehicle = value.ev
                   resultingEv.chosenChargingStation shouldBe None
                   resultingEv.chargingAtSimona shouldBe false
                 case None => None
@@ -221,7 +220,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "handle arriving ev" in {
-      val handleArrivingEv = PrivateMethod[Future[Option[(UUID, Movement)]]](
+      val handleArrivingEv = PrivateMethod[Future[Option[Movement]]](
         Symbol("handleArrivingEv")
       )
 
@@ -232,7 +231,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           Map(cs6.uuid -> 0.0),
           Map(cs6.uuid -> 1),
           Option(
-            cs6.uuid,
             Movement(
               cs6.uuid,
               arrivingEv
@@ -270,7 +268,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
               value match {
                 case Some(value) =>
-                  val resultingEv: ElectricVehicle = value._2.ev
+                  val resultingEv: ElectricVehicle = value.ev
                   resultingEv.chosenChargingStation shouldBe Some(
                     cs6.uuid
                   )
