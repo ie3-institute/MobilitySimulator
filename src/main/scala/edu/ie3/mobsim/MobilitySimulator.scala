@@ -93,7 +93,7 @@ final class MobilitySimulator(
     val (
       departedEvsFromSimona,
       chargingStationOccupancy
-    ) = sendEvMovementsToSimona(
+    ) = exchangeEvMovementsWithSimona(
       currentTime,
       availableChargingPoints,
       currentPricesAtChargingStations,
@@ -149,7 +149,7 @@ final class MobilitySimulator(
     * @return
     *   Returned EV models from SIMONA as set of Electric Vehicles
     */
-  private def sendEvMovementsToSimona(
+  private def exchangeEvMovementsWithSimona(
       currentTime: ZonedDateTime,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
@@ -199,9 +199,7 @@ final class MobilitySimulator(
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
-    val sortedSet = SortedSet
-      .empty[ElectricVehicle] ++ departedEvs
-    (sortedSet, evcsToParkedEvs)
+    (SortedSet(departedEvs), evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
