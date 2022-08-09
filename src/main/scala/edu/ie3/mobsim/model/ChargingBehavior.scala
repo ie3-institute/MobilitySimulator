@@ -18,7 +18,7 @@ import tech.units.indriya.quantity.Quantities.getQuantity
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable
+import scala.collection.immutable.Queue
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
@@ -83,11 +83,11 @@ object ChargingBehavior extends LazyLogging {
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
 
-        val prices = immutable.Queue.from(
-          ev.destinationPoi.nearestChargingStations.keys.map { cs =>
+        val prices = ev.destinationPoi.nearestChargingStations.keys
+          .map { cs =>
             currentPricesAtChargingStations(cs.uuid)
           }
-        )
+          .to(Queue)
 
         val evWithUpdatedPriceMemory = ev.updateChargingPricesMemory(prices)
 

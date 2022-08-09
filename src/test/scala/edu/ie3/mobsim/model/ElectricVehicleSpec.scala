@@ -15,7 +15,7 @@ import tech.units.indriya.unit.Units
 
 import java.time.ZonedDateTime
 import javax.measure.quantity.Energy
-import scala.collection.immutable
+import scala.collection.immutable.Queue
 
 class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
   "Building and assigning evs" when {
@@ -71,7 +71,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
             chargingAtHomePossible shouldBe true
             finalDestinationPoi shouldBe None
             remainingDistanceAfterChargingHub shouldBe None
-            chargingPricesMemory shouldBe immutable.Queue[Double]()
+            chargingPricesMemory shouldBe Queue[Double]()
         }
       }
 
@@ -334,22 +334,18 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
 
       "update charging price memory correctly" in {
         val evNoQueue: ElectricVehicle = ev1
-        val queue: immutable.Queue[Double] = immutable.Queue.empty
-
-        for (n <- 0 to 10) {
-          queue.enqueue(n.doubleValue())
-        }
+        val queue: Queue[Double] =
+          (1 to 10).map { x => x.doubleValue() }.to(Queue)
 
         var updatedEv: ElectricVehicle =
           evNoQueue.updateChargingPricesMemory(queue)
         updatedEv.chargingPricesMemory shouldBe queue
 
-        for (n <- 11 to 25) {
-          queue.enqueue(n.doubleValue())
-        }
+        val secondQueue: Queue[Double] =
+          (1 to 25).map { x => x.doubleValue() }.to(Queue)
 
-        updatedEv = updatedEv.updateChargingPricesMemory(queue)
-        updatedEv.chargingPricesMemory shouldBe queue.drop(7)
+        updatedEv = updatedEv.updateChargingPricesMemory(secondQueue)
+        updatedEv.chargingPricesMemory shouldBe secondQueue.drop(5)
       }
     }
   }

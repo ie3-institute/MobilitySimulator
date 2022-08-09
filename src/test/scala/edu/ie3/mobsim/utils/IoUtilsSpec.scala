@@ -38,15 +38,15 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val compareString: String = (s"$uuid;" +
+      val compareString: String = s"$uuid;" +
         s"$currentTime;" +
-        s"${firstEv.uuid},$status;" +
+        s"${firstEv.uuid};$status;" +
         s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.batteryCapacity.getValue
           .doubleValue()};" +
         s"${firstEv.destinationPoi.id};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
         s"${firstEv.departureTime};" +
-        s"${firstEv.chargingAtSimona}").replaceAll(",", ";")
+        s"${firstEv.chargingAtSimona}"
 
       list.forEach { str =>
         if (str.contains(uuid.toString)) {
@@ -70,7 +70,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val firstEvString: String = (s"${firstEv.uuid};" +
+      val firstEvString: String = s"${firstEv.uuid};" +
         s"${firstEv.id};" +
         s"${firstEv.model};" +
         s"${firstEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
@@ -79,9 +79,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         s"${firstEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
         s"${firstEv.homePoi.id};" +
         s"${firstEv.workPoi.id};" +
-        s"${firstEv.chargingAtHomePossible}").replaceAll(",", ";")
+        s"${firstEv.chargingAtHomePossible}"
 
-      val secondEvString: String = (s"${secondEv.uuid};" +
+      val secondEvString: String = s"${secondEv.uuid};" +
         s"${secondEv.id};" +
         s"${secondEv.model};" +
         s"${secondEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
@@ -90,10 +90,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         s"${secondEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
         s"${secondEv.homePoi.id};" +
         s"${secondEv.workPoi.id};" +
-        s"${secondEv.chargingAtHomePossible}").replaceAll(",", ";")
+        s"${secondEv.chargingAtHomePossible}"
 
-      list.get(list.size() - 2) shouldBe firstEvString
-      list.get(list.size() - 1) shouldBe secondEvString
+      list.forEach { str =>
+        if (str.contains(firstEv.uuid.toString)) {
+          str shouldBe firstEvString
+        }
+        if (str.contains(secondEv.uuid.toString)) {
+          str shouldBe secondEvString
+        }
+      }
     }
 
     "write electric vehicle charging stations correctly" in {
@@ -123,13 +129,17 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           0
         )).toString
 
-      val entry: String = (s"$uuid;" +
+      val entry: String = s"$uuid;" +
         s"$currentTime;" +
         s"${cs6.uuid};" +
         s"$chargingPoints;" +
-        s"$occupiedChargingPoints").replaceAll(",", ";")
+        s"$occupiedChargingPoints"
 
-      list.get(list.size() - 1) shouldBe entry
+      list.forEach { str =>
+        if (str.contains(uuid.toString)) {
+          str shouldBe entry
+        }
+      }
     }
 
     "write pois correctly" in {
@@ -147,22 +157,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val string: String =
-        charging_hub_townPoi.nearestChargingStations.foreach {
-          case (evcsUuid, distance) =>
-            evcsUuid.toString + "," + distance.getValue.doubleValue().toString
-        }.toString
+      val compareString: String = s"${charging_hub_townPoi.id};" +
+        s"${charging_hub_townPoi.getPoiType};" +
+        s"${charging_hub_townPoi.size};" +
+        s"$cs4;" +
+        s"${0.0}"
 
-      val compareString: String = (s"${charging_hub_townPoi.id};" +
-        s"${charging_hub_townPoi.getPoiType.toString};" +
-        s"${charging_hub_townPoi.size.toString};" +
-        s"$string").replaceAll(",", ";")
+      val str = list.get(list.size() - 1)
+      val randomUuid = str.split(";")(0)
 
-      list.forEach { str =>
-        if (str.contains(uuid.toString)) {
-          str shouldBe compareString
-        }
-      }
+      str shouldBe randomUuid + ";" + compareString
     }
 
     "write positions correctly" in {
@@ -190,9 +194,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           )
         }
 
-      val compareString: String = (s"$uuid," +
+      val compareString: String = s"$uuid;" +
         s"${firstEv.uuid.toString};" +
-        s"$location;").replaceAll(",", ";") +
+        s"$location;" +
         s"$destinationPoi"
 
       list.forEach { str =>

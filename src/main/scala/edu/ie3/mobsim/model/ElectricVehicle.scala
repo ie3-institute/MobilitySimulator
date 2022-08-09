@@ -26,7 +26,6 @@ import tech.units.indriya.quantity.Quantities
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length, Power}
-import scala.collection.immutable
 import scala.collection.immutable.{Queue, SortedSet}
 import scala.util.{Failure, Success, Try}
 
@@ -52,7 +51,7 @@ final case class ElectricVehicle(
     remainingDistanceAfterChargingHub: Option[
       ComparableQuantity[Length]
     ],
-    chargingPricesMemory: immutable.Queue[Double]
+    chargingPricesMemory: Queue[Double]
 ) extends EvModel
     with Ordered[ElectricVehicle] {
 
@@ -130,15 +129,9 @@ final case class ElectricVehicle(
   def updateChargingPricesMemory(
       newPrices: Queue[Double]
   ): ElectricVehicle = {
-    var queue: Queue[Double] =
-      Queue.empty.enqueueAll(chargingPricesMemory).enqueueAll(newPrices)
+    val newPriceQueue = (chargingPricesMemory ++ newPrices).takeRight(20)
 
-    /* keep maximum of 20 last known prices */
-    while (queue.size >= 20) {
-      queue = queue.dequeue._2
-    }
-
-    copy(chargingPricesMemory = Queue.empty.enqueueAll(queue))
+    copy(chargingPricesMemory = newPriceQueue)
   }
 
   def compare(that: ElectricVehicle): Int = {
@@ -434,7 +427,7 @@ case object ElectricVehicle extends LazyLogging {
       chargingAtSimona = false,
       finalDestinationPoi = None,
       remainingDistanceAfterChargingHub = None,
-      chargingPricesMemory = immutable.Queue[Double]()
+      chargingPricesMemory = Queue[Double]()
     )
   }
 
