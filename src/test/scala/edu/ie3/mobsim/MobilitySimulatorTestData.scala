@@ -53,21 +53,21 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
       )
 
       ev.setChargingAtSimona(true)
-      ev.setChosenChargingStation(Some(cs6.getUuid))
+      ev.setChosenChargingStation(Some(cs6.uuid))
     }
     evs
   }
 
-  protected val chargingPointsAllTaken: Map[UUID, Integer] = {
-    Map(cs6.getUuid -> Integer.valueOf(0))
+  protected val chargingPointsAllTaken: Map[UUID, Int] = {
+    Map(cs6.uuid -> 0)
   }
 
-  protected val chargingPointsAllFree: Map[UUID, Integer] = {
-    Map(cs6.getUuid -> cs6.getChargingPoints)
+  protected val chargingPointsAllFree: Map[UUID, Int] = {
+    Map(cs6.uuid -> cs6.chargingPoints)
   }
 
   protected val pricesAtChargingStation: Map[UUID, Double] = {
-    Map(cs6.getUuid -> 0.0)
+    Map(cs6.uuid -> 0.0)
   }
 
   protected val arrivingEv: ElectricVehicle = {
@@ -82,7 +82,7 @@ trait MobilitySimulatorTestData extends ChargingBehaviorTestData {
   protected val evChargingAtSimonaWithStation: ElectricVehicle = {
     ev1.copy(
       chargingAtSimona = true,
-      chosenChargingStation = Some(cs6.getUuid)
+      chosenChargingStation = Some(cs6.uuid)
     )
   }
 

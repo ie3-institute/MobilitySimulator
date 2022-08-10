@@ -119,9 +119,9 @@ final case class IoUtils private (
       "evcs" -> cs.uuid.toString,
       "charging_points" -> cs.chargingPoints.toString,
       "charging_evs" -> chargingStationOccupancy
-        .get(cs.uuid)
-        .map(_.map(_.getUuid).mkString("[", "|", "]"))
-        .getOrElse("-none-")
+        .getOrElse(cs.uuid, Set.empty)
+        .map(_.getUuid)
+        .mkString("[", "|", "]")
     ).asJava
 
     evcsWriter.write(fieldData)

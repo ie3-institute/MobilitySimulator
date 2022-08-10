@@ -195,12 +195,12 @@ final class MobilitySimulator(
         .sendEvPositions(movements)
         .asScala
         .map(ev => ev.asInstanceOf[ElectricVehicle])
-        .toSet
+        .to(SortedSet)
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
 
-    (SortedSet(departedEvs), evcsToParkedEvs)
+    (departedEvs, evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
@@ -336,9 +336,7 @@ final class MobilitySimulator(
       .filter { case (uuid, _) =>
         !freeLots.keys.toSeq.contains(uuid)
       }
-      .map { uuidToDifference =>
-        val uuid = uuidToDifference._1
-        val lotDifference = uuidToDifference._2
+      .map { case (uuid, lotDifference) =>
         uuid -> lotDifference
       }
 
