@@ -64,22 +64,22 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         PrivateMethod[Map[UUID, Integer]](Symbol("handleDepartures"))
 
       val cases = Table(
-        ("departingEvs", "resultingChargingPoints"),
+        ("departingEvs", "expectedChargingPoints"),
         (SortedSet(ev1), 1),
         (SortedSet(ev1, ev2), 2),
         (SortedSet(ev1, ev2, ev3), 3)
       )
 
-      forAll(cases) { (departingEvs, resultingChargingPoints) =>
-        val mapWithFreePoints =
+      forAll(cases) { (departingEvs, expectedCsCount) =>
+        val actualChargingPoints =
           mobSim invokePrivate handleDepartures(
             setEvsAsDeparting(departingEvs),
             chargingPointsAllTaken,
             builder
           )
 
-        mapWithFreePoints shouldBe Map(
-          cs6.getUuid -> Integer.valueOf(resultingChargingPoints)
+        actualChargingPoints shouldBe Map(
+          cs6.getUuid -> Integer.valueOf(expectedCsCount)
         )
       }
     }
@@ -97,16 +97,16 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (SortedSet(ev1, ev2, ev3), Map(cs6.getUuid -> 3))
       )
 
-      forAll(cases) { (evs, resultingMap) =>
-        val (map, sequence) =
+      forAll(cases) { (evs, expectedFreeCs) =>
+        val (actualFreeCs, actualMovements) =
           mobSim invokePrivate handleDepartingEvs(setEvsAsDeparting(evs))
 
-        val resultingSequence = evs.toSeq.map { ev =>
+        val expectedMovements = evs.toSeq.map { ev =>
           Movement(cs6.getUuid, ev)
         }
 
-        map shouldBe resultingMap
-        sequence shouldBe resultingSequence
+        actualFreeCs shouldBe expectedFreeCs
+        actualMovements shouldBe expectedMovements
       }
     }
 
@@ -116,10 +116,10 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       val cases = Table(
-        ("ev", "option"),
+        ("ev", "expectedResults"),
         (
           evChargingAtSimonaWithStation,
-          Option(
+          Some(
             cs6.getUuid,
             Movement(cs6.getUuid, evChargingAtSimonaWithStation)
           )
@@ -127,20 +127,19 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (evChargingAtSimonaWithoutStation, None)
       )
 
-      forAll(cases) { (ev, option) =>
+      forAll(cases) { (ev, expectedResults) =>
         val result =
           mobSim invokePrivate handleDepartingEv(ev)
 
         result.onComplete(
           {
-            case Success(value) =>
-              value shouldBe option
+            case Success(actualResults) =>
+              actualResults shouldBe expectedResults
 
-              value match {
-                case Some(value) =>
-                  val resultingEv: ElectricVehicle = value._2.ev
-                  resultingEv.getChosenChargingStation shouldBe None
-                  resultingEv.isChargingAtSimona shouldBe false
+              actualResults match {
+                case Some((_, Movement(_, ev))) =>
+                  ev.getChosenChargingStation shouldBe None
+                  ev.isChargingAtSimona shouldBe false
                 case None => None
               }
             case Failure(exception) => throw exception
@@ -167,55 +166,54 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
       )
 
-      forAll(cases) { (freeLots, change, resultingMap) =>
-        val map =
+      forAll(cases) { (freeLots, change, expectedFreeLots) =>
+        val actualFreeLots =
           mobSim invokePrivate updateFreeLots(freeLots, change)
 
-        map shouldBe resultingMap
+        actualFreeLots shouldBe expectedFreeLots
       }
     }
 
     "handle parking evs" in {
-      val handleParkingEvs = PrivateMethod[(Map[UUID, Integer], Seq[Movement])](
+      val handleParkingEvs = PrivateMethod[Seq[Movement]](
         Symbol("handleParkingEvs")
       )
 
       val cases = Table(
-        ("evs", "resultingMap"),
-        (setEvsAsParking(SortedSet(ev1)), Map(cs6.getUuid -> -1)),
-        (setEvsAsParking(SortedSet(ev1, ev2)), Map(cs6.getUuid -> -2)),
-        (setEvsAsParking(SortedSet(ev1, ev2, ev3)), Map(cs6.getUuid -> -3))
+        "evs",
+        setEvsAsParking(SortedSet(ev1)),
+        setEvsAsParking(SortedSet(ev1, ev2)),
+        setEvsAsParking(SortedSet(ev1, ev2, ev3))
       )
 
-      forAll(cases) { (evs, resultingMap) =>
-        val (map, sequence) = mobSim invokePrivate handleParkingEvs(
+      forAll(cases) { evs =>
+        val actualMovements = mobSim invokePrivate handleParkingEvs(
           evs,
           pricesAtChargingStation,
           chargingPointsAllFree,
           maxDistance
         )
 
-        val resultingSequence: Seq[Movement] = evs.toSeq.map { ev =>
+        val expectedMovements: Seq[Movement] = evs.toSeq.map { ev =>
           Movement(cs6.getUuid, ev)
         }
 
-        map shouldBe resultingMap
-        sequence shouldBe resultingSequence
+        actualMovements shouldBe expectedMovements
       }
     }
 
     "handle arriving ev" in {
-      val handleArrivingEv = PrivateMethod[Future[Option[(UUID, Movement)]]](
+      val handleArrivingEv = PrivateMethod[Option[Movement]](
         Symbol("handleArrivingEv")
       )
 
       val cases = Table(
-        ("ev", "prices", "availablePoints", "option"),
+        ("ev", "prices", "availablePoints", "expectedMovement"),
         (
           arrivingEv,
           Map(cs6.getUuid -> 0.0),
           Map(cs6.getUuid -> 1),
-          Option(cs6.getUuid, Movement(cs6.getUuid, arrivingEv))
+          Some(Movement(cs6.getUuid, arrivingEv))
         ),
         (
           arrivingEv,
@@ -231,31 +229,15 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
       )
 
-      forAll(cases) { (ev, prices, availablePoints, option) =>
-        val result = mobSim invokePrivate handleArrivingEv(
+      forAll(cases) { (ev, prices, availablePoints, expectedMovement) =>
+        val actualMovement = mobSim invokePrivate handleArrivingEv(
           ev,
           prices,
           availablePoints,
           maxDistance
         )
 
-        result.onComplete(
-          {
-            case Success(value) =>
-              value shouldBe option
-
-              value match {
-                case Some(value) =>
-                  val resultingEv: ElectricVehicle = value._2.ev
-                  resultingEv.getChosenChargingStation shouldBe Some(
-                    cs6.getUuid
-                  )
-                  resultingEv.isChargingAtSimona shouldBe true
-                case None => None
-              }
-            case Failure(exception) => throw exception
-          }
-        )
+        actualMovement shouldBe expectedMovement
       }
     }
 
@@ -269,19 +251,19 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
 
       val cases = Table(
-        ("evs", "result"),
+        ("evs", "expectedNextEvent"),
         (Seq(arrivingEv).toSet, 3600),
         (Seq(ev2).toSet, 2700),
         (Seq(arrivingEv, ev2).toSet, 2700)
       )
 
-      forAll(cases) { (evs, result) =>
-        val nextEvent = mobSim invokePrivate getTimeUntilNextEvent(
+      forAll(cases) { (evs, expectedNextEvent) =>
+        val actualNextEvent = mobSim invokePrivate getTimeUntilNextEvent(
           evs,
           givenSimulationStart
         )
 
-        nextEvent shouldBe result
+        actualNextEvent shouldBe expectedNextEvent
       }
     }
   }
