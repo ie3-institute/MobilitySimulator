@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.Coordinate
 import java.util.UUID
 import scala.jdk.CollectionConverters._
 
-final case class ChargingStation(
+case class ChargingStation(
     uuid: UUID,
     id: String,
     geoPosition: Coordinate,

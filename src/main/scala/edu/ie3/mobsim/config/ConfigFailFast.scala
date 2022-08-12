@@ -7,9 +7,9 @@
 package edu.ie3.mobsim.config
 
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.{Input, Simulation}
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Simulation.Location
+import edu.ie3.mobsim.config.MobSimConfig.Mobsim.{Input, Simulation}
 import edu.ie3.mobsim.exceptions.IllegalConfigException
 
 object ConfigFailFast {

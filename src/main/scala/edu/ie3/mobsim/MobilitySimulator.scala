@@ -173,14 +173,14 @@ final class MobilitySimulator(
       updatedChargingPoints,
       maxDistance
     )
-    arrivals.foreach { case Movement(cs, ev) =>
-      builder.addArrival(cs, ev)
+    arrivals.foreach { case Movement(cs, updatedEv) =>
+      builder.addArrival(cs, updatedEv)
     }
 
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
       .flatMap { ev =>
-        ev.getChosenChargingStation.map(ev -> _)
+        ev.chosenChargingStation.map(ev -> _)
       }
       .groupMap { case (_, cs) =>
         cs
@@ -217,16 +217,15 @@ final class MobilitySimulator(
       evs: SortedSet[ElectricVehicle],
       currentTime: ZonedDateTime
   ): (SortedSet[ElectricVehicle], SortedSet[ElectricVehicle]) = {
-    val isParking = (ev: ElectricVehicle) =>
-      ev.getParkingTimeStart == currentTime
+    val isParking = (ev: ElectricVehicle) => ev.parkingTimeStart == currentTime
     /* Relevant are only cars, that depart AND that are charging at a suitable charging station in SIMONA */
     val isDeparting = (ev: ElectricVehicle) =>
-      ev.getDepartureTime == currentTime && ev.isChargingAtSimona && ev.getChosenChargingStation.isDefined
+      ev.departureTime == currentTime && ev.chargingAtSimona && ev.chosenChargingStation.isDefined
     evs.par
       .filter { ev =>
         isDeparting(ev) || isParking(ev)
       }
-      .partition(_.getParkingTimeStart == currentTime) match {
+      .partition(_.parkingTimeStart == currentTime) match {
       case (arrivals, departures) =>
         (TreeSet.from(arrivals), TreeSet.from(departures))
     }
@@ -250,9 +249,12 @@ final class MobilitySimulator(
   ): Map[UUID, Int] = {
     val (additionallyFreeChargingPoints, departures) =
       handleDepartingEvs(evs)
-    departures.foreach { case Movement(cs, ev) =>
-      builder.addDeparture(cs, ev.getUuid)
+    departures.foreach { case Movement(cs, updatedEv) =>
+      builder.addDeparture(cs, updatedEv.getUuid)
     }
+
+    updateElectricVehicles(departures)
+
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
 
@@ -269,10 +271,11 @@ final class MobilitySimulator(
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
   ): (Map[UUID, Int], Seq[Movement]) =
-    evs.par.toSeq.flatMap(handleDepartingEv).unzip match {
-      case (uuids, movements) =>
+    evs.par.toSeq.flatMap(handleDepartingEv) match {
+      case movements =>
         (
-          uuids
+          movements
+            .map(_.cs)
             .groupBy(identity)
             .map { case (uuid, uuids) =>
               uuid -> uuids.size
@@ -294,25 +297,24 @@ final class MobilitySimulator(
     */
   private def handleDepartingEv(
       ev: ElectricVehicle
-  ): Option[(UUID, Movement)] =
+  ): Option[Movement] =
     /* Determine the charging station, the car currently is connected to */
-    ev.getChosenChargingStation.map { cs =>
-      /* Register departure */
-      val movement = MobilitySimulator.Movement(cs, ev)
-      logger.debug(
-        s"${ev.getId} departs from $cs."
-      )
-      cs -> movement
-    } match {
-      case result @ Some(_) =>
-        ev.setChargingAtSimona(false)
-        ev.setChosenChargingStation(None)
-        result
-      case result @ None =>
+    ev.chosenChargingStation match {
+      case Some(cs) =>
+        /* Register departure */
+        logger.debug(
+          s"${ev.getId} departs from $cs."
+        )
+
+        val updatedEv =
+          ev.removeChargingAtSimona().setChosenChargingStation(None)
+
+        Some(MobilitySimulator.Movement(cs, updatedEv))
+      case None =>
         logger.warn(
           s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
         )
-        result
+        None
     }
 
   /** Update the free charging lots per charging station.
@@ -405,39 +407,47 @@ final class MobilitySimulator(
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): Option[Movement] =
-    chooseChargingStation(
+  ): Option[Movement] = {
+    val (chosenCsOpt, updatedEvOpt) = chooseChargingStation(
       ev,
       pricesAtChargingStation,
       availableChargingPoints,
       MobilitySimulator.seed,
       maxDistance
-    ).map { cs =>
-      val availableChargingPointsAtStation =
-        availableChargingPoints.getOrElse(cs, 0)
-      if (availableChargingPointsAtStation > 0) {
-        ev.setChargingAtSimona(true)
-        ev.setChosenChargingStation(Some(cs))
+    )
 
-        logger.debug(
-          s"${ev.getId} starts charging at $cs."
-        )
+    chosenCsOpt
+      .map { cs =>
+        val availableChargingPointsAtStation =
+          availableChargingPoints.getOrElse(cs, 0)
+        if (availableChargingPointsAtStation > 0) {
 
-        Some(Movement(cs, ev))
-      } else {
+          val updatedEv = updatedEvOpt
+            .getOrElse(ev)
+            .setChargingAtSimona()
+            .setChosenChargingStation(Some(cs))
+
+          logger.debug(
+            s"${ev.getId} starts charging at $cs."
+          )
+
+          Some(Movement(cs, updatedEv))
+        } else {
+          logger.debug(
+            s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
+              s"(${ev.getDestinationPoiType}) because all charging points " +
+              s"at $cs were taken."
+          )
+          None
+        }
+      }
+      .getOrElse {
         logger.debug(
-          s"${ev.getId} could not be charged at destination ${ev.getDestinationPoi} " +
-            s"(${ev.getDestinationPoiType}) because all charging points " +
-            s"at $cs were taken."
+          s"${ev.getId} parks but does not charge."
         )
         None
       }
-    }.getOrElse {
-      logger.debug(
-        s"${ev.getId} parks but does not charge."
-      )
-      None
-    }
+  }
 
   /** Update and simulate EVs which are ending their parking at current time.
     * <p> First, the battery level is updated with the data returned from
@@ -479,7 +489,7 @@ final class MobilitySimulator(
   ): Unit = {
 
     val allDepartedEvs: Set[UUID] = electricVehicles
-      .filter(_.getDepartureTime == currentTime)
+      .filter(_.departureTime == currentTime)
       .map(filteredEv => filteredEv.getUuid)
 
     electricVehicles = electricVehicles.map(ev => {
@@ -535,18 +545,18 @@ final class MobilitySimulator(
 
     val nextEvent: ZonedDateTime = evs.foldLeft(currentTime.plusYears(1))(
       (earliestEvent: ZonedDateTime, ev: ElectricVehicle) => {
-        val earlierEvent = if (ev.getParkingTimeStart.isAfter(currentTime)) {
+        val earlierEvent = if (ev.parkingTimeStart.isAfter(currentTime)) {
           Seq(
             earliestEvent,
-            ev.getParkingTimeStart,
-            ev.getDepartureTime
+            ev.parkingTimeStart,
+            ev.departureTime
           ).minOption.getOrElse(
             throw new IllegalArgumentException(
               "Unable to determine the earlier time"
             )
           )
         } else {
-          Seq(earliestEvent, ev.getDepartureTime).minOption.getOrElse(
+          Seq(earliestEvent, ev.departureTime).minOption.getOrElse(
             throw new IllegalArgumentException(
               "Unable to determine the earlier time"
             )
@@ -564,6 +574,17 @@ final class MobilitySimulator(
     )
 
     timeUntilNextEvent
+  }
+
+  private def updateElectricVehicles(movements: Seq[Movement]): Unit = {
+    val movementMap = movements.map { case Movement(_, ev) =>
+      ev.uuid -> ev
+    }.toMap
+
+    // updates all ev in electricVehicles that are departing or arriving
+    electricVehicles = electricVehicles.map { ev =>
+      movementMap.getOrElse(ev.uuid, ev)
+    }
   }
 }
 
@@ -746,7 +767,7 @@ object MobilitySimulator
     logger.info(
       s"Created ${evs.size} EVs in ${"%.2f"
         .format((System.currentTimeMillis() - start) / 1000d)} s, of which ${evs
-        .count(_.isChargingAtHomePossible)} can charge at home."
+        .count(_.chargingAtHomePossible)} can charge at home."
     )
 
     /* Calculate and print total number of charging points at charging stations */

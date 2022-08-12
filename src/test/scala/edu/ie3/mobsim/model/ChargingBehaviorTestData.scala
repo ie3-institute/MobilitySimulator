@@ -6,64 +6,66 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.util.Random
 
 trait ChargingBehaviorTestData extends TripSimulationTestData {
 
-  protected def evLowSoC: ElectricVehicle = ev1.copyWith(
+  protected val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
-    destinationPoiType = PoiTypeDictionary.SHOPPING,
-    destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
     destinationPoi = supermarket,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
-  protected def evAtChargingHub: ElectricVehicle = ev2.copyWith(
+  protected val evAtChargingHub: ElectricVehicle = ev2.copyWith(
     half,
-    destinationPoiType = PoiTypeDictionary.CHARGING_HUB_TOWN,
-    destinationCategoricalLocation =
-      CategoricalLocationDictionary.CHARGING_HUB_TOWN,
     destinationPoi = charging_hub_townPoi,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
 
-  protected def evNextTrip: ElectricVehicle = ev3.copyWith(
+  protected val evNextTrip: ElectricVehicle = ev3.copyWith(
     ev3.getEStorage,
-    destinationPoiType = PoiTypeDictionary.SHOPPING,
-    destinationCategoricalLocation = CategoricalLocationDictionary.OTHER_SHOP,
     destinationPoi = other_shopPoi,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
 
-  protected def evChargingNeeded: ElectricVehicle = ev4.copyWith(
+  protected val evChargingNeeded: ElectricVehicle = ev4.copyWith(
     zero,
-    destinationPoiType = PoiTypeDictionary.SHOPPING,
-    destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
     destinationPoi = supermarket,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
-  protected def evNoChargingStations: ElectricVehicle = ev5.copyWith(
+  protected val evNoChargingStations: ElectricVehicle = ev5.copyWith(
     zero,
-    destinationPoiType = PoiTypeDictionary.SHOPPING,
-    destinationCategoricalLocation = CategoricalLocationDictionary.SUPERMARKET,
     destinationPoi = supermarketPoi,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
 
   protected val currentPricesAtChargingStations: Map[UUID, Double] = {
-    chargingStations.map { _.uuid -> 0.0 }.toMap
+    chargingStations
+      .map { chargingStation =>
+        chargingStation.uuid -> 2.0
+      }
+      .toMap
+      .updated(cs7.uuid, 10.0)
+  }
+
+  protected val chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]] = {
+    Set(ev1, ev2, ev3, ev4, ev5)
+      .flatMap { ev =>
+        ev.chosenChargingStation.map(ev -> _)
+      }
+      .groupMap { case (_, cs) =>
+        cs
+      } { case (ev, _) =>
+        ev
+      }
   }
 
   protected val currentlyAvailableChargingPoints: Map[UUID, Int] = {
@@ -77,4 +79,9 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   }
 
   protected def random: Random = new scala.util.Random(6)
+  protected val availableChargingPoints: Map[UUID, Int] = {
+    chargingStations.map { chargingStations =>
+      chargingStations.uuid -> chargingStations.chargingPoints
+    }.toMap
+  }
 }

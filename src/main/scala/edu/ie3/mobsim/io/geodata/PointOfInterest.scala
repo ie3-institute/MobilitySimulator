@@ -8,7 +8,10 @@ package edu.ie3.mobsim.io.geodata
 
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
-import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.geo.GeoUtils
 import org.locationtech.jts.geom.Coordinate
@@ -24,8 +27,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.io.Source
-import scala.util.{Try, Using}
 import scala.jdk.CollectionConverters._
+import scala.util.{Try, Using}
 
 /** A point of special interest (POI)
   *
@@ -55,6 +58,9 @@ final case class PointOfInterest(
     else if (this.id > that.id) 1
     else -1
   }
+
+  def getPoiType: PoiTypeDictionary.Value =
+    PoiTypeDictionary.apply(categoricalLocation)
 }
 
 case object PointOfInterest {
