@@ -91,9 +91,9 @@ final class MobilitySimulator(
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
-      departedEvsFromSimona: SortedSet[ElectricVehicle],
-      availableChargingPointsAfterMovements: Map[UUID, Int]
-    ) = sendEvMovementsToSimona(
+      departedEvsFromSimona,
+      chargingStationOccupancy
+    ) = exchangeEvMovementsWithSimona(
       currentTime,
       availableChargingPoints,
       currentPricesAtChargingStations,
@@ -122,7 +122,7 @@ final class MobilitySimulator(
     chargingStations.foreach(cs =>
       ioUtils.writeEvcs(
         cs,
-        availableChargingPointsAfterMovements,
+        chargingStationOccupancy,
         currentTime
       )
     )
@@ -149,12 +149,12 @@ final class MobilitySimulator(
     * @return
     *   Returned EV models from SIMONA as set of Electric Vehicles
     */
-  private def sendEvMovementsToSimona(
+  private def exchangeEvMovementsWithSimona(
       currentTime: ZonedDateTime,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: ComparableQuantity[Length]
-  ): (SortedSet[ElectricVehicle], Map[UUID, Int]) = {
+  ): (SortedSet[ElectricVehicle], Map[UUID, Set[ElectricVehicle]]) = {
     val builder = new EvMovementsMessageBuilder
 
     /* Determine parking and departing evs in this tick */
@@ -167,7 +167,7 @@ final class MobilitySimulator(
       handleDepartures(departingEvs, availableChargingPoints, builder)
 
     /* Add EVs that start parking to movements and assign to Evcs UUID */
-    val (takenChargingPoints, arrivals) = handleParkingEvs(
+    val arrivals = handleParkingEvs(
       parkingEvs,
       currentPricesAtChargingStations,
       updatedChargingPoints,
@@ -177,10 +177,16 @@ final class MobilitySimulator(
       builder.addArrival(cs, updatedEv)
     }
 
-    updateElectricVehicles(arrivals)
-
-    val finalTakenChargingPoints =
-      updateFreeLots(updatedChargingPoints, takenChargingPoints)
+    // compile map from evcs to their parked evs
+    val evcsToParkedEvs = electricVehicles
+      .flatMap { ev =>
+        ev.chosenChargingStation.map(ev -> _)
+      }
+      .groupMap { case (_, cs) =>
+        cs
+      } { case (ev, _) =>
+        ev
+      }
 
     /* Send to SIMONA and receive departed EVs */
     val movements = builder.build()
@@ -189,13 +195,12 @@ final class MobilitySimulator(
         .sendEvPositions(movements)
         .asScala
         .map(ev => ev.asInstanceOf[ElectricVehicle])
-        .toSet
+        .to(SortedSet)
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
-    val sortedSet = SortedSet
-      .empty[ElectricVehicle] ++ departedEvs
-    (sortedSet, finalTakenChargingPoints)
+
+    (departedEvs, evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
@@ -341,9 +346,7 @@ final class MobilitySimulator(
       .filter { case (uuid, _) =>
         !freeLots.keys.toSeq.contains(uuid)
       }
-      .map { uuidToDifference =>
-        val uuid = uuidToDifference._1
-        val lotDifference: Int = uuidToDifference._2
+      .map { case (uuid, lotDifference) =>
         uuid -> lotDifference
       }
 
@@ -361,44 +364,37 @@ final class MobilitySimulator(
     *   Maximum permissible distance between an point of interest and a
     *   candidate charging station
     * @return
-    *   An overview of newly taken charging points as well as a collection of
-    *   movements
+    *   A collection of movements
     */
   private def handleParkingEvs(
       evs: SortedSet[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): (Map[UUID, Int], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence {
-          evs.toSeq.map {
-            /* Lets the EV choose whether and at which charging station it wants to charge */
-            handleArrivingEv(
-              _,
-              pricesAtChargingStation,
-              availableChargingPoints,
-              maxDistance
-            )
-          }
-        }
-        .map {
-          _.flatten match {
-            case movements =>
+  ): Seq[Movement] =
+    evs.toSeq.foldLeft((availableChargingPoints, Seq.empty[Movement])) {
+      case ((updatedAvailableChargingPoints, movements), ev) =>
+        /* Lets the EV choose whether and at which charging station it wants to charge */
+        handleArrivingEv(
+          ev,
+          pricesAtChargingStation,
+          updatedAvailableChargingPoints,
+          maxDistance
+        ).flatMap {
+          // in case of a successful start of charging,
+          // remove the charging point from available points
+          // so that it won't be chosen more than once
+          case movement @ Movement(cs, _) =>
+            updatedAvailableChargingPoints.get(cs).map { count =>
               (
-                movements
-                  .map { movement => movement.cs }
-                  .groupBy(uuid => uuid)
-                  .map { case (uuid, uuids) =>
-                    uuid -> -uuids.size
-                  },
-                movements
+                updatedAvailableChargingPoints + (cs -> (count - 1)),
+                movements :+ movement
               )
-          }
-        },
-      Duration("1h")
-    )
+            }
+        }.getOrElse((updatedAvailableChargingPoints, movements))
+    } match {
+      case (_, movements) => movements
+    }
 
   /** Handle a single arriving ev, that wants to charge
     *
@@ -412,15 +408,15 @@ final class MobilitySimulator(
     *   Maximum permissible distance between point of interest and charging
     *   station
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the movement towards a charging station, if one was
+    *   made
     */
   private def handleArrivingEv(
       ev: ElectricVehicle,
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
-  ): Future[Option[Movement]] = Future {
+  ): Option[Movement] = {
     val (ratingMap, evOption) = chooseChargingStation(
       ev,
       pricesAtChargingStation,
@@ -429,9 +425,8 @@ final class MobilitySimulator(
       maxDistance
     )
 
-    ratingMap
-      .map { cs =>
-        val availableChargingPointsAtStation: Int =
+      ratingMap.map { cs =>
+        val availableChargingPointsAtStation =
           availableChargingPoints.getOrElse(cs, 0)
         if (availableChargingPointsAtStation > 0) {
 
@@ -453,8 +448,7 @@ final class MobilitySimulator(
           )
           None
         }
-      }
-      .getOrElse {
+      }.getOrElse {
         logger.debug(
           s"${ev.getId} parks but does not charge."
         )
