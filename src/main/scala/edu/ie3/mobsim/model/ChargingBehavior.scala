@@ -92,11 +92,11 @@ object ChargingBehavior extends LazyLogging {
         val evWithUpdatedPriceMemory = ev.updateChargingPricesMemory(prices)
 
         /* If EV wants to charge, rank available charging stations and choose the best */
-        val evWantsToCharge = doesEvWantToCharge(ev, seed)
+        val evWantsToCharge = doesEvWantToCharge(evWithUpdatedPriceMemory, seed)
         if (evWantsToCharge) {
           /* Create rating for each possible charging station */
           val ratingMap = createRatingsForChargingStations(
-            ev,
+            evWithUpdatedPriceMemory,
             currentPricesAtChargingStations,
             currentlyAvailableChargingPoints,
             maxDistance

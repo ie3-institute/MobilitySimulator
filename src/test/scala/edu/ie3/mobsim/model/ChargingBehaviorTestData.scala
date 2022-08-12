@@ -48,9 +48,12 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   )
 
   protected val currentPricesAtChargingStations: Map[UUID, Double] = {
-    chargingStations.map { chargingStations =>
-      chargingStations.uuid -> 0.0
-    }.toMap
+    chargingStations
+      .map { chargingStation =>
+        chargingStation.uuid -> 2.0
+      }
+      .toMap
+      .updated(cs7.uuid, 10.0)
   }
 
   protected val chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]] = {

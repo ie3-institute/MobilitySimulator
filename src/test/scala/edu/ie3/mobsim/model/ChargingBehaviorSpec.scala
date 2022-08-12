@@ -28,7 +28,22 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
 
       uuid shouldBe Some(cs2.uuid)
       evOption shouldBe Some(
-        evChargingNeeded.updateChargingPricesMemory(Queue(0.0))
+        evChargingNeeded.updateChargingPricesMemory(Queue(2.0, 10.0))
+      )
+    }
+
+    "choose a chargingStation if charging is needed plus check for correct rating" in {
+      val (uuid, evOption) = ChargingBehavior.chooseChargingStation(
+        evChargingNeeded,
+        currentPricesAtChargingStations.updated(cs7.uuid, 0.0),
+        currentlyAvailableChargingPoints,
+        random,
+        maxDistance
+      )
+
+      uuid shouldBe Some(cs7.uuid)
+      evOption shouldBe Some(
+        evChargingNeeded.updateChargingPricesMemory(Queue(2.0, 0.0))
       )
     }
 
@@ -337,7 +352,8 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
       )
 
       x shouldBe Map(
-        UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81") -> 5.0
+        UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81") -> 5.0,
+        cs7.uuid -> 5.0
       )
     }
 
