@@ -279,7 +279,7 @@ final class MobilitySimulator(
             case movements =>
               (
                 movements
-                  .map { movement => movement.cs }
+                  .map(_.cs)
                   .groupBy(identity)
                   .map { case (uuid, uuids) =>
                     uuid -> uuids.size
@@ -313,7 +313,7 @@ final class MobilitySimulator(
             s"${ev.getId} departs from $cs."
           )
 
-          val updatedEv: ElectricVehicle =
+          val updatedEv =
             ev.removeChargingAtSimona().setChosenChargingStation(None)
 
           Some(MobilitySimulator.Movement(cs, updatedEv))
@@ -417,7 +417,7 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Option[Movement] = {
-    val (ratingMap, evOption) = chooseChargingStation(
+    val (chosenCsOpt, updatedEvOpt) = chooseChargingStation(
       ev,
       pricesAtChargingStation,
       availableChargingPoints,
@@ -425,13 +425,13 @@ final class MobilitySimulator(
       maxDistance
     )
 
-    ratingMap
+    chosenCsOpt
       .map { cs =>
         val availableChargingPointsAtStation =
           availableChargingPoints.getOrElse(cs, 0)
         if (availableChargingPointsAtStation > 0) {
 
-          val updatedEv = evOption
+          val updatedEv = updatedEvOpt
             .getOrElse(ev)
             .setChargingAtSimona()
             .setChosenChargingStation(Some(cs))

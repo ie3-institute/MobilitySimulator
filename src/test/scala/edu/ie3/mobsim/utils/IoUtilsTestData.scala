@@ -11,21 +11,21 @@ import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingBehaviorTestData, ElectricVehicle}
 
 import java.io.File
+import java.nio.file.Files
 import java.time.ZonedDateTime
 import java.util.UUID
 
 trait IoUtilsTestData extends ChargingBehaviorTestData {
-  protected val outputFileFolder: String = new java.io.File(
-    "."
-  ).getCanonicalPath + File.separator + "out" + File.separator
+  protected val outputFileDir: File =
+    Files.createTempDirectory("io-utils-test").toFile
 
   protected val ioUtils: IoUtils = IoUtils(
-    outputFileFolder,
-    "movements",
-    "evs",
-    "evcs",
-    "positions",
-    "pois"
+    outputFileDir.getPath,
+    "movements.csv",
+    "evs.csv",
+    "evcs.csv",
+    "positions.csv",
+    "pois.csv"
   )
 
   protected val currentTime: ZonedDateTime = ZonedDateTime.now()

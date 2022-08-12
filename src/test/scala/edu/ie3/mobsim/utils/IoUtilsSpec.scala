@@ -27,7 +27,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       )
 
       val data = new BufferedReader(
-        new FileReader(new File(outputFileFolder + "movements"))
+        new FileReader(new File(outputFileDir, "movements.csv"))
       )
 
       val list: util.ArrayList[String] = new util.ArrayList[String]()
@@ -59,7 +59,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       ioUtils.writeEvs(evSet)
 
       val data = new BufferedReader(
-        new FileReader(new File(outputFileFolder + "evs"))
+        new FileReader(new File(outputFileDir, "evs.csv"))
       )
 
       val list: util.ArrayList[String] = new util.ArrayList[String]()
@@ -111,7 +111,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       )
 
       val data = new BufferedReader(
-        new FileReader(new File(outputFileFolder + "evcs"))
+        new FileReader(new File(outputFileDir, "evcs.csv"))
       )
 
       val list: util.ArrayList[String] = new util.ArrayList[String]()
@@ -146,7 +146,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       ioUtils.writePois(poiMap)
 
       val data = new BufferedReader(
-        new FileReader(new File(outputFileFolder + "pois"))
+        new FileReader(new File(outputFileDir, "pois.csv"))
       )
 
       val list: util.ArrayList[String] = new util.ArrayList[String]()
@@ -173,7 +173,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       ioUtils.writeEvPosition(firstEv, currentTime, uuid)
 
       val data = new BufferedReader(
-        new FileReader(new File(outputFileFolder + "positions"))
+        new FileReader(new File(outputFileDir, "positions.csv"))
       )
 
       val list: util.ArrayList[String] = new util.ArrayList[String]()
