@@ -255,7 +255,7 @@ object IoUtils {
           "time",
           "evcs",
           "charging_points",
-          "occupied_charging_points"
+          "charging_evs"
         ),
         csvSep,
         true

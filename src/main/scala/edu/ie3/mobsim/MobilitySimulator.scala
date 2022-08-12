@@ -425,7 +425,8 @@ final class MobilitySimulator(
       maxDistance
     )
 
-      ratingMap.map { cs =>
+    ratingMap
+      .map { cs =>
         val availableChargingPointsAtStation =
           availableChargingPoints.getOrElse(cs, 0)
         if (availableChargingPointsAtStation > 0) {
@@ -448,7 +449,8 @@ final class MobilitySimulator(
           )
           None
         }
-      }.getOrElse {
+      }
+      .getOrElse {
         logger.debug(
           s"${ev.getId} parks but does not charge."
         )

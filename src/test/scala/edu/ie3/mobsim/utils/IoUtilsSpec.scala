@@ -105,7 +105,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     "write electric vehicle charging stations correctly" in {
       ioUtils.writeEvcs(
         cs6,
-        currentlyAvailableChargingPoints,
+        chargingStationOccupancy,
         currentTime,
         uuid
       )
@@ -123,17 +123,17 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       }
 
       val chargingPoints: Int = cs6.chargingPoints
-      val occupiedChargingPoints: String =
-        (chargingPoints - availableChargingPoints.getOrElse(
-          cs6.uuid,
-          0
-        )).toString
+      val chargingEvs: String =
+        chargingStationOccupancy
+          .getOrElse(cs6.uuid, Set.empty)
+          .map(_.uuid)
+          .mkString("[", "|", "]")
 
       val entry: String = s"$uuid;" +
         s"$currentTime;" +
         s"${cs6.uuid};" +
         s"$chargingPoints;" +
-        s"$occupiedChargingPoints"
+        s"$chargingEvs"
 
       list.forEach { str =>
         if (str.contains(uuid.toString)) {

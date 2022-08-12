@@ -53,6 +53,18 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
     }.toMap
   }
 
+  protected val chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]] = {
+    Set(ev1, ev2, ev3, ev4, ev5)
+      .flatMap { ev =>
+        ev.chosenChargingStation.map(ev -> _)
+      }
+      .groupMap { case (_, cs) =>
+        cs
+      } { case (ev, _) =>
+        ev
+      }
+  }
+
   protected val currentlyAvailableChargingPoints: Map[UUID, Int] = {
     chargingStations.map { chargingStations =>
       chargingStations.uuid -> chargingStations.chargingPoints
