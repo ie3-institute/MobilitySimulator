@@ -17,26 +17,8 @@ import edu.ie3.mobsim.io.geodata.{
   PointOfInterest
 }
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.factories.{
-  CategoricalLocationFactory,
-  DrivingSpeedFactory,
-  FirstDepartureFactory,
-  LastTripFactory,
-  ParkingTimeFactory,
-  PoiTransitionFactory,
-  TripDistanceFactory
-}
-import edu.ie3.mobsim.io.probabilities.{
-  CategoricalLocation,
-  DrivingSpeed,
-  FirstDepartureOfDay,
-  LastTripOfDay,
-  ParkingTime,
-  PoiTransition,
-  ProbabilityDensityFunction,
-  TripDistance
-}
-import edu.ie3.mobsim.utils.IoUtils
+import edu.ie3.mobsim.io.probabilities.factories._
+import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
@@ -56,7 +38,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val half: ComparableQuantity[Energy] =
     Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR)
 
-  def ev1: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev1: ElectricVehicle = ElectricVehicle.buildEv(
     "car_1",
     givenModel,
     givenHomePoi,
@@ -66,7 +48,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev2: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev2: ElectricVehicle = ElectricVehicle.buildEv(
     "car_2",
     givenModel,
     givenHomePoi,
@@ -76,7 +58,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev3: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev3: ElectricVehicle = ElectricVehicle.buildEv(
     "car_3",
     givenModel,
     givenHomePoi,
@@ -86,7 +68,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev4: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev4: ElectricVehicle = ElectricVehicle.buildEv(
     "car_4",
     givenModel,
     givenHomePoi,
@@ -96,7 +78,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  def ev5: ElectricVehicle = ElectricVehicle.buildEv(
+  val ev5: ElectricVehicle = ElectricVehicle.buildEv(
     "car_5",
     givenModel,
     givenHomePoi,
@@ -107,7 +89,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   )
 
   protected val chargingStations: Set[ChargingStation] =
-    Set(cs0, cs1, cs2, cs3, cs4, cs5, cs6)
+    Set(cs0, cs1, cs2, cs3, cs4, cs5, cs6, cs7)
 
   private val poiData: Seq[PointOfInterest] = Seq(
     poiHome,
@@ -162,17 +144,6 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
 
   protected val maxDistance: ComparableQuantity[Length] =
     Quantities.getQuantity(5000, METRE)
-
-  protected val ioUtils: IoUtils = IoUtils(
-    new java.io.File(
-      "."
-    ).getCanonicalPath + File.separator + "out" + File.separator,
-    "movements",
-    "evs",
-    "evcs",
-    "positions",
-    "pois"
-  )
 
   private val basePath: String = Seq(
     Paths.get("").toAbsolutePath.toString,

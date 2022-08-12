@@ -79,7 +79,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           )
 
         actualChargingPoints shouldBe Map(
-          cs6.getUuid -> Integer.valueOf(expectedCsCount)
+          cs6.uuid -> Integer.valueOf(expectedCsCount)
         )
       }
     }
@@ -91,10 +91,10 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
 
       val cases = Table(
-        ("evs", "resultingMap"),
-        (SortedSet(ev1), Map(cs6.getUuid -> 1)),
-        (SortedSet(ev1, ev2), Map(cs6.getUuid -> 2)),
-        (SortedSet(ev1, ev2, ev3), Map(cs6.getUuid -> 3))
+        ("evs", "expectedFreeCs"),
+        (SortedSet(ev1), Map(cs6.uuid -> 1)),
+        (SortedSet(ev1, ev2), Map(cs6.uuid -> 2)),
+        (SortedSet(ev1, ev2, ev3), Map(cs6.uuid -> 3))
       )
 
       forAll(cases) { (evs, expectedFreeCs) =>
@@ -102,7 +102,17 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           mobSim invokePrivate handleDepartingEvs(setEvsAsDeparting(evs))
 
         val expectedMovements = evs.toSeq.map { ev =>
-          Movement(cs6.getUuid, ev)
+          Movement(
+            cs6.uuid,
+            ev.copy(
+              storedEnergy = half,
+              destinationPoi = workPoi,
+              parkingTimeStart = givenSimulationStart.plusHours(-4),
+              departureTime = givenSimulationStart,
+              chargingAtSimona = false,
+              chosenChargingStation = None
+            )
+          )
         }
 
         actualFreeCs shouldBe expectedFreeCs
@@ -111,7 +121,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "handle departing ev" in {
-      val handleDepartingEv = PrivateMethod[Future[Option[(UUID, Movement)]]](
+      val handleDepartingEv = PrivateMethod[Future[Option[Movement]]](
         Symbol("handleDepartingEv")
       )
 
@@ -120,8 +130,12 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           evChargingAtSimonaWithStation,
           Some(
-            cs6.getUuid,
-            Movement(cs6.getUuid, evChargingAtSimonaWithStation)
+            Movement(
+              cs6.uuid,
+              evChargingAtSimonaWithStation
+                .removeChargingAtSimona()
+                .setChosenChargingStation(None)
+            )
           )
         ),
         (evChargingAtSimonaWithoutStation, None)
@@ -134,12 +148,12 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         result.onComplete(
           {
             case Success(actualResults) =>
-              actualResults shouldBe expectedResults
-
               actualResults match {
-                case Some((_, Movement(_, ev))) =>
-                  ev.getChosenChargingStation shouldBe None
-                  ev.isChargingAtSimona shouldBe false
+                case Some(Movement(cs, ev)) =>
+                  cs shouldBe cs6.uuid
+
+                  ev.chosenChargingStation shouldBe None
+                  ev.chargingAtSimona shouldBe false
                 case None => None
               }
             case Failure(exception) => throw exception
@@ -155,14 +169,14 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val cases = Table(
         ("freeLots", "change", "resultingMap"),
         (
-          Map(cs6.getUuid -> 0, cs5.getUuid -> 0),
-          Map(cs6.getUuid -> 1),
-          Map(cs6.getUuid -> 1, cs5.getUuid -> 0)
+          Map(cs6.uuid -> 0, cs5.uuid -> 0),
+          Map(cs6.uuid -> 1),
+          Map(cs6.uuid -> 1, cs5.uuid -> 0)
         ),
         (
-          Map(cs6.getUuid -> 0, cs5.getUuid -> 0),
-          Map(cs6.getUuid -> 2, cs5.getUuid -> 1),
-          Map(cs6.getUuid -> 2, cs5.getUuid -> 1)
+          Map(cs6.uuid -> 0, cs5.uuid -> 0),
+          Map(cs6.uuid -> 2, cs5.uuid -> 1),
+          Map(cs6.uuid -> 2, cs5.uuid -> 1)
         )
       )
 
@@ -195,7 +209,10 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
 
         val expectedMovements: Seq[Movement] = evs.toSeq.map { ev =>
-          Movement(cs6.getUuid, ev)
+          Movement(
+            cs6.uuid,
+            ev.setChargingAtSimona().setChosenChargingStation(Some(cs6.uuid))
+          )
         }
 
         actualMovements shouldBe expectedMovements
@@ -211,14 +228,21 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         ("ev", "prices", "availablePoints", "expectedMovement"),
         (
           arrivingEv,
-          Map(cs6.getUuid -> 0.0),
-          Map(cs6.getUuid -> 1),
-          Some(Movement(cs6.getUuid, arrivingEv))
+          Map(cs6.uuid -> 0.0),
+          Map(cs6.uuid -> 1),
+          Some(
+            Movement(
+              cs6.uuid,
+              arrivingEv
+                .setChargingAtSimona()
+                .setChosenChargingStation(Some(cs6.uuid))
+            )
+          )
         ),
         (
           arrivingEv,
-          Map(cs6.getUuid -> 0.0),
-          Map(cs6.getUuid -> 0),
+          Map(cs6.uuid -> 0.0),
+          Map(cs6.uuid -> 0),
           None
         ),
         (

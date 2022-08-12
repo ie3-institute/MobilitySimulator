@@ -9,8 +9,8 @@ package edu.ie3.mobsim.io.probabilities.factories
 import edu.ie3.mobsim.exceptions.SourceException
 
 import scala.io.Source
-import scala.util.{Failure, Success, Try, Using}
 import scala.jdk.CollectionConverters._
+import scala.util.{Failure, Success, Try, Using}
 
 trait ProbabilityFactory[T] {
   protected val requiredFields: Seq[String]

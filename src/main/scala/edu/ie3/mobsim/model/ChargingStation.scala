@@ -18,30 +18,16 @@ import java.util.UUID
 import scala.jdk.CollectionConverters._
 
 case class ChargingStation(
-    private val uuid: UUID,
-    private val id: String,
-    private val geoPosition: Coordinate,
-    private val evcsType: ChargingPointType,
-    private val evcsLocationType: EvcsLocationType,
-    private val chargingPoints: Int,
-    private var homeChargingStationAssignedToPOI: Boolean
-) {
+    uuid: UUID,
+    id: String,
+    geoPosition: Coordinate,
+    evcsType: ChargingPointType,
+    evcsLocationType: EvcsLocationType,
+    chargingPoints: Int,
+    homeChargingStationAssignedToPOI: Boolean
+)
 
-  def getUuid: UUID = uuid
-  def getGeoPosition: Coordinate = geoPosition
-  def getChargingPoints: Int = chargingPoints
-  def getEvcsType: ChargingPointType = evcsType
-  def getEvcsLocationType: EvcsLocationType = evcsLocationType
-  def isHomeChargingStationAssignedToPOI: Boolean =
-    homeChargingStationAssignedToPOI
-
-  def setHomeChargingStationAssignedToPOI(assigned: Boolean): Unit = {
-    homeChargingStationAssignedToPOI = assigned
-  }
-
-}
-
-case object ChargingStation extends LazyLogging {
+object ChargingStation extends LazyLogging {
 
   /** Create a list of charging stations to be used by the mobility simulator.
     * Charging stations have information on their UUID and their geographical

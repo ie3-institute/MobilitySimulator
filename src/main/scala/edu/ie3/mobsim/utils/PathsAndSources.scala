@@ -8,13 +8,13 @@ package edu.ie3.mobsim.utils
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.io.naming.FileNamingStrategy
-import edu.ie3.datamodel.io.source.{RawGridSource, SystemParticipantSource}
 import edu.ie3.datamodel.io.source.csv.{
   CsvRawGridSource,
   CsvSystemParticipantSource,
   CsvThermalSource,
   CsvTypeSource
 }
+import edu.ie3.datamodel.io.source.{RawGridSource, SystemParticipantSource}
 import edu.ie3.mobsim.config.MobSimConfig
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input
