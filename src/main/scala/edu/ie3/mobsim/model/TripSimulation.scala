@@ -695,7 +695,7 @@ object TripSimulation extends LazyLogging {
 
     /* Reduced driving distance to the charging hub */
     val newDrivingDistance: ComparableQuantity[Length] = usedEnergyForThisTrip
-      .divide(ev.consumption)
+      .divide(ev.evType.consumption)
       .asType(classOf[Length])
       .to(KILOMETRE)
 
@@ -1069,7 +1069,7 @@ object TripSimulation extends LazyLogging {
 
     /* Calculate consumed energy during the trip */
     val consumedEnergy: ComparableQuantity[Energy] = drivingDistance
-      .multiply(ev.consumption)
+      .multiply(ev.evType.consumption)
       .asType(classOf[Energy])
       .to(KILOWATTHOUR)
 
@@ -1149,7 +1149,7 @@ object TripSimulation extends LazyLogging {
   ): ComparableQuantity[Length] = {
 
     val possibleDistance: ComparableQuantity[Length] = ev.getStoredEnergy
-      .divide(ev.consumption)
+      .divide(ev.evType.consumption)
       .asType(classOf[Length])
       .to(KILOMETRE)
 

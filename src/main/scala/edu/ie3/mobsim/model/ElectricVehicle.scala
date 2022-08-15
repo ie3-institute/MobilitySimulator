@@ -33,11 +33,7 @@ final case class ElectricVehicle(
     simulationStart: ZonedDateTime,
     uuid: UUID,
     id: String,
-    model: String,
-    batteryCapacity: ComparableQuantity[Energy],
-    acChargingPower: ComparableQuantity[Power],
-    dcChargingPower: ComparableQuantity[Power],
-    consumption: ComparableQuantity[SpecificEnergy], // kWh per km
+    evType: EvTypeInput,
     homePoi: PointOfInterest,
     workPoi: PointOfInterest,
     storedEnergy: ComparableQuantity[Energy],
@@ -59,11 +55,11 @@ final case class ElectricVehicle(
 
   def getId: String = id
 
-  def getEStorage: ComparableQuantity[Energy] = batteryCapacity
+  def getEStorage: ComparableQuantity[Energy] = evType.capacity
 
-  def getSRatedAC: ComparableQuantity[Power] = acChargingPower
+  def getSRatedAC: ComparableQuantity[Power] = evType.acPower
 
-  def getSRatedDC: ComparableQuantity[Power] = dcChargingPower
+  def getSRatedDC: ComparableQuantity[Power] = evType.dcPower
 
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
@@ -141,7 +137,7 @@ final case class ElectricVehicle(
   }
 
   override def toString: String =
-    s"EV(id=$id, eStorage=$batteryCapacity, storedEnergy=$storedEnergy, AC=$acChargingPower, DC=$dcChargingPower, departureTime=$departureTime)"
+    s"EV(id=$id, eStorage=${evType.capacity}, storedEnergy=$storedEnergy, AC=${evType.acPower}, DC=${evType.dcPower}, departureTime=$departureTime)"
 
 }
 
@@ -401,18 +397,16 @@ case object ElectricVehicle extends LazyLogging {
       simulationStart = simulationStart,
       uuid = UUID.randomUUID(),
       id = id,
-      model = s"${evType.producer} ${evType.model}",
-      batteryCapacity = evType.capacity,
-      acChargingPower = evType.acPower,
-      dcChargingPower =
-        if (
-          evType.dcPower.isLessThan(
-            Quantities.getQuantity(0.1, PowerSystemUnits.KILOWATT)
-          )
-        )
-          evType.acPower
-        else evType.dcPower,
-      consumption = evType.consumption,
+      // todo: check if this is neccessary
+      evType = evType.copy(
+        dcPower =
+          if (
+            evType.dcPower.isLessThan(
+              Quantities.getQuantity(0.1, PowerSystemUnits.KILOWATT)
+            )
+          ) evType.acPower
+          else evType.dcPower
+      ),
       homePoi = homePoi,
       workPoi = workPoi,
       storedEnergy = evType.capacity,

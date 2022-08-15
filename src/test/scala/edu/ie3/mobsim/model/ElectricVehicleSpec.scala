@@ -35,11 +35,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 simulationStart,
                 uuid,
                 id,
-                model,
-                batteryCapacity,
-                acChargingPower,
-                dcChargingPower,
-                consumption,
+                evType,
                 homePoi,
                 workPoi,
                 storedEnergy,
@@ -55,11 +51,11 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
               ) =>
             simulationStart shouldBe givenSimulationStart
             id shouldBe "test_car"
-            model shouldBe "cool_producer cool_model"
-            batteryCapacity shouldBe givenModel.capacity
-            acChargingPower shouldBe givenModel.acPower
-            dcChargingPower shouldBe givenModel.dcPower
-            consumption shouldBe givenModel.consumption
+            evType.model shouldBe "cool_model"
+            evType.capacity shouldBe givenModel.capacity
+            evType.acPower shouldBe givenModel.acPower
+            evType.dcPower shouldBe givenModel.dcPower
+            evType.consumption shouldBe givenModel.consumption
             homePoi shouldBe givenHomePoi
             workPoi shouldBe givenWorkPoi
             storedEnergy shouldBe givenModel.capacity

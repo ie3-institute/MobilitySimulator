@@ -74,7 +74,7 @@ final case class IoUtils private (
     val fieldData = Map(
       "uuid" -> ev.getUuid.toString,
       "id" -> ev.getId,
-      "model" -> ev.model,
+      "model" -> ev.evType.model,
       "battery_capacity" ->
         ev.getEStorage.to(KILOWATTHOUR).getValue.doubleValue().toString,
       "max_charging_power_ac" ->
@@ -82,7 +82,7 @@ final case class IoUtils private (
       "max_charging_power_dc" ->
         ev.getSRatedDC.to(KILOWATT).getValue.doubleValue().toString,
       "consumption" ->
-        ev.consumption
+        ev.evType.consumption
           .to(KILOWATTHOUR_PER_KILOMETRE)
           .getValue
           .doubleValue()
