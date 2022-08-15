@@ -4,7 +4,7 @@
  * Research group Distribution grid planning and operation
  */
 
-package edu.ie3.mobsim.io.model
+package edu.ie3.mobsim.model
 
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction

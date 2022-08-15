@@ -17,12 +17,11 @@ import edu.ie3.mobsim.exceptions.{
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
-import edu.ie3.mobsim.io.model.EvType
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
+import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
