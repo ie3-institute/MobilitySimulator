@@ -117,6 +117,14 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
         actualFreeCs shouldBe expectedFreeCs
         actualMovements shouldBe expectedMovements
+
+        mobSim.electricVehicles.foreach { electricVehicle =>
+          expectedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
+          }
+        }
       }
     }
 
@@ -216,6 +224,14 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         }
 
         actualMovements shouldBe expectedMovements
+
+        mobSim.electricVehicles.foreach { electricVehicle =>
+          expectedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
+          }
+        }
       }
     }
 
@@ -288,6 +304,49 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
 
         actualNextEvent shouldBe expectedNextEvent
+      }
+    }
+
+    "update electricVehicles correctly" in {
+      val updateElectricVehicles =
+        PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+      val mobSimCopy = mobSim
+
+      val cases = Table(
+        "updatedMovements",
+        Seq(
+          Movement(
+            cs0.uuid,
+            ev1.copy(
+              homePoi = charging_hub_highwayPoi,
+              chargingAtHomePossible = false
+            )
+          )
+        ),
+        Seq(
+          Movement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
+          Movement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+        ),
+        Seq(
+          Movement(cs0.uuid, ev1.copy(storedEnergy = zero)),
+          Movement(cs0.uuid, ev2.setChargingAtSimona()),
+          Movement(
+            cs0.uuid,
+            ev3.copy(finalDestinationPoi = Some(charging_hub_townPoi))
+          )
+        )
+      )
+
+      forAll(cases) { updatedMovements =>
+        mobSimCopy invokePrivate updateElectricVehicles(updatedMovements)
+
+        mobSimCopy.electricVehicles.foreach { electricVehicle =>
+          updatedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
+          }
+        }
       }
     }
   }

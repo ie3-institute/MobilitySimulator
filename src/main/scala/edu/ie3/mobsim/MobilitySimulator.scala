@@ -393,7 +393,9 @@ final class MobilitySimulator(
             }
         }.getOrElse((updatedAvailableChargingPoints, movements))
     } match {
-      case (_, movements) => movements
+      case (_, arrivals) =>
+        updateElectricVehicles(arrivals)
+        arrivals
     }
 
   /** Handle a single arriving ev, that wants to charge
