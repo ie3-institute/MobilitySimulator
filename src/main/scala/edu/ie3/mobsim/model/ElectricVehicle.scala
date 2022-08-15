@@ -11,7 +11,7 @@ import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationTyp
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.io.model.EvTypeInput
+import edu.ie3.mobsim.io.model.EvType
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
   ProbabilityDensityFunction
@@ -33,7 +33,7 @@ final case class ElectricVehicle(
     simulationStart: ZonedDateTime,
     uuid: UUID,
     id: String,
-    evType: EvTypeInput,
+    evType: EvType,
     homePoi: PointOfInterest,
     workPoi: PointOfInterest,
     storedEnergy: ComparableQuantity[Energy],
@@ -154,7 +154,7 @@ case object ElectricVehicle extends LazyLogging {
       chargingStations: Seq[ChargingStation],
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay
   ): SortedSet[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
@@ -296,7 +296,7 @@ case object ElectricVehicle extends LazyLogging {
       amountOfHomeChargingCars: Int,
       homePoiPdfWithHomeCharging: ProbabilityDensityFunction[PointOfInterest],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay,
       simulationStart: ZonedDateTime
   ): Iterable[ElectricVehicle] =
@@ -338,7 +338,7 @@ case object ElectricVehicle extends LazyLogging {
     */
   private def buildEvWithRandomAttributes(
       id: String,
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       firstDepartureOfDay: FirstDepartureOfDay,
       startTime: ZonedDateTime,
@@ -386,7 +386,7 @@ case object ElectricVehicle extends LazyLogging {
     */
   def buildEv(
       id: String,
-      evType: EvTypeInput,
+      evType: EvType,
       homePoi: PointOfInterest,
       workPoi: PointOfInterest,
       simulationStart: ZonedDateTime,
@@ -461,7 +461,7 @@ case object ElectricVehicle extends LazyLogging {
         PointOfInterest
       ],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay,
       simulationStart: ZonedDateTime
   ): Seq[ElectricVehicle] = {

@@ -17,7 +17,7 @@ import edu.ie3.mobsim.exceptions.{
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
-import edu.ie3.mobsim.io.model.EvTypeInput
+import edu.ie3.mobsim.io.model.EvType
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
@@ -730,7 +730,7 @@ object MobilitySimulator
 
     /* Initialize all EV objects in the area */
     val evModelPdf =
-      EvTypeInput.getEvInputModelsWithProbabilities(
+      EvType.getEvInputModelsWithProbabilities(
         pathsAndSources.evInputModelPath,
         pathsAndSources.evSegmentPath
       )
