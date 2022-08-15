@@ -95,18 +95,18 @@ trait PoiTestData {
     UUID.fromString("91b8a161-7e44-4363-aaa3-2d2adbaaab6d"),
     "POI_home_1",
     CategoricalLocationDictionary.HOME,
-    new Coordinate(7.3201668, 51.5067774),
+    new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map(cs1 -> Quantities.getQuantity(0, PowerSystemUnits.KILOMETRE))
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("a26b6850-c966-4b42-8ccf-762015bf19ba"),
     "work_617762273",
     CategoricalLocationDictionary.WORK,
-    new Coordinate(7.4065593, 51.5491556),
+    new Coordinate(7.41154872, 51.4833271),
     1549.4886151800551,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map(cs3 -> Quantities.getQuantity(0, PowerSystemUnits.KILOMETRE))
   )
 
   protected val bbpgPoi: PointOfInterest = PointOfInterest(

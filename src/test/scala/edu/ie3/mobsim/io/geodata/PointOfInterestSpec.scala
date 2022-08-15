@@ -239,7 +239,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
       PointOfInterest.getFromFile(
         testFileName,
         ",",
-        Seq(cs0),
+        Seq(cs1, cs3),
         Quantities.getQuantity(50d, Units.METRE),
         Quantities.getQuantity(30d, Units.METRE)
       ) match {

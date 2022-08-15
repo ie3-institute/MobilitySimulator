@@ -165,6 +165,8 @@ final class MobilitySimulator(
       builder.addArrival(cs, updatedEv)
     }
 
+    updateElectricVehicles(arrivals)
+
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
       .flatMap { ev =>
