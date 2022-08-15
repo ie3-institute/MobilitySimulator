@@ -12,9 +12,6 @@ import edu.ie3.test.common.UnitSpec
 
 import java.util.UUID
 import scala.collection.immutable.SortedSet
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
   "MobilitySimulator" should {
@@ -65,7 +62,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val handleDepartures =
-        PrivateMethod[Map[UUID, Integer]](Symbol("handleDepartures"))
+        PrivateMethod[Map[UUID, Int]](Symbol("handleDepartures"))
 
       val cases = Table(
         ("departingEvs", "expectedChargingPoints"),
@@ -83,7 +80,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           )
 
         actualChargingPoints shouldBe Map(
-          cs6.uuid -> Integer.valueOf(expectedCsCount)
+          cs6.uuid -> expectedCsCount
         )
       }
     }
@@ -92,7 +89,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val handleDepartingEvs =
-        PrivateMethod[(Map[UUID, Integer], Seq[Movement])](
+        PrivateMethod[(Map[UUID, Int], Seq[Movement])](
           Symbol("handleDepartingEvs")
         )
 
@@ -124,7 +121,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         }
 
         actualFreeCs shouldBe expectedFreeCs
-        actualMovements shouldBe expectedMovements
+        actualMovements.size shouldBe expectedMovements.size
+        actualMovements should contain allElementsOf expectedMovements
 
         mobilitySimulator.electricVehicles.foreach { electricVehicle =>
           expectedMovements.foreach { movement =>
@@ -139,7 +137,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     "handle departing ev" in {
       val mobilitySimulator = mobSim()
 
-      val handleDepartingEv = PrivateMethod[Future[Option[Movement]]](
+      val handleDepartingEv = PrivateMethod[Option[Movement]](
         Symbol("handleDepartingEv")
       )
 
@@ -160,23 +158,18 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (ev, expectedResults) =>
-        val result =
+        val actualResults =
           mobilitySimulator invokePrivate handleDepartingEv(ev)
 
-        result.onComplete(
-          {
-            case Success(actualResults) =>
-              actualResults match {
-                case Some(Movement(cs, ev)) =>
-                  cs shouldBe cs6.uuid
+        actualResults shouldBe expectedResults
 
-                  ev.chosenChargingStation shouldBe None
-                  ev.chargingAtSimona shouldBe false
-                case None => None
-              }
-            case Failure(exception) => throw exception
-          }
-        )
+        actualResults match {
+          case Some(Movement(cs, ev)) =>
+            cs shouldBe cs6.uuid
+
+            ev.chosenChargingStation shouldBe None
+          case None =>
+        }
       }
     }
 
@@ -184,7 +177,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val updateFreeLots =
-        PrivateMethod[Map[UUID, Integer]](Symbol("updateFreeLots"))
+        PrivateMethod[Map[UUID, Int]](Symbol("updateFreeLots"))
 
       val cases = Table(
         ("freeLots", "change", "resultingMap"),
@@ -280,7 +273,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           arrivingEv,
           Map.empty[UUID, Double],
-          Map.empty[UUID, Integer],
+          Map.empty[UUID, Int],
           None
         )
       )

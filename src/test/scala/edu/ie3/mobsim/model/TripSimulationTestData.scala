@@ -88,8 +88,8 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     isChargingAtHomePossible
   )
 
-  protected val chargingStations: Set[ChargingStation] =
-    Set(cs0, cs1, cs2, cs3, cs4, cs5, cs6, cs7)
+  protected val chargingStations: Seq[ChargingStation] =
+    Seq(cs0, cs1, cs2, cs3, cs4, cs5, cs6, cs7)
 
   private val poiData: Seq[PointOfInterest] = Seq(
     poiHome,

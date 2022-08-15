@@ -69,15 +69,13 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   }
 
   protected val currentlyAvailableChargingPoints: Map[UUID, Int] = {
-    chargingStations.map { chargingStations =>
-      chargingStations.uuid -> chargingStations.chargingPoints
+    chargingStations.map { cs =>
+      cs.uuid -> cs.chargingPoints
     }.toMap
   }
 
   protected val noAvailableChargingPoints: Map[UUID, Int] = {
-    chargingStations.map { chargingStations =>
-      chargingStations.uuid -> 0
-    }.toMap
+    chargingStations.map { _.uuid -> 0 }.toMap
   }
 
   protected def random: Random = new scala.util.Random(6)
