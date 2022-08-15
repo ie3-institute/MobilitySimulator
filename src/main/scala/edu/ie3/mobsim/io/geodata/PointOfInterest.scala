@@ -106,11 +106,9 @@ case object PointOfInterest {
         } match {
         case (homePois, otherPois) =>
           /* Home POIs have to be treated sequentially */
-          val homeCs = locationTypeToChargingStations.getOrElse(
-            EvcsLocationType.HOME,
-            throw InitializationException(
-              "Unable to get home charging stations."
-            )
+          val homeCs = suitableChargingStations(
+            CategoricalLocationDictionary.HOME,
+            locationTypeToChargingStations
           )
           val homeFuture = parseHomePoi(
             homePois,
