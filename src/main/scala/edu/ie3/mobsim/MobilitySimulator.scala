@@ -253,8 +253,6 @@ final class MobilitySimulator(
       builder.addDeparture(cs, updatedEv.getUuid)
     }
 
-    updateElectricVehicles(departures)
-
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
 
