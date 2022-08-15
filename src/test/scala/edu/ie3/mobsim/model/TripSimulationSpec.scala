@@ -30,13 +30,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         chargingHubHighwayIsPresent = true,
         chargingStations,
         ioUtils,
-        categoricalLocation,
-        speed,
-        firstDepartureOfDay,
-        lastTripOfDay,
-        parkingTime,
-        poiTransition,
-        tripDistance,
+        tripProbabilities,
         maxDistance
       ) match {
         case ElectricVehicle(
@@ -93,13 +87,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         chargingHubHighwayIsPresent = true,
         chargingStations,
         ioUtils,
-        categoricalLocation,
-        speed,
-        firstDepartureOfDay,
-        lastTripOfDay,
-        parkingTime,
-        poiTransition,
-        tripDistance,
+        tripProbabilities,
         maxDistance
       ) match {
         case ElectricVehicle(

@@ -7,6 +7,7 @@
 package edu.ie3.mobsim
 
 import akka.actor.ActorRef
+import edu.ie3.mobsim.io.probabilities.TripProbabilities
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
@@ -82,13 +83,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     chargingHubTownIsPresent = true,
     chargingHubHighwayIsPresent = true,
     ioUtils = ioUtils,
-    categoricalLocation = categoricalLocation,
-    drivingSpeed = drivingSpeed,
-    firstDepartureOfDay = firstDepartureOfDay,
-    lastTripOfDay = lastTripOfDay,
-    parkingTime = parkingTime,
-    poiTransition = poiTransition,
-    tripDistance = tripDistance,
+    tripProbabilities,
     maxDistanceFromPoi = maxDistance,
     thresholdChargingHubDistance = maxDistance
   )

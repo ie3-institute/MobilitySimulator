@@ -232,4 +232,14 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
       case Failure(exception) => throw exception
     }
   }
+
+  protected val tripProbabilities: TripProbabilities = TripProbabilities(
+    categoricalLocation,
+    drivingSpeed,
+    firstDepartureOfDay,
+    lastTripOfDay,
+    parkingTime,
+    poiTransition,
+    tripDistance
+  )
 }
