@@ -310,7 +310,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     "update electricVehicles correctly" in {
       val updateElectricVehicles =
         PrivateMethod[Unit](Symbol("updateElectricVehicles"))
-      val mobSimCopy = mobSim
 
       val cases = Table(
         "updatedMovements",
@@ -338,9 +337,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { updatedMovements =>
-        mobSimCopy invokePrivate updateElectricVehicles(updatedMovements)
+        mobSim invokePrivate updateElectricVehicles(updatedMovements)
 
-        mobSimCopy.electricVehicles.foreach { electricVehicle =>
+        mobSim.electricVehicles.foreach { electricVehicle =>
           updatedMovements.foreach { movement =>
             if (movement.ev.uuid.equals(electricVehicle.uuid)) {
               electricVehicle shouldBe movement.ev
