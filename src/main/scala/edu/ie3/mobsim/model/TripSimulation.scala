@@ -79,7 +79,7 @@ object TripSimulation extends LazyLogging {
       ],
       chargingHubTownIsPresent: Boolean,
       chargingHubHighwayIsPresent: Boolean,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       ioUtils: IoUtils,
       categoricalLocation: CategoricalLocation,
       drivingSpeed: DrivingSpeed,
@@ -681,7 +681,7 @@ object TripSimulation extends LazyLogging {
       socAtChargingHubArrival: Double,
       plannedDrivingDistance: ComparableQuantity[Length],
       plannedDestinationPoi: PointOfInterest,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       drivingSpeed: DrivingSpeed
   ): ElectricVehicle = {
 
@@ -794,7 +794,7 @@ object TripSimulation extends LazyLogging {
       socAtChargingHubArrival: Double,
       plannedDrivingDistance: ComparableQuantity[Length],
       plannedDestinationPoi: PointOfInterest,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       drivingSpeed: DrivingSpeed
   ): ElectricVehicle = {
 
@@ -1013,7 +1013,7 @@ object TripSimulation extends LazyLogging {
   private def doNotDepartAndStayLongerAtDestination(
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
-      chargingStations: Set[ChargingStation],
+      chargingStations: Seq[ChargingStation],
       firstDepartureOfDay: FirstDepartureOfDay,
       lastTripOfDay: LastTripOfDay,
       parkingTime: ParkingTime
@@ -1182,7 +1182,7 @@ object TripSimulation extends LazyLogging {
       ev: ElectricVehicle,
       destinationPoi: PointOfInterest,
       storedEnergyAtChargingStart: ComparableQuantity[Energy],
-      chargingStations: Set[ChargingStation]
+      chargingStations: Seq[ChargingStation]
   ): Long = {
     val chargingHub = destinationPoi.nearestChargingStations.headOption
       .flatMap { case (closestChargingStation, _) =>

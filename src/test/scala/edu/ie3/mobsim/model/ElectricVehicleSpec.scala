@@ -256,7 +256,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
               targetAmount,
               homePoisWithSizes,
               givenWorkPoiPdf,
-              Set(givenChargingStation),
+              Seq(givenChargingStation),
               givenSimulationStart,
               targetShare,
               givenModelPdf,

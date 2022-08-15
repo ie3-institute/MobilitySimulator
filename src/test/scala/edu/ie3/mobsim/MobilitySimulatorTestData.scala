@@ -44,11 +44,11 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
         .setChosenChargingStation(Some(cs6.uuid))
     }
 
-  protected val chargingPointsAllTaken: Map[UUID, Integer] = {
-    Map(cs6.uuid -> Integer.valueOf(0))
+  protected val chargingPointsAllTaken: Map[UUID, Int] = {
+    Map(cs6.uuid -> 0)
   }
 
-  protected val chargingPointsAllFree: Map[UUID, Integer] = {
+  protected val chargingPointsAllFree: Map[UUID, Int] = {
     Map(cs6.uuid -> cs6.chargingPoints)
   }
 

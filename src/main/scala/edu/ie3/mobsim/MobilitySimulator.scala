@@ -39,16 +39,13 @@ import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedSet, TreeSet}
-import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Random, Success}
 
 final class MobilitySimulator(
     evData: ExtEvData,
-    chargingStations: Set[ChargingStation],
+    chargingStations: Seq[ChargingStation],
     poisWithSizes: Map[
       CategoricalLocationDictionary.Value,
       ProbabilityDensityFunction[PointOfInterest]
@@ -77,17 +74,20 @@ final class MobilitySimulator(
     )
 
     /* Receive available charging points of evcs from SIMONA and converting them to scala values */
-    val availableChargingPoints =
-      evData.requestAvailablePublicEvCs().asScala.toMap.map {
-        case (cs, freeLots) =>
-          (cs, freeLots.intValue())
-      }
+    val availableChargingPoints = evData
+      .requestAvailablePublicEvCs()
+      .asScala
+      .view
+      .mapValues(_.toInt)
+      .toMap
 
     /* Receive current prices for public evcs situation and converting them to scala values */
-    val currentPricesAtChargingStations =
-      evData.requestCurrentPrices().asScala.toMap.map { case (cs, price) =>
-        (cs, price.doubleValue())
-      }
+    val currentPricesAtChargingStations = evData
+      .requestCurrentPrices()
+      .asScala
+      .view
+      .mapValues(_.toDouble)
+      .toMap
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
@@ -132,7 +132,7 @@ final class MobilitySimulator(
     newTicks
   }
 
-  /** Handover EVs to SIMONA which arrive at their destination POI or depart
+  /** Hand over EVs to SIMONA which arrive at their destination POI or depart
     * from their POI at current time, but only if there is a charging point
     * available at the charging station. Otherwise, the EV is not sent to
     * SIMONA. <p> Get updated EV models for all EVs that depart from a charging
@@ -176,6 +176,8 @@ final class MobilitySimulator(
     arrivals.foreach { case Movement(cs, updatedEv) =>
       builder.addArrival(cs, updatedEv)
     }
+
+    updateElectricVehicles(arrivals)
 
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
@@ -271,25 +273,19 @@ final class MobilitySimulator(
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
   ): (Map[UUID, Int], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence(evs.toSeq.map(handleDepartingEv))
-        .map {
-          _.flatten match {
-            case movements =>
-              (
-                movements
-                  .map(_.cs)
-                  .groupBy(identity)
-                  .map { case (uuid, uuids) =>
-                    uuid -> uuids.size
-                  },
-                movements
-              )
-          }
-        },
-      Duration("1h")
-    )
+    evs.par.toSeq.flatMap(handleDepartingEv) match {
+      case movements =>
+        (
+          movements
+            .map(_.cs)
+            .groupBy(identity)
+            .map { case (uuid, uuids) =>
+              uuid -> uuids.size
+            }
+            .seq,
+          movements.seq
+        )
+    }
 
   /** Handle a single departing ev. Empty information are handed back, if the
     * car either does not charge in SIMONA or there is no target charging
@@ -298,31 +294,29 @@ final class MobilitySimulator(
     * @param ev
     *   The car to handle
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the target charging stations' UUID as well as
+    *   information about the movement
     */
   private def handleDepartingEv(
       ev: ElectricVehicle
-  ): Future[Option[Movement]] =
-    Future {
-      /* Determine the charging station, the car currently is connected to */
-      ev.chosenChargingStation match {
-        case Some(cs) =>
-          /* Register departure */
-          logger.debug(
-            s"${ev.getId} departs from $cs."
-          )
+  ): Option[Movement] =
+    /* Determine the charging station, the car currently is connected to */
+    ev.chosenChargingStation match {
+      case Some(cs) =>
+        /* Register departure */
+        logger.debug(
+          s"${ev.getId} departs from $cs."
+        )
 
-          val updatedEv =
-            ev.removeChargingAtSimona().setChosenChargingStation(None)
+        val updatedEv =
+          ev.removeChargingAtSimona().setChosenChargingStation(None)
 
-          Some(MobilitySimulator.Movement(cs, updatedEv))
-        case None =>
-          logger.warn(
-            s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
-          )
-          None
-      }
+        Some(MobilitySimulator.Movement(cs, updatedEv))
+      case None =>
+        logger.warn(
+          s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
+        )
+        None
     }
 
   /** Update the free charging lots per charging station.
@@ -339,8 +333,8 @@ final class MobilitySimulator(
       change: Map[UUID, Int]
   ): Map[UUID, Int] =
     freeLots.map { case (uuid, freeLots) =>
-      val lotDiff: Int = change.getOrElse(uuid, 0)
-      val newLots: Int = freeLots + lotDiff
+      val lotDiff = change.getOrElse(uuid, 0)
+      val newLots = freeLots + lotDiff
       uuid -> newLots
     } ++ change
       .filter { case (uuid, _) =>
@@ -351,8 +345,7 @@ final class MobilitySimulator(
       }
 
   /** Handle parking evs. Based on given surrounding information, a target
-    * charging station is sampled. The newly taken charging points as well as
-    * the movements are tracked and handed back.
+    * charging station is sampled. The movements are tracked and handed back.
     *
     * @param evs
     *   Collection of parking evs
