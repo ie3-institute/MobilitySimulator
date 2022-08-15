@@ -42,18 +42,20 @@ object ChargingStation extends LazyLogging {
       participantSource: SystemParticipantSource
   ): Seq[ChargingStation] = {
 
-    val evcsInput = participantSource.getEvCS().asScala.toSeq
-
-    val chargingStations = evcsInput.map { evcs =>
-      ChargingStation(
-        evcs.getUuid,
-        evcs.getId,
-        evcs.getNode.getGeoPosition.getCoordinate,
-        evcsType = evcs.getType,
-        evcs.getLocationType,
-        chargingPoints = evcs.getChargingPoints
-      )
-    }
+    val chargingStations = participantSource
+      .getEvCS()
+      .asScala
+      .toSeq
+      .map { evcs =>
+        ChargingStation(
+          evcs.getUuid,
+          evcs.getId,
+          evcs.getNode.getGeoPosition.getCoordinate,
+          evcsType = evcs.getType,
+          evcs.getLocationType,
+          chargingPoints = evcs.getChargingPoints
+        )
+      }
 
     logger.info(
       s"Received ${chargingStations.size} charging stations during setup."

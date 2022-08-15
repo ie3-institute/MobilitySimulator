@@ -228,18 +228,18 @@ case object PointOfInterest {
         poi -> SortedSet.from(nearestCs)(Ordering.by(_._2))
       }.toList
     }
-      .map(assignChargingStations)
+      .map(assignHomeChargingStations)
 
-  /** Per Point of Interest, assign the nearest home charging station, taking
-    * care of only assigning a charging station to one home POI
+  /** Per home POI, assign the nearest home charging station. Each charging
+    * station is assigned to only one single home POI.
     *
     * @param poiWithNearbyChargingStations
-    *   Iterator of POI with its nearest charging stations
+    *   POIs with their nearest charging stations
     * @return
     *   A [[Set]] of [[PointOfInterest]]s with its nearest home charging station
-    *   assigned
+    *   assigned, if available
     */
-  private def assignChargingStations(
+  private def assignHomeChargingStations(
       poiWithNearbyChargingStations: Seq[
         (
             PointOfInterest,
