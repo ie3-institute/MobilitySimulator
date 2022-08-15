@@ -25,7 +25,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
   "Creating a point of interest" when {
     val coordinate = new Coordinate(7.4116481, 51.4843282)
     val locationToChargingStations =
-      Seq(cs0, cs1, cs2, cs3).groupBy(_.getEvcsLocationType)
+      Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType)
 
     "assess the headline of a file correctly" should {
       val assessHeadLine =
@@ -171,7 +171,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate findNearestChargingStations(
           CategoricalLocationDictionary.HOME,
           coordinate,
-          Seq(cs0, cs1, cs2, cs3).groupBy(_.getEvcsLocationType),
+          Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType),
           Quantities.getQuantity(1000d, Units.METRE)
         )
 
@@ -191,7 +191,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate findNearestChargingStations(
           CategoricalLocationDictionary.WORK,
           coordinate,
-          Seq(cs0, cs1, cs2, cs3).groupBy(_.getEvcsLocationType),
+          Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType),
           Quantities.getQuantity(1000d, Units.METRE)
         )
         actual.keys should contain theSameElementsAs Seq(cs3)
@@ -201,7 +201,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate findNearestChargingStations(
           CategoricalLocationDictionary.SPORTS,
           coordinate,
-          Seq(cs0, cs1, cs2, cs3).groupBy(_.getEvcsLocationType),
+          Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType),
           Quantities.getQuantity(1000d, Units.METRE)
         )
         actual.keys should contain theSameElementsAs Seq(cs2)

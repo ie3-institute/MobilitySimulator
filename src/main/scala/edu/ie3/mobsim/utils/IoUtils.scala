@@ -54,10 +54,10 @@ final case class IoUtils private (
       "ev" -> ev.getUuid.toString,
       "status" -> status,
       "soc" -> (ev.getStoredEnergy.getValue.doubleValue / ev.getEStorage.getValue.doubleValue).toString,
-      "destination_poi" -> ev.getDestinationPoi.id,
-      "categorical_location" -> ev.getDestinationCategoricalLocation.toString,
-      "scheduled_departure" -> ev.getDepartureTime.toString,
-      "is_charging" -> ev.isChargingAtSimona.toString
+      "destination_poi" -> ev.destinationPoi.id,
+      "categorical_location" -> ev.destinationPoi.categoricalLocation.toString,
+      "scheduled_departure" -> ev.departureTime.toString,
+      "is_charging" -> ev.chargingAtSimona.toString
     ).asJava
 
     movementWriter.write(fieldData)
@@ -74,7 +74,7 @@ final case class IoUtils private (
     val fieldData = Map(
       "uuid" -> ev.getUuid.toString,
       "id" -> ev.getId,
-      "model" -> ev.getModel,
+      "model" -> ev.model,
       "battery_capacity" ->
         ev.getEStorage.to(KILOWATTHOUR).getValue.doubleValue().toString,
       "max_charging_power_ac" ->
@@ -82,14 +82,14 @@ final case class IoUtils private (
       "max_charging_power_dc" ->
         ev.getSRatedDC.to(KILOWATT).getValue.doubleValue().toString,
       "consumption" ->
-        ev.getConsumption
+        ev.consumption
           .to(KILOWATTHOUR_PER_KILOMETRE)
           .getValue
           .doubleValue()
           .toString,
-      "home_poi" -> ev.getHomePOI.id,
-      "work_poi" -> ev.getWorkPOI.id,
-      "is_home_charging_possible" -> ev.isChargingAtHomePossible.toString
+      "home_poi" -> ev.homePoi.id,
+      "work_poi" -> ev.workPoi.id,
+      "is_home_charging_possible" -> ev.chargingAtHomePossible.toString
     ).asJava
 
     evWriter.write(fieldData)
@@ -116,11 +116,11 @@ final case class IoUtils private (
     val fieldData = Map(
       "uuid" -> uuid.toString,
       "time" -> currentTime.toString,
-      "evcs" -> cs.getUuid.toString,
-      "charging_points" -> cs.getChargingPoints.toString,
+      "evcs" -> cs.uuid.toString,
+      "charging_points" -> cs.chargingPoints.toString,
       "charging_evs" -> chargingStationOccupancy
-        .getOrElse(cs.getUuid, Set.empty)
-        .map(_.getUuid)
+        .getOrElse(cs.uuid, Set.empty)
+        .map(_.uuid)
         .mkString("[", "|", "]")
     ).asJava
 
@@ -167,12 +167,12 @@ final case class IoUtils private (
       uuid: UUID = UUID.randomUUID()
   ): Unit = {
     val (location, destinationPoi) =
-      if (time.isBefore(ev.getParkingTimeStart)) {
+      if (time.isBefore(ev.parkingTimeStart)) {
         ("DRIVING", "")
       } else {
         (
-          ev.getDestinationCategoricalLocation.toString,
-          ev.getDestinationPoi.toString
+          ev.destinationPoi.categoricalLocation.toString,
+          ev.destinationPoi.toString
         )
       }
 
@@ -255,7 +255,7 @@ object IoUtils {
           "time",
           "evcs",
           "charging_points",
-          "occupied_charging_points"
+          "charging_evs"
         ),
         csvSep,
         true
