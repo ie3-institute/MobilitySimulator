@@ -253,8 +253,6 @@ final class MobilitySimulator(
       builder.addDeparture(cs, updatedEv.getUuid)
     }
 
-    updateElectricVehicles(departures)
-
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
 
@@ -277,6 +275,8 @@ final class MobilitySimulator(
         .map {
           _.flatten match {
             case movements =>
+              updateElectricVehicles(movements)
+
               (
                 movements
                   .map(_.cs)
