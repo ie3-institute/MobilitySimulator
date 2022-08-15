@@ -55,13 +55,7 @@ final class MobilitySimulator(
     chargingHubTownIsPresent: Boolean,
     chargingHubHighwayIsPresent: Boolean,
     ioUtils: IoUtils,
-    categoricalLocation: CategoricalLocation,
-    drivingSpeed: DrivingSpeed,
-    firstDepartureOfDay: FirstDepartureOfDay,
-    lastTripOfDay: LastTripOfDay,
-    parkingTime: ParkingTime,
-    poiTransition: PoiTransition,
-    tripDistance: TripDistance,
+    tripProbabilities: TripProbabilities,
     maxDistanceFromPoi: ComparableQuantity[Length],
     thresholdChargingHubDistance: ComparableQuantity[Length]
 ) extends LazyLogging {
@@ -104,13 +98,7 @@ final class MobilitySimulator(
     updateAndSimulateDepartedEvs(
       currentTime,
       departedEvsFromSimona,
-      categoricalLocation,
-      drivingSpeed,
-      firstDepartureOfDay,
-      lastTripOfDay,
-      parkingTime,
-      poiTransition,
-      tripDistance,
+      tripProbabilities,
       thresholdChargingHubDistance
     )
 
@@ -458,33 +446,15 @@ final class MobilitySimulator(
     *   current time
     * @param departedEvsFromSimona
     *   All EV objects were returned from SIMONA
-    * @param categoricalLocation
-    *   Meta-information to determine the next categorical location
-    * @param drivingSpeed
-    *   Meta-information to determine the next driving speed
-    * @param firstDepartureOfDay
-    *   Meta-information to determine the first departure of the day
-    * @param lastTripOfDay
-    *   Meta-information to determine if that trip is the last trip of the day
-    * @param parkingTime
-    *   Meta-information to determine the parking time
-    * @param poiTransition
-    *   Meta-information to determine the next POI transition
-    * @param tripDistance
-    *   Meta-information to determine the distance of the next trip
+    * @param tripProbabilities
+    *   Probabilities to generate new trips
     * @param thresholdChargingHubDistance
     *   Maximum permissible distance to next charging hub
     */
   private def updateAndSimulateDepartedEvs(
       currentTime: ZonedDateTime,
       departedEvsFromSimona: SortedSet[ElectricVehicle],
-      categoricalLocation: CategoricalLocation,
-      drivingSpeed: DrivingSpeed,
-      firstDepartureOfDay: FirstDepartureOfDay,
-      lastTripOfDay: LastTripOfDay,
-      parkingTime: ParkingTime,
-      poiTransition: PoiTransition,
-      tripDistance: TripDistance,
+      tripProbabilities: TripProbabilities,
       thresholdChargingHubDistance: ComparableQuantity[Length]
   ): Unit = {
 
@@ -514,13 +484,7 @@ final class MobilitySimulator(
           chargingHubHighwayIsPresent,
           chargingStations,
           ioUtils,
-          categoricalLocation,
-          drivingSpeed,
-          firstDepartureOfDay,
-          lastTripOfDay,
-          parkingTime,
-          poiTransition,
-          tripDistance,
+          tripProbabilities,
           thresholdChargingHubDistance
         )
       } else ev
@@ -883,6 +847,16 @@ object MobilitySimulator
     }
     logger.debug("Done loading probabilities for trip distance")
 
+    val tripProbabilities = TripProbabilities(
+      categoricalLocation,
+      drivingSpeed,
+      firstDepartureOfDay,
+      lastTripOfDay,
+      parkingTime,
+      poiTransition,
+      tripDistance
+    )
+
     val mobSim = new MobilitySimulator(
       availableEvData,
       chargingStations,
@@ -892,13 +866,7 @@ object MobilitySimulator
       chargingHubTownIsPresent,
       chargingHubHighwayIsPresent,
       ioUtils,
-      categoricalLocation,
-      drivingSpeed,
-      firstDepartureOfDay,
-      lastTripOfDay,
-      parkingTime,
-      poiTransition,
-      tripDistance,
+      tripProbabilities,
       maxDistanceFromPoi,
       thresholdChargingHubDistance
     )
