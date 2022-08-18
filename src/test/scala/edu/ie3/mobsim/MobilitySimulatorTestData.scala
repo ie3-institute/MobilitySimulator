@@ -74,7 +74,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     ev1.copy(chargingAtSimona = true)
   }
 
-  val mobSim: MobilitySimulator = new MobilitySimulator(
+  def mobSim(): MobilitySimulator = new MobilitySimulator(
     evData = evData,
     chargingStations = chargingStations,
     poisWithSizes = poisWithSizes,

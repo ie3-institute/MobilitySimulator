@@ -165,8 +165,6 @@ final class MobilitySimulator(
       builder.addArrival(cs, updatedEv)
     }
 
-    updateElectricVehicles(arrivals)
-
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
       .flatMap { ev =>
@@ -243,8 +241,6 @@ final class MobilitySimulator(
       builder.addDeparture(cs, updatedEv.getUuid)
     }
 
-    updateElectricVehicles(departures)
-
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
 
@@ -263,6 +259,8 @@ final class MobilitySimulator(
   ): (Map[UUID, Int], Seq[Movement]) =
     evs.par.toSeq.flatMap(handleDepartingEv) match {
       case movements =>
+        updateElectricVehicles(movements.seq)
+
         (
           movements
             .map(_.cs)
@@ -374,7 +372,9 @@ final class MobilitySimulator(
             }
         }.getOrElse((updatedAvailableChargingPoints, movements))
     } match {
-      case (_, movements) => movements
+      case (_, arrivals) =>
+        updateElectricVehicles(arrivals)
+        arrivals
     }
 
   /** Handle a single arriving ev, that wants to charge
