@@ -17,6 +17,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
   "MobilitySimulator" should {
 
     "define movement correctly" in {
+      val mobilitySimulator = mobSim()
+
       val defineMovements =
         PrivateMethod[(SortedSet[ElectricVehicle], SortedSet[ElectricVehicle])](
           Symbol("defineMovements")
@@ -46,7 +48,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         val evs = parkingEvs ++ departingEvs
 
         val (resultParking, resultDeparting) =
-          mobSim invokePrivate defineMovements(
+          mobilitySimulator invokePrivate defineMovements(
             evs,
             givenSimulationStart
           )
@@ -57,6 +59,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "handle departures" in {
+      val mobilitySimulator = mobSim()
+
       val handleDepartures =
         PrivateMethod[Map[UUID, Int]](Symbol("handleDepartures"))
 
@@ -69,7 +73,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (departingEvs, expectedCsCount) =>
         val actualChargingPoints =
-          mobSim invokePrivate handleDepartures(
+          mobilitySimulator invokePrivate handleDepartures(
             setEvsAsDeparting(departingEvs),
             chargingPointsAllTaken,
             builder
@@ -82,6 +86,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "handle departing evs" in {
+      val mobilitySimulator = mobSim()
+
       val handleDepartingEvs =
         PrivateMethod[(Map[UUID, Int], Seq[Movement])](
           Symbol("handleDepartingEvs")
@@ -96,7 +102,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (evs, expectedFreeCs) =>
         val (actualFreeCs, actualMovements) =
-          mobSim invokePrivate handleDepartingEvs(setEvsAsDeparting(evs))
+          mobilitySimulator invokePrivate handleDepartingEvs(
+            setEvsAsDeparting(evs)
+          )
 
         val expectedMovements = evs.toSeq.map { ev =>
           Movement(
@@ -115,10 +123,20 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         actualFreeCs shouldBe expectedFreeCs
         actualMovements.size shouldBe expectedMovements.size
         actualMovements should contain allElementsOf expectedMovements
+
+        mobilitySimulator.electricVehicles.foreach { electricVehicle =>
+          expectedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
+          }
+        }
       }
     }
 
     "handle departing ev" in {
+      val mobilitySimulator = mobSim()
+
       val handleDepartingEv = PrivateMethod[Option[Movement]](
         Symbol("handleDepartingEv")
       )
@@ -141,7 +159,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (ev, expectedResults) =>
         val actualResults =
-          mobSim invokePrivate handleDepartingEv(ev)
+          mobilitySimulator invokePrivate handleDepartingEv(ev)
 
         actualResults shouldBe expectedResults
 
@@ -156,6 +174,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "update free lots" in {
+      val mobilitySimulator = mobSim()
+
       val updateFreeLots =
         PrivateMethod[Map[UUID, Int]](Symbol("updateFreeLots"))
 
@@ -175,13 +195,15 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (freeLots, change, expectedFreeLots) =>
         val actualFreeLots =
-          mobSim invokePrivate updateFreeLots(freeLots, change)
+          mobilitySimulator invokePrivate updateFreeLots(freeLots, change)
 
         actualFreeLots shouldBe expectedFreeLots
       }
     }
 
     "handle parking evs" in {
+      val mobilitySimulator = mobSim()
+
       val handleParkingEvs = PrivateMethod[Seq[Movement]](
         Symbol("handleParkingEvs")
       )
@@ -194,7 +216,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { evs =>
-        val actualMovements = mobSim invokePrivate handleParkingEvs(
+        val actualMovements = mobilitySimulator invokePrivate handleParkingEvs(
           evs,
           pricesAtChargingStation,
           chargingPointsAllFree,
@@ -209,10 +231,20 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         }
 
         actualMovements shouldBe expectedMovements
+
+        mobilitySimulator.electricVehicles.foreach { electricVehicle =>
+          expectedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
+          }
+        }
       }
     }
 
     "handle arriving ev" in {
+      val mobilitySimulator = mobSim()
+
       val handleArrivingEv = PrivateMethod[Option[Movement]](
         Symbol("handleArrivingEv")
       )
@@ -247,7 +279,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (ev, prices, availablePoints, expectedMovement) =>
-        val actualMovement = mobSim invokePrivate handleArrivingEv(
+        val actualMovement = mobilitySimulator invokePrivate handleArrivingEv(
           ev,
           prices,
           availablePoints,
@@ -259,6 +291,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "get time until next event" in {
+      val mobilitySimulator = mobSim()
+
       val getTimeUntilNextEvent =
         PrivateMethod[Long](Symbol("getTimeUntilNextEvent"))
 
@@ -275,12 +309,57 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (evs, expectedNextEvent) =>
-        val actualNextEvent = mobSim invokePrivate getTimeUntilNextEvent(
-          evs,
-          givenSimulationStart
-        )
+        val actualNextEvent =
+          mobilitySimulator invokePrivate getTimeUntilNextEvent(
+            evs,
+            givenSimulationStart
+          )
 
         actualNextEvent shouldBe expectedNextEvent
+      }
+    }
+
+    "update electricVehicles correctly" in {
+      val mobilitySimulator = mobSim()
+
+      val updateElectricVehicles =
+        PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+
+      val cases = Table(
+        "updatedMovements",
+        Seq(
+          Movement(
+            cs0.uuid,
+            ev1.copy(
+              homePoi = charging_hub_highwayPoi,
+              chargingAtHomePossible = false
+            )
+          )
+        ),
+        Seq(
+          Movement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
+          Movement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+        ),
+        Seq(
+          Movement(cs0.uuid, ev1.copy(storedEnergy = zero)),
+          Movement(cs0.uuid, ev2.setChargingAtSimona()),
+          Movement(
+            cs0.uuid,
+            ev3.copy(finalDestinationPoi = Some(charging_hub_townPoi))
+          )
+        )
+      )
+
+      forAll(cases) { updatedMovements =>
+        mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
+
+        mobilitySimulator.electricVehicles.foreach { electricVehicle =>
+          updatedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
+          }
+        }
       }
     }
   }
