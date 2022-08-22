@@ -185,7 +185,7 @@ object EvType {
         .getLines()
         .drop(1)
         .map { inputString =>
-          val cols = inputString.split(",").map(_.trim)
+          val cols = inputString.split(csvSep).map(_.trim)
           cols(0).toLowerCase -> cols(1).toDouble
         }
         .toMap
