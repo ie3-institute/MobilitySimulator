@@ -23,7 +23,7 @@ package edu.ie3.mobsim.io.probabilities
   * @param tripDistance
   *   Meta-information to determine the distance of the next trip
   */
-case class TripProbabilities(
+final case class TripProbabilities(
     categoricalLocation: CategoricalLocation,
     drivingSpeed: DrivingSpeed,
     firstDepartureOfDay: FirstDepartureOfDay,
