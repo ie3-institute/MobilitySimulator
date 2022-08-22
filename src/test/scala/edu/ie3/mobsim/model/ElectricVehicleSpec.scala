@@ -51,11 +51,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
               ) =>
             simulationStart shouldBe givenSimulationStart
             id shouldBe "test_car"
-            evType.model shouldBe "cool_model"
-            evType.capacity shouldBe givenModel.capacity
-            evType.acPower shouldBe givenModel.acPower
-            evType.dcPower shouldBe givenModel.dcPower
-            evType.consumption shouldBe givenModel.consumption
+            evType shouldBe givenModel
             homePoi shouldBe givenHomePoi
             workPoi shouldBe givenWorkPoi
             storedEnergy shouldBe givenModel.capacity

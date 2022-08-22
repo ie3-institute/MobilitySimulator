@@ -60,11 +60,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev2.getUuid
           id shouldBe "car_2"
-          evType.model shouldBe "cool_model"
-          evType.capacity shouldBe givenModel.capacity
-          evType.acPower shouldBe givenModel.acPower
-          evType.dcPower shouldBe givenModel.dcPower
-          evType.consumption shouldBe givenModel.consumption
+          evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe half
@@ -119,11 +115,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev1.getUuid
           id shouldBe "car_1"
-          evType.model shouldBe "cool_model"
-          evType.capacity shouldBe givenModel.capacity
-          evType.acPower shouldBe givenModel.acPower
-          evType.dcPower shouldBe givenModel.dcPower
-          evType.consumption shouldBe givenModel.consumption
+          evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe zero
@@ -174,11 +166,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
           id shouldBe "car_4"
-          evType.model shouldBe "cool_model"
-          evType.capacity shouldBe givenModel.capacity
-          evType.acPower shouldBe givenModel.acPower
-          evType.dcPower shouldBe givenModel.dcPower
-          evType.consumption shouldBe givenModel.consumption
+          evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
@@ -230,11 +218,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
           id shouldBe "car_4"
-          evType.model shouldBe "cool_model"
-          evType.capacity shouldBe givenModel.capacity
-          evType.acPower shouldBe givenModel.acPower
-          evType.dcPower shouldBe givenModel.dcPower
-          evType.consumption shouldBe givenModel.consumption
+          evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
@@ -281,12 +265,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
           id shouldBe "car_4"
-          evType.model shouldBe "cool_model"
-          evType.capacity shouldBe givenModel.capacity
-          evType.acPower shouldBe givenModel.acPower
-          evType.dcPower shouldBe givenModel.dcPower
-          evType.consumption shouldBe givenModel.consumption
-          homePoi shouldBe givenHomePoi
+          evType.model shouldBe givenModel
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe plannedStoredEnergyEndOfTrip
           chargingAtSimona shouldBe false

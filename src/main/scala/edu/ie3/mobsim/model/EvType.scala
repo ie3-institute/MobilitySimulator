@@ -43,7 +43,7 @@ final case class EvType(
     dcPower: ComparableQuantity[Power]
 )
 
-case object EvType {
+object EvType {
 
   private def apply(
       evString: String,
