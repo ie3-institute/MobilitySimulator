@@ -4,7 +4,7 @@
  * Research group Distribution grid planning and operation
  */
 
-package edu.ie3.mobsim.io.model
+package edu.ie3.mobsim.model
 
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
@@ -33,7 +33,7 @@ import scala.util.{Failure, Success, Try, Using}
   * @param dcPower
   *   Possible DC charging power
   */
-final case class EvTypeInput(
+final case class EvType(
     model: String,
     producer: String,
     segment: String,
@@ -43,12 +43,12 @@ final case class EvTypeInput(
     dcPower: ComparableQuantity[Power]
 )
 
-case object EvTypeInput {
+object EvType {
 
   private def apply(
       evString: String,
       csvSep: String = ","
-  ): Try[EvTypeInput] = {
+  ): Try[EvType] = {
     val entries = evString.trim.toLowerCase.split(csvSep)
     if (entries.length != 7)
       Failure(
@@ -74,7 +74,7 @@ case object EvTypeInput {
         val dcPower =
           Quantities.getQuantity(entries(6).toDouble, PowerSystemUnits.KILOWATT)
 
-        new EvTypeInput(
+        new EvType(
           model,
           producer,
           segment,
@@ -100,7 +100,7 @@ case object EvTypeInput {
   def getEvInputModelsWithProbabilities(
       modelFilePath: String,
       probabilityFilePath: String
-  ): ProbabilityDensityFunction[EvTypeInput] = {
+  ): ProbabilityDensityFunction[EvType] = {
     val models = getFromFile(modelFilePath)
     getEvInputModelsWithProbabilities(models, probabilityFilePath)
   }
@@ -108,12 +108,12 @@ case object EvTypeInput {
   def getFromFile(
       filePath: String,
       dropFirstLine: Boolean = true
-  ): Seq[EvTypeInput] =
+  ): Seq[EvType] =
     Using(Source.fromFile(filePath)) {
       _.getLines()
         .drop(if (dropFirstLine) 1 else 0)
         .map { inputString =>
-          EvTypeInput(inputString) match {
+          EvType(inputString) match {
             case Failure(exception) =>
               throw InitializationException(
                 s"Unable to parse input string '$inputString' to ev type.",
@@ -144,9 +144,9 @@ case object EvTypeInput {
     *   Probability density function for different ev model types
     */
   def getEvInputModelsWithProbabilities(
-      modelList: Seq[EvTypeInput],
+      modelList: Seq[EvType],
       probabilityFilePath: String
-  ): ProbabilityDensityFunction[EvTypeInput] = {
+  ): ProbabilityDensityFunction[EvType] = {
     val segmentProbabilities = getEvSegmentProbabilities(probabilityFilePath)
 
     /* Determine the amount of cars per segment */
@@ -185,7 +185,7 @@ case object EvTypeInput {
         .getLines()
         .drop(1)
         .map { inputString =>
-          val cols = inputString.split(",").map(_.trim)
+          val cols = inputString.split(csvSep).map(_.trim)
           cols(0).toLowerCase -> cols(1).toDouble
         }
         .toMap

@@ -11,7 +11,6 @@ import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationTyp
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
   ProbabilityDensityFunction
@@ -33,11 +32,7 @@ final case class ElectricVehicle(
     simulationStart: ZonedDateTime,
     uuid: UUID,
     id: String,
-    model: String,
-    batteryCapacity: ComparableQuantity[Energy],
-    acChargingPower: ComparableQuantity[Power],
-    dcChargingPower: ComparableQuantity[Power],
-    consumption: ComparableQuantity[SpecificEnergy], // kWh per km
+    evType: EvType,
     homePoi: PointOfInterest,
     workPoi: PointOfInterest,
     storedEnergy: ComparableQuantity[Energy],
@@ -59,11 +54,11 @@ final case class ElectricVehicle(
 
   def getId: String = id
 
-  def getEStorage: ComparableQuantity[Energy] = batteryCapacity
+  def getEStorage: ComparableQuantity[Energy] = evType.capacity
 
-  def getSRatedAC: ComparableQuantity[Power] = acChargingPower
+  def getSRatedAC: ComparableQuantity[Power] = evType.acPower
 
-  def getSRatedDC: ComparableQuantity[Power] = dcChargingPower
+  def getSRatedDC: ComparableQuantity[Power] = evType.dcPower
 
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
@@ -141,7 +136,7 @@ final case class ElectricVehicle(
   }
 
   override def toString: String =
-    s"EV(id=$id, eStorage=$batteryCapacity, storedEnergy=$storedEnergy, AC=$acChargingPower, DC=$dcChargingPower, departureTime=$departureTime)"
+    s"EV(id=$id, eStorage=${evType.capacity}, storedEnergy=$storedEnergy, AC=${evType.acPower}, DC=${evType.dcPower}, departureTime=$departureTime)"
 
 }
 
@@ -158,7 +153,7 @@ case object ElectricVehicle extends LazyLogging {
       chargingStations: Seq[ChargingStation],
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay
   ): SortedSet[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
@@ -300,7 +295,7 @@ case object ElectricVehicle extends LazyLogging {
       amountOfHomeChargingCars: Int,
       homePoiPdfWithHomeCharging: ProbabilityDensityFunction[PointOfInterest],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay,
       simulationStart: ZonedDateTime
   ): Iterable[ElectricVehicle] =
@@ -342,7 +337,7 @@ case object ElectricVehicle extends LazyLogging {
     */
   private def buildEvWithRandomAttributes(
       id: String,
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       firstDepartureOfDay: FirstDepartureOfDay,
       startTime: ZonedDateTime,
@@ -390,7 +385,7 @@ case object ElectricVehicle extends LazyLogging {
     */
   def buildEv(
       id: String,
-      evType: EvTypeInput,
+      evType: EvType,
       homePoi: PointOfInterest,
       workPoi: PointOfInterest,
       simulationStart: ZonedDateTime,
@@ -401,18 +396,16 @@ case object ElectricVehicle extends LazyLogging {
       simulationStart = simulationStart,
       uuid = UUID.randomUUID(),
       id = id,
-      model = s"${evType.producer} ${evType.model}",
-      batteryCapacity = evType.capacity,
-      acChargingPower = evType.acPower,
-      dcChargingPower =
-        if (
-          evType.dcPower.isLessThan(
-            Quantities.getQuantity(0.1, PowerSystemUnits.KILOWATT)
-          )
-        )
-          evType.acPower
-        else evType.dcPower,
-      consumption = evType.consumption,
+      // todo: check if this is neccessary
+      evType = evType.copy(
+        dcPower =
+          if (
+            evType.dcPower.isLessThan(
+              Quantities.getQuantity(0.1, PowerSystemUnits.KILOWATT)
+            )
+          ) evType.acPower
+          else evType.dcPower
+      ),
       homePoi = homePoi,
       workPoi = workPoi,
       storedEnergy = evType.capacity,
@@ -467,7 +460,7 @@ case object ElectricVehicle extends LazyLogging {
         PointOfInterest
       ],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      evModelPdf: ProbabilityDensityFunction[EvTypeInput],
+      evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay,
       simulationStart: ZonedDateTime
   ): Seq[ElectricVehicle] = {

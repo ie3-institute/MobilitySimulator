@@ -11,7 +11,6 @@ import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointT
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
   ProbabilityDensityFunction
@@ -26,7 +25,7 @@ import java.util.UUID
 import javax.measure.quantity.Length
 
 trait ElectricVehicleTestData {
-  protected val givenModel: EvTypeInput = EvTypeInput(
+  protected val givenModel: EvType = EvType(
     "cool_model",
     "cool_producer",
     "Van",
@@ -36,7 +35,7 @@ trait ElectricVehicleTestData {
     Quantities.getQuantity(11d, PowerSystemUnits.KILOWATT),
     Quantities.getQuantity(50d, PowerSystemUnits.KILOWATT)
   )
-  protected val givenModelPdf: ProbabilityDensityFunction[EvTypeInput] =
+  protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
 
   protected val givenHomePoi: PointOfInterest = PointOfInterest(
