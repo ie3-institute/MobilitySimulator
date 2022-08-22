@@ -253,7 +253,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
           id shouldBe "car_4"
-          evType.model shouldBe givenModel
+          evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe plannedStoredEnergyEndOfTrip
