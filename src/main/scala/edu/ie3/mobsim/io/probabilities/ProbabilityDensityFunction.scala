@@ -14,7 +14,7 @@ import scala.util.Random
 
 final case class ProbabilityDensityFunction[T] private (
     pdf: Map[T, Double],
-    cdf: Map[Double, T],
+    cdf: TreeMap[Double, T],
     private val seed: Random
 ) {
   def sample(): T = {
@@ -45,7 +45,7 @@ object ProbabilityDensityFunction {
       )
     } else {
       /* Build a cumulative density function with cumulated weight as key and value as double */
-      val cdf: Map[Double, T] = {
+      val cdf: TreeMap[Double, T] = {
         val weightSum: Double = pdf.values.sum
         pdf
           .foldLeft(0d, TreeMap.empty[Double, T]) {
