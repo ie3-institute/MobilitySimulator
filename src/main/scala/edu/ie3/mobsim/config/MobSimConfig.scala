@@ -45,6 +45,7 @@ object MobSimConfig {
 
   final case class Mobsim(
       input: MobSimConfig.Mobsim.Input,
+      outputDir: scala.Option[java.lang.String],
       simulation: MobSimConfig.Mobsim.Simulation
   )
   object Mobsim {
@@ -250,6 +251,9 @@ object MobSimConfig {
           parentPath + "input.",
           $tsCfgValidator
         ),
+        outputDir =
+          if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
+          else None,
         simulation = MobSimConfig.Mobsim.Simulation(
           if (c.hasPathOrNull("simulation")) c.getConfig("simulation")
           else com.typesafe.config.ConfigFactory.parseString("simulation{}"),
