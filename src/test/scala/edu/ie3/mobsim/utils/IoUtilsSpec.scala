@@ -44,7 +44,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         s"$currentTime;" +
         s"${firstEv.uuid};$status;" +
         s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.evType.capacity.getValue
-          .doubleValue()};" +
+            .doubleValue()};" +
         s"${firstEv.destinationPoi.id};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
         s"${firstEv.departureTime};" +

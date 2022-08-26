@@ -19,8 +19,8 @@ object DayType extends Enumeration {
       Failure(
         new IllegalArgumentException(
           s"Unable to parse day type from unknown token '$invalid'. Permissible values: ${values
-            .map(_.toString.toLowerCase)
-            .mkString(", ")}"
+              .map(_.toString.toLowerCase)
+              .mkString(", ")}"
         )
       )
   }
