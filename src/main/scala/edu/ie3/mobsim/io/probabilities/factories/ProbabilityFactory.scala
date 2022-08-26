@@ -59,7 +59,7 @@ trait ProbabilityFactory[T] {
     else
       Failure(
         SourceException(s"Unable to read from content from file. Available headline elements: '${availableElements
-          .mkString(",")}', required fields: '${requiredFields.mkString(",")}'")
+            .mkString(",")}', required fields: '${requiredFields.mkString(",")}'")
       )
   }
 

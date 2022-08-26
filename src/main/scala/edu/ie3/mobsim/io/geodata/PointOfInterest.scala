@@ -150,7 +150,7 @@ case object PointOfInterest {
     if (header.length != columns.length)
       throw InitializationException(
         s"Unable to read POI from file. Expected headline elements: '${columns
-          .mkString(",")}', given elements: '${header.mkString(",")}'"
+            .mkString(",")}', given elements: '${header.mkString(",")}'"
       )
     columns.map { element =>
       val idx = header.indexOf(element)

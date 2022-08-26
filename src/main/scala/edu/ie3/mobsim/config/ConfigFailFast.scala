@@ -29,7 +29,7 @@ object ConfigFailFast {
     if (!permissibleSeparators.contains(csvParams.colSep))
       throw IllegalConfigException(
         s"Received illegal column separator '${csvParams.colSep}'. It has to be one of '${permissibleSeparators
-          .mkString(", ")}'."
+            .mkString(", ")}'."
       )
   }
 
