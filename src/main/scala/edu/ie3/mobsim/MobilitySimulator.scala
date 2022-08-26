@@ -701,19 +701,6 @@ object MobilitySimulator
       .toZonedDateTime(config.mobsim.simulation.startDate)
       .withZoneSameInstant(ZoneId.of("UTC"))
 
-    logger.debug("Loading probabilities for first departure of day")
-    val firstDepartureOfDay = FirstDepartureFactory.getFromFile(
-      pathsAndSources.firstDepartureOfDayPath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get probabilities for first departure of day from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-
     /* Initialize all EV objects in the area */
     val evModelPdf =
       EvType.getEvInputModelsWithProbabilities(
@@ -728,6 +715,12 @@ object MobilitySimulator
       s"Creating $numberOfEvsInArea evs with a targeted home charging share of ${"%.2f"
           .format(targetShareOfHomeCharging * 100)} %."
     )
+
+    val tripProbabilities = TripProbabilities.read(
+      pathsAndSources,
+      config.mobsim.input.mobility.source.colSep
+    )
+
     val evs = ElectricVehicle.createEvs(
       numberOfEvsInArea,
       poisWithSizes
@@ -748,7 +741,7 @@ object MobilitySimulator
       startTime,
       targetShareOfHomeCharging,
       evModelPdf,
-      firstDepartureOfDay
+      tripProbabilities.firstDepartureOfDay
     )
     ioUtils.writeEvs(evs)
 
@@ -791,94 +784,6 @@ object MobilitySimulator
         s"Public: ${numberOfChargingPointsInArea._3}, " +
         s"Charging hubs: ${numberOfChargingPointsInArea._4}. Consider that not all charging stations are " +
         s"necessarily within reach of the POIs!"
-    )
-
-    val categoricalLocation = CategoricalLocationFactory.getFromFile(
-      pathsAndSources.categoricalLocationPath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get categorical location probabilities from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-    logger.debug("Done loading probabilities for categorical locations")
-
-    val drivingSpeed = DrivingSpeedFactory.getFromFile(
-      pathsAndSources.drivingSpeedPath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get driving speed parameters from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-    logger.debug("Done loading probabilities for driving speed")
-
-    val lastTripOfDay = LastTripFactory.getFromFile(
-      pathsAndSources.lastTripPath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get last trip probabilities from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-    logger.debug("Done loading probabilities for last trip of day")
-
-    val parkingTime = ParkingTimeFactory.getFromFile(
-      pathsAndSources.parkingTimePath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get probabilities for parking time from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-    logger.debug("Done loading probabilities for parking time")
-
-    val poiTransition = PoiTransitionFactory.getFromFile(
-      pathsAndSources.poiTransitionPath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get probabilities for poi type transitions from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-    logger.debug("Done loading probabilities for poi transition")
-
-    val tripDistance = TripDistanceFactory.getFromFile(
-      pathsAndSources.tripDistancePath,
-      config.mobsim.input.mobility.source.colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get probabilities for trip distance transitions from path.",
-          exception
-        )
-      case Success(value) => value
-    }
-    logger.debug("Done loading probabilities for trip distance")
-
-    val tripProbabilities = TripProbabilities(
-      categoricalLocation,
-      drivingSpeed,
-      firstDepartureOfDay,
-      lastTripOfDay,
-      parkingTime,
-      poiTransition,
-      tripDistance
     )
 
     val mobSim = new MobilitySimulator(
