@@ -629,7 +629,11 @@ object MobilitySimulator
 
     /* Setup paths received from SIMONA */
     val pathsAndSources =
-      PathsAndSources(config.mobsim.simulation.name, config.mobsim.input)
+      PathsAndSources(
+        config.mobsim.simulation.name,
+        config.mobsim.input,
+        config.mobsim.outputDir
+      )
 
     val ioUtils = IoUtils(
       pathsAndSources.outputDir,
