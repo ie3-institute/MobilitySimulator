@@ -6,6 +6,22 @@
 
 package edu.ie3.mobsim.io.probabilities
 
+import com.typesafe.scalalogging.LazyLogging
+import edu.ie3.mobsim.MobilitySimulator.logger
+import edu.ie3.mobsim.exceptions.SourceException
+import edu.ie3.mobsim.io.probabilities.factories.{
+  CategoricalLocationFactory,
+  DrivingSpeedFactory,
+  FirstDepartureFactory,
+  LastTripFactory,
+  ParkingTimeFactory,
+  PoiTransitionFactory,
+  TripDistanceFactory
+}
+import edu.ie3.mobsim.utils.PathsAndSources
+
+import scala.util.{Failure, Success}
+
 /** Container class to wrap probabilities for trip generation.
   *
   * @param categoricalLocation
@@ -32,3 +48,113 @@ final case class TripProbabilities(
     poiTransition: PoiTransition,
     tripDistance: TripDistance
 )
+
+object TripProbabilities extends LazyLogging {
+
+  def read(
+      pathsAndSources: PathsAndSources,
+      colSep: String
+  ): TripProbabilities = {
+
+    val firstDepartureOfDay = FirstDepartureFactory.getFromFile(
+      pathsAndSources.firstDepartureOfDayPath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get probabilities for first departure of day from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+
+    val categoricalLocation = CategoricalLocationFactory.getFromFile(
+      pathsAndSources.categoricalLocationPath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get categorical location probabilities from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+    logger.debug("Done loading probabilities for categorical locations")
+
+    val drivingSpeed = DrivingSpeedFactory.getFromFile(
+      pathsAndSources.drivingSpeedPath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get driving speed parameters from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+    logger.debug("Done loading probabilities for driving speed")
+
+    val lastTripOfDay = LastTripFactory.getFromFile(
+      pathsAndSources.lastTripPath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get last trip probabilities from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+    logger.debug("Done loading probabilities for last trip of day")
+
+    val parkingTime = ParkingTimeFactory.getFromFile(
+      pathsAndSources.parkingTimePath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get probabilities for parking time from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+    logger.debug("Done loading probabilities for parking time")
+
+    val poiTransition = PoiTransitionFactory.getFromFile(
+      pathsAndSources.poiTransitionPath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get probabilities for poi type transitions from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+    logger.debug("Done loading probabilities for poi transition")
+
+    val tripDistance = TripDistanceFactory.getFromFile(
+      pathsAndSources.tripDistancePath,
+      colSep
+    ) match {
+      case Failure(exception) =>
+        throw SourceException(
+          "Unable to get probabilities for trip distance transitions from path.",
+          exception
+        )
+      case Success(value) => value
+    }
+    logger.debug("Done loading probabilities for trip distance")
+
+    TripProbabilities(
+      categoricalLocation,
+      drivingSpeed,
+      firstDepartureOfDay,
+      lastTripOfDay,
+      parkingTime,
+      poiTransition,
+      tripDistance
+    )
+  }
+
+}
