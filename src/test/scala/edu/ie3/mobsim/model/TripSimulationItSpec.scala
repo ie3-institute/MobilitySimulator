@@ -6,34 +6,21 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.mobsim.MobilitySimulatorTestData
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
-import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.io.probabilities.{
-  DrivingSpeed,
-  FirstDepartureOfDay,
-  LastTripOfDay,
-  ParkingTime,
-  TripProbabilities
-}
-import edu.ie3.mobsim.io.probabilities.factories.FirstDepartureFactory
+import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.TripSimulation.{
   calculateDepartureTime,
   calculateStoredEnergyAtEndOfTrip,
   simulateNextTrip
 }
-import edu.ie3.mobsim.model.TripSimulationItSpec.{
-  firstDepartureOfDay,
-  initializeEv
-}
-import edu.ie3.mobsim.utils.DefaultQuantities.ZERO_ENERGY
+import edu.ie3.mobsim.model.TripSimulationItSpec.initializeEv
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.TimeUtil
@@ -49,11 +36,10 @@ import tech.units.indriya.unit.Units.{KILOMETRE_PER_HOUR, WATT}
 
 import java.io.File
 import java.nio.file.Files
-import java.time.{LocalDateTime, ZonedDateTime}
+import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length}
 import scala.collection.immutable.Queue
-import scala.util.{Failure, Success}
 
 class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
 
@@ -91,28 +77,17 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
       "pois.csv"
     )
 
-    new File(pathsAndSources.outputDir)
-      .listFiles()
-      .foreach(file => Files.delete(file.toPath))
+//    new File(pathsAndSources.outputDir)
+//      .listFiles()
+//      .foreach(file => Files.delete(file.toPath))
 
-    val firstDepartureOfDay = FirstDepartureFactory.getFromFile(
-      pathsAndSources.firstDepartureOfDayPath,
-      ","
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get probabilities for first departure of day from path.",
-          exception
-        )
-      case Success(value) => value
-    }
     val simulationStart =
       TimeUtil.withDefaults.toZonedDateTime("2016-01-01 00:00:00")
 
     val tripProbabilities = TripProbabilities.read(pathsAndSources, ",")
-    val numbers = (0 to 100)
-    val evs =
-      (0 to 100).map(_ => initializeEv(simulationStart, tripProbabilities))
+    var evs =
+      (0 to 100).map(nr => initializeEv(nr, simulationStart, tripProbabilities))
+
     var simulationTime = simulationStart
 
     val simulationEnd = simulationStart.plusDays(1)
@@ -122,8 +97,8 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
         .minOption
         .getOrElse(throw new RuntimeException("No minimum departure time."))
       val nextDepartures = evs.filter(_.departureTime.equals(nextDepartureTime))
-      nextDepartures.map(departingEv =>
-        simulateNextTrip(
+      val updatedEvs = nextDepartures.map(departingEv => {
+        val updatedEv = simulateNextTrip(
           currentTime = nextDepartureTime,
           ev = departingEv,
           poisWithSizes = poisWithSizes,
@@ -134,10 +109,10 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
           tripProbabilities = tripProbabilities,
           thresholdChargingHubDistance = Quantities.getQuantity(1000, KILOMETRE)
         )
-      )
+        evs = evs.updated(evs.indexOf(departingEv), updatedEv)
+      })
       simulationTime = nextDepartureTime
     }
-    evs.foreach(ioUtils.writeMovement(_, simulationTime, "departure"))
     print()
   }
 }
@@ -155,6 +130,7 @@ object TripSimulationItSpec extends TripSimulationTestData {
   )
 
   def initializeEv(
+      carNo: Int,
       simulationStart: ZonedDateTime,
       tripProbabilities: TripProbabilities
   ): ElectricVehicle = {
@@ -186,13 +162,6 @@ object TripSimulationItSpec extends TripSimulationTestData {
       tripProbabilities.parkingTime
     )
 
-    val departureTime = calculateDepartureTime(
-      destinationLocation,
-      plannedParkingTimeStart,
-      firstDepartureOfDay,
-      lastTripOfDay,
-      parkingTime
-    )
     val destinationPoi = PointOfInterest(
       UUID.randomUUID(),
       destinationLocation.toString,
@@ -205,14 +174,14 @@ object TripSimulationItSpec extends TripSimulationTestData {
     ElectricVehicle(
       simulationStart = simulationStart,
       uuid = UUID.randomUUID(),
-      id = "myCar",
+      id = "myCar" + carNo,
       evType = evType,
       homePoi = poiHome,
       workPoi = poiHome,
       storedEnergy = plannedStoredEnergyEndOfTrip,
       destinationPoi = destinationPoi,
       parkingTimeStart = plannedParkingTimeStart,
-      departureTime = departureTime,
+      departureTime = plannedDepartureTime,
       chargingAtHomePossible = true,
       chosenChargingStation = None,
       chargingAtSimona = false,
