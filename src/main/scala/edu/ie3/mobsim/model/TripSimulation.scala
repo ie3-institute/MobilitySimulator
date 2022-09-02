@@ -74,7 +74,7 @@ object TripSimulation extends LazyLogging {
       thresholdChargingHubDistance: ComparableQuantity[Length]
   ): ElectricVehicle = {
 
-    /* Save EV to csv before trip */
+    /* Save EV movement to csv before trip */
     ioUtils.writeMovement(ev, currentTime, "departure")
 
     val socAtStartOfTrip: Double = ev.getStoredEnergy
