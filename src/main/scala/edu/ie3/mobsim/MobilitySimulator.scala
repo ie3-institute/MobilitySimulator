@@ -621,7 +621,7 @@ object MobilitySimulator
       .getOrElse(
         throw InitializationException(
           s"Unable to parse config from given args '${getMainArgs
-            .mkString("Array(", ", ", ")")}'. " +
+              .mkString("Array(", ", ", ")")}'. " +
             s"They have to contain at least 'config=<config_location>'."
         )
       )
@@ -707,7 +707,7 @@ object MobilitySimulator
     val start = System.currentTimeMillis()
     logger.info(
       s"Creating $numberOfEvsInArea evs with a targeted home charging share of ${"%.2f"
-        .format(targetShareOfHomeCharging * 100)} %."
+          .format(targetShareOfHomeCharging * 100)} %."
     )
     val evs = ElectricVehicle.createEvs(
       numberOfEvsInArea,
@@ -735,8 +735,8 @@ object MobilitySimulator
 
     logger.info(
       s"Created ${evs.size} EVs in ${"%.2f"
-        .format((System.currentTimeMillis() - start) / 1000d)} s, of which ${evs
-        .count(_.chargingAtHomePossible)} can charge at home."
+          .format((System.currentTimeMillis() - start) / 1000d)} s, of which ${evs
+          .count(_.chargingAtHomePossible)} can charge at home."
     )
 
     /* Calculate and print total number of charging points at charging stations */

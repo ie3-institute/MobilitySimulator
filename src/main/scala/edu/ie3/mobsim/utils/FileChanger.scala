@@ -478,7 +478,7 @@ object FileChanger extends App {
     if (!elements.sameElements(expectedElements))
       throw new RuntimeException(
         s"Unable to parse input file. Malicious header: Apparent = ${elements
-          .mkString(", ")}, expected = ${expectedElements.mkString(", ")}"
+            .mkString(", ")}, expected = ${expectedElements.mkString(", ")}"
       )
 
     elements.zipWithIndex.toMap
