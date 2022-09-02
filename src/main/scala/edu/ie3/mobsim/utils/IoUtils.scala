@@ -50,13 +50,19 @@ final case class IoUtils private (
   ): Unit = {
     val fieldData = Map(
       "uuid" -> uuid.toString,
-      "time" -> currentTime.toString,
+      "origin_departure" -> currentTime.toString,
       "ev" -> ev.getUuid.toString,
       "status" -> status,
-      "soc" -> (ev.getStoredEnergy.getValue.doubleValue / ev.getEStorage.getValue.doubleValue).toString,
+      "soc" -> ev.getStoredEnergy
+        .divide(ev.getEStorage)
+        .getValue
+        .doubleValue()
+        .toString,
       "destination_poi" -> ev.destinationPoi.id,
+      "destination_poi_type" -> ev.getDestinationPoiType.toString,
       "categorical_location" -> ev.destinationPoi.categoricalLocation.toString,
-      "scheduled_departure" -> ev.departureTime.toString,
+      "destination_arrival" -> ev.parkingTimeStart.toString,
+      "destination_departure" -> ev.departureTime.toString,
       "is_charging" -> ev.chargingAtSimona.toString
     ).asJava
 
@@ -207,13 +213,15 @@ object IoUtils {
         filePath,
         Array(
           "uuid",
-          "time",
+          "origin_departure",
           "ev",
           "status",
           "soc",
           "destination_poi",
+          "destination_poi_type",
           "categorical_location",
-          "scheduled_departure",
+          "destination_arrival",
+          "destination_departure",
           "is_charging"
         ),
         csvSep,
