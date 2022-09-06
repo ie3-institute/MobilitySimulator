@@ -6,6 +6,7 @@
 
 package edu.ie3.mobsim.model
 
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.quantity.Quantities
@@ -80,6 +81,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         (
           "soc",
           "destinationPoi",
+          "destinationPoiType",
           "isChargingAtHomePossible",
           "departureTime",
           "expectedResult"
@@ -89,6 +91,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // not long enough -> does not want to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           true,
           parkingTimeStart.plusMinutes(14),
           false
@@ -98,6 +101,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc under lower threshold and stays long enough -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           true,
           parkingTimeStart.plusMinutes(15),
           true
@@ -107,6 +111,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           true,
           parkingTimeStart.plusMinutes(15),
           false
@@ -116,6 +121,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // is under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           true,
           parkingTimeStart.plusMinutes(15),
           true
@@ -125,6 +131,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // is over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           true,
           parkingTimeStart.plusMinutes(15),
           false
@@ -134,6 +141,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc under lower threshold -> wants to charge
           Quantities.getQuantity(29, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           true,
           parkingTimeStart.plusMinutes(15),
           true
@@ -143,6 +151,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(51, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           true,
           parkingTimeStart.plusMinutes(15),
           false
@@ -152,6 +161,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc has soc under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           false,
           parkingTimeStart.plusMinutes(15),
           true
@@ -161,6 +171,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           false,
           parkingTimeStart.plusMinutes(15),
           false
@@ -170,6 +181,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc under lower threshold -> wants to charge
           Quantities.getQuantity(39, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           false,
           parkingTimeStart.plusMinutes(15),
           true
@@ -179,6 +191,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(86, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           false,
           parkingTimeStart.plusMinutes(15),
           false
@@ -188,6 +201,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc under lower threshold -> wants to charge
           Quantities.getQuantity(29, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           false,
           parkingTimeStart.plusMinutes(15),
           true
@@ -197,6 +211,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc over upper threshold -> does not want to charge
           Quantities.getQuantity(76, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           false,
           parkingTimeStart.plusMinutes(15),
           false
@@ -206,6 +221,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = lower thresholds -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           true,
           parkingTimeStart.plusMinutes(15),
           true
@@ -215,6 +231,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = upper thresholds -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           true,
           parkingTimeStart.plusMinutes(15),
           false
@@ -224,6 +241,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = lower thresholds -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           true,
           parkingTimeStart.plusMinutes(15),
           true
@@ -233,6 +251,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = upper thresholds -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           true,
           parkingTimeStart.plusMinutes(15),
           false
@@ -242,6 +261,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = lower thresholds -> wants to charge
           Quantities.getQuantity(30, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           true,
           parkingTimeStart.plusMinutes(15),
           true
@@ -251,6 +271,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = upper thresholds -> does not want to charge
           Quantities.getQuantity(50, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           true,
           parkingTimeStart.plusMinutes(15),
           false
@@ -260,6 +281,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = lower threshold -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           false,
           parkingTimeStart.plusMinutes(15),
           true
@@ -269,6 +291,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = upper threshold -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           poiHome,
+          PoiTypeDictionary.HOME,
           false,
           parkingTimeStart.plusMinutes(15),
           false
@@ -278,6 +301,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = lower threshold -> wants to charge
           Quantities.getQuantity(40, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           false,
           parkingTimeStart.plusMinutes(15),
           true
@@ -287,6 +311,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = upper threshold -> does not want to charge
           Quantities.getQuantity(85, PowerSystemUnits.KILOWATTHOUR),
           workPoi,
+          PoiTypeDictionary.WORK,
           false,
           parkingTimeStart.plusMinutes(15),
           false
@@ -296,6 +321,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = lower threshold -> wants to charge
           Quantities.getQuantity(30, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           false,
           parkingTimeStart.plusMinutes(15),
           true
@@ -305,6 +331,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
           // soc = upper threshold -> does not want to charge
           Quantities.getQuantity(75, PowerSystemUnits.KILOWATTHOUR),
           supermarketPoi,
+          PoiTypeDictionary.SHOPPING,
           false,
           parkingTimeStart.plusMinutes(15),
           false
@@ -315,6 +342,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
         (
             soc,
             destinationPoi,
+            destinationPoiType,
             isChargingAtHomePossible,
             departureTime,
             expectedResult
@@ -332,6 +360,7 @@ class ChargingBehaviorSpec extends UnitSpec with ChargingBehaviorTestData {
             .copyWith(
               soc,
               destinationPoi,
+              destinationPoiType,
               parkingTimeStart,
               departureTime
             )

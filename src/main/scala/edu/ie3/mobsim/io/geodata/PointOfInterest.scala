@@ -59,8 +59,6 @@ final case class PointOfInterest(
     else -1
   }
 
-  def getPoiType: PoiTypeDictionary.Value =
-    PoiTypeDictionary.apply(categoricalLocation)
 }
 
 case object PointOfInterest {

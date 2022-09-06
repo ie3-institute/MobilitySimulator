@@ -7,6 +7,7 @@
 package edu.ie3.mobsim
 
 import edu.ie3.mobsim.MobilitySimulator.Movement
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
@@ -112,6 +113,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
             ev.copy(
               storedEnergy = half,
               destinationPoi = workPoi,
+              destinationPoiType = PoiTypeDictionary.WORK,
               parkingTimeStart = givenSimulationStart.plusHours(-4),
               departureTime = givenSimulationStart,
               chargingAtSimona = false,

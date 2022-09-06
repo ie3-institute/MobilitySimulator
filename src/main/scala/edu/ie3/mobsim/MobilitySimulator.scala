@@ -424,7 +424,7 @@ final class MobilitySimulator(
         } else {
           logger.debug(
             s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
-              s"(${ev.getDestinationPoiType}) because all charging points " +
+              s"(${ev.destinationPoiType}) because all charging points " +
               s"at $cs were taken."
           )
           None

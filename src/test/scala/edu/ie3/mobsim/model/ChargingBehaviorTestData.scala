@@ -6,6 +6,8 @@
 
 package edu.ie3.mobsim.model
 
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
+
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.util.Random
@@ -15,6 +17,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   protected val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
     destinationPoi = supermarket,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
@@ -22,6 +25,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   protected val evAtChargingHub: ElectricVehicle = ev2.copyWith(
     half,
     destinationPoi = charging_hub_townPoi,
+    destinationPoiType = PoiTypeDictionary.CHARGING_HUB_TOWN,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
@@ -29,6 +33,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   protected val evNextTrip: ElectricVehicle = ev3.copyWith(
     ev3.getEStorage,
     destinationPoi = other_shopPoi,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
@@ -36,6 +41,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   protected val evChargingNeeded: ElectricVehicle = ev4.copyWith(
     zero,
     destinationPoi = supermarket,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
@@ -43,6 +49,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
   protected val evNoChargingStations: ElectricVehicle = ev5.copyWith(
     zero,
     destinationPoi = supermarketPoi,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
