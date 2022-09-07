@@ -50,7 +50,6 @@ final case class IoUtils private (
   ): Unit = {
     val fieldData = Map(
       "uuid" -> uuid.toString,
-      "origin_departure" -> currentTime.toString,
       "ev" -> ev.getUuid.toString,
       "status" -> status,
       "soc" -> ev.getStoredEnergy
