@@ -90,7 +90,7 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
 
     var simulationTime = simulationStart
 
-    val simulationEnd = simulationStart.plusDays(1)
+    val simulationEnd = simulationStart.plusDays(2)
     while (simulationTime.isBefore(simulationEnd)) {
       val nextDepartureTime = evs
         .map(_.departureTime)

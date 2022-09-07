@@ -28,6 +28,41 @@ import javax.measure.quantity.{Energy, Length, Power}
 import scala.collection.immutable.{Queue, SortedSet}
 import scala.util.{Failure, Success, Try}
 
+/** Class to denote electric vehicle and its current trip.
+  *
+  * @param simulationStart
+  *   start time of simulation
+  * @param uuid
+  *   its uuid
+  * @param id
+  *   its id
+  * @param evType
+  *   type information of car
+  * @param homePoi
+  *   the vehicles home poi
+  * @param workPoi
+  *   the vehicles work poi
+  * @param storedEnergy
+  *   current soc
+  * @param destinationPoi
+  *   destination POI of current trip
+  * @param parkingTimeStart
+  *   parking start time of current trip
+  * @param departureTime
+  *   departure time from destination
+  * @param chargingAtHomePossible
+  *   whether car can charge at home
+  * @param chosenChargingStation
+  *   the chosen charging station it wants to charge at
+  * @param chargingAtSimona
+  *   whether the car will charge at SIMONA
+  * @param finalDestinationPoi
+  *   stores final destination if making a trip to charging hub
+  * @param remainingDistanceAfterChargingHub
+  *   distance remaining when departing from charging hub
+  * @param chargingPricesMemory
+  *   the charging prices at charging stations
+  */
 final case class ElectricVehicle(
     simulationStart: ZonedDateTime,
     uuid: UUID,
