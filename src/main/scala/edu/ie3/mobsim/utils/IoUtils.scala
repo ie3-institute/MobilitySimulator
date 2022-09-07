@@ -59,7 +59,7 @@ final case class IoUtils private (
         .doubleValue()
         .toString,
       "destination_poi" -> ev.destinationPoi.id,
-      "destination_poi_type" -> ev.getDestinationPoiType.toString,
+      "destination_poi_type" -> ev.destinationPoiType.toString,
       "categorical_location" -> ev.destinationPoi.categoricalLocation.toString,
       "destination_arrival" -> ev.parkingTimeStart.toString,
       "destination_departure" -> ev.departureTime.toString,

@@ -68,6 +68,10 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
       )
     )
 
+    new File(pathsAndSources.outputDir)
+      .listFiles()
+      .foreach(file => Files.delete(file.toPath))
+
     val ioUtils = IoUtils(
       pathsAndSources.outputDir,
       "movements.csv",
@@ -77,12 +81,8 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
       "pois.csv"
     )
 
-//    new File(pathsAndSources.outputDir)
-//      .listFiles()
-//      .foreach(file => Files.delete(file.toPath))
-
     val simulationStart =
-      TimeUtil.withDefaults.toZonedDateTime("2016-01-01 00:00:00")
+      TimeUtil.withDefaults.toZonedDateTime("2022-09-01 00:00:00")
 
     val tripProbabilities = TripProbabilities.read(pathsAndSources, ",")
     var evs =
@@ -97,7 +97,7 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
         .minOption
         .getOrElse(throw new RuntimeException("No minimum departure time."))
       val nextDepartures = evs.filter(_.departureTime.equals(nextDepartureTime))
-      val updatedEvs = nextDepartures.map(departingEv => {
+      nextDepartures.foreach(departingEv => {
         val updatedEv = simulateNextTrip(
           currentTime = nextDepartureTime,
           ev = departingEv,
@@ -162,10 +162,13 @@ object TripSimulationItSpec extends TripSimulationTestData {
       tripProbabilities.parkingTime
     )
 
+    val plannedCategoricalLocation = tripProbabilities.categoricalLocation
+      .sample(plannedParkingTimeStart, destinationLocation)
+
     val destinationPoi = PointOfInterest(
       UUID.randomUUID(),
       destinationLocation.toString,
-      CategoricalLocationDictionary.HOME,
+      plannedCategoricalLocation,
       new Coordinate(1d, 1d),
       10,
       Map.empty
@@ -177,15 +180,17 @@ object TripSimulationItSpec extends TripSimulationTestData {
       id = "myCar" + carNo,
       evType = evType,
       homePoi = poiHome,
-      workPoi = poiHome,
+      workPoi = workPoi,
       storedEnergy = plannedStoredEnergyEndOfTrip,
       destinationPoi = destinationPoi,
+      destinationPoiType = destinationLocation,
       parkingTimeStart = plannedParkingTimeStart,
       departureTime = plannedDepartureTime,
       chargingAtHomePossible = true,
       chosenChargingStation = None,
       chargingAtSimona = false,
       finalDestinationPoi = None,
+      finalDestinationPoiType = None,
       remainingDistanceAfterChargingHub = None,
       chargingPricesMemory = Queue.empty
     )

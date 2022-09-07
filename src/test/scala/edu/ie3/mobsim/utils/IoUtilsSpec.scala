@@ -43,14 +43,11 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
 
       val compareString: String = s"$uuid;" +
         s"$currentTime;" +
-        s"${firstEv.uuid};" +
-        s"$status;" +
+        s"${firstEv.uuid};$status;" +
         s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.evType.capacity.getValue
             .doubleValue()};" +
         s"${firstEv.destinationPoi.id};" +
-        s"${firstEv.destinationPoi.getPoiType.toString};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
-        s"${firstEv.parkingTimeStart.toString};" +
         s"${firstEv.departureTime};" +
         s"${firstEv.chargingAtSimona}"
 
