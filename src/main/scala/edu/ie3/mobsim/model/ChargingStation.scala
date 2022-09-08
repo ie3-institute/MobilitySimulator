@@ -8,8 +8,6 @@ package edu.ie3.mobsim.model
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.io.source.{RawGridSource, SystemParticipantSource}
-import edu.ie3.datamodel.models.input.NodeInput
-import edu.ie3.datamodel.models.input.system.EvcsInput
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import org.locationtech.jts.geom.Coordinate
@@ -23,51 +21,10 @@ case class ChargingStation(
     geoPosition: Coordinate,
     evcsType: ChargingPointType,
     evcsLocationType: EvcsLocationType,
-    chargingPoints: Int,
-    homeChargingStationAssignedToPOI: Boolean
+    chargingPoints: Int
 )
 
 object ChargingStation extends LazyLogging {
-
-  /** Create a list of charging stations to be used by the mobility simulator.
-    * Charging stations have information on their UUID and their geographical
-    * position. Uses PSDM classes and functions.
-    *
-    * @param evcsInput
-    *   EvcsInput objects (same as in SIMONA)
-    * @param nodeInput
-    *   NodeInput objects (same as in SIMONA)
-    * @return
-    *   List of charging stations
-    */
-  def getChargingStationsWithPSDM(
-      evcsInput: Set[EvcsInput],
-      nodeInput: Set[NodeInput]
-  ): Set[ChargingStation] = {
-
-    var chargingStations: Set[ChargingStation] = Set()
-
-    evcsInput.foreach(evcs => {
-      nodeInput.foreach(node => {
-
-        if (node.equals(evcs.getNode)) {
-          val cs = new ChargingStation(
-            evcs.getUuid,
-            evcs.getId,
-            node.getGeoPosition.getCoordinate,
-            evcsType = evcs.getType,
-            evcs.getLocationType,
-            chargingPoints = evcs.getChargingPoints,
-            false
-          )
-          chargingStations += cs
-        }
-
-      })
-    })
-
-    chargingStations
-  }
 
   /** Load node and evcs input data using PSDM functions and use it to construct
     * charging stations with needed information. The information contains among
@@ -83,13 +40,22 @@ object ChargingStation extends LazyLogging {
   def loadChargingStationsWithPSDM(
       gridSource: RawGridSource,
       participantSource: SystemParticipantSource
-  ): Set[ChargingStation] = {
+  ): Seq[ChargingStation] = {
 
-    val nodeInput: Set[NodeInput] = gridSource.getNodes().asScala.toSet
-    val evcsInput: Set[EvcsInput] = participantSource.getEvCS().asScala.toSet
-
-    val chargingStations =
-      ChargingStation.getChargingStationsWithPSDM(evcsInput, nodeInput)
+    val chargingStations = participantSource
+      .getEvCS()
+      .asScala
+      .toSeq
+      .map { evcs =>
+        ChargingStation(
+          evcs.getUuid,
+          evcs.getId,
+          evcs.getNode.getGeoPosition.getCoordinate,
+          evcsType = evcs.getType,
+          evcs.getLocationType,
+          chargingPoints = evcs.getChargingPoints
+        )
+      }
 
     logger.info(
       s"Received ${chargingStations.size} charging stations during setup."

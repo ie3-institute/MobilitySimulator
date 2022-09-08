@@ -32,8 +32,7 @@ trait PoiTestData {
     new Coordinate(7.4116482, 51.4843281),
     csType,
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs1: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -41,8 +40,7 @@ trait PoiTestData {
     new Coordinate(7.4116472, 51.4843381),
     csType,
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs2: ChargingStation = ChargingStation(
     UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81"),
@@ -50,8 +48,7 @@ trait PoiTestData {
     new Coordinate(7.4115482, 51.4833281),
     csType,
     EvcsLocationType.STREET,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs3: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -59,8 +56,7 @@ trait PoiTestData {
     new Coordinate(7.41154872, 51.4833271),
     csType,
     EvcsLocationType.WORK,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs4: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -68,26 +64,23 @@ trait PoiTestData {
     new Coordinate(7.41153872, 51.4834271),
     csType,
     EvcsLocationType.CHARGING_HUB_TOWN,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
   protected val cs5: ChargingStation = ChargingStation(
     UUID.randomUUID(),
-    "cs_4",
+    "cs_5",
     new Coordinate(7.41153872, 51.4834271),
     csType,
     EvcsLocationType.HOME,
-    1,
-    homeChargingStationAssignedToPOI = true
+    1
   )
   protected val cs6: ChargingStation = ChargingStation(
     UUID.randomUUID(),
-    "cs_4",
+    "cs_6",
     new Coordinate(7.41153842, 51.4834251),
     csType,
     EvcsLocationType.CHARGING_HUB_HIGHWAY,
-    3,
-    homeChargingStationAssignedToPOI = false
+    3
   )
   protected val cs7: ChargingStation = ChargingStation(
     UUID.randomUUID(),
@@ -95,26 +88,25 @@ trait PoiTestData {
     new Coordinate(7.4115482, 51.4833281),
     csType,
     EvcsLocationType.STREET,
-    1,
-    homeChargingStationAssignedToPOI = false
+    1
   )
 
   protected val poiHome: PointOfInterest = PointOfInterest(
     UUID.fromString("91b8a161-7e44-4363-aaa3-2d2adbaaab6d"),
     "POI_home_1",
     CategoricalLocationDictionary.HOME,
-    new Coordinate(7.3201668, 51.5067774),
+    new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map(cs1 -> Quantities.getQuantity(0, PowerSystemUnits.KILOMETRE))
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("a26b6850-c966-4b42-8ccf-762015bf19ba"),
     "work_617762273",
     CategoricalLocationDictionary.WORK,
-    new Coordinate(7.4065593, 51.5491556),
+    new Coordinate(7.41154872, 51.4833271),
     1549.4886151800551,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map(cs3 -> Quantities.getQuantity(0, PowerSystemUnits.KILOMETRE))
   )
 
   protected val bbpgPoi: PointOfInterest = PointOfInterest(

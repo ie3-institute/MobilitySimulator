@@ -7,6 +7,7 @@
 package edu.ie3.mobsim
 
 import akka.actor.ActorRef
+import edu.ie3.mobsim.io.probabilities.TripProbabilities
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
@@ -44,11 +45,11 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
         .setChosenChargingStation(Some(cs6.uuid))
     }
 
-  protected val chargingPointsAllTaken: Map[UUID, Integer] = {
-    Map(cs6.uuid -> Integer.valueOf(0))
+  protected val chargingPointsAllTaken: Map[UUID, Int] = {
+    Map(cs6.uuid -> 0)
   }
 
-  protected val chargingPointsAllFree: Map[UUID, Integer] = {
+  protected val chargingPointsAllFree: Map[UUID, Int] = {
     Map(cs6.uuid -> cs6.chargingPoints)
   }
 
@@ -73,7 +74,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     ev1.copy(chargingAtSimona = true)
   }
 
-  val mobSim: MobilitySimulator = new MobilitySimulator(
+  def mobSim(): MobilitySimulator = new MobilitySimulator(
     evData = evData,
     chargingStations = chargingStations,
     poisWithSizes = poisWithSizes,
@@ -82,13 +83,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     chargingHubTownIsPresent = true,
     chargingHubHighwayIsPresent = true,
     ioUtils = ioUtils,
-    categoricalLocation = categoricalLocation,
-    drivingSpeed = drivingSpeed,
-    firstDepartureOfDay = firstDepartureOfDay,
-    lastTripOfDay = lastTripOfDay,
-    parkingTime = parkingTime,
-    poiTransition = poiTransition,
-    tripDistance = tripDistance,
+    tripProbabilities,
     maxDistanceFromPoi = maxDistance,
     thresholdChargingHubDistance = maxDistance
   )

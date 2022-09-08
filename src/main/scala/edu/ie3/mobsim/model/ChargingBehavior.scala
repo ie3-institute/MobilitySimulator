@@ -117,7 +117,7 @@ object ChargingBehavior extends LazyLogging {
       /* If there are no charging stations nearby */
     } else {
       logger.debug(
-        s"${ev.getId} can't charge because there are no charging stations nearby."
+        s"${ev.getId} can't charge because POI ${ev.destinationPoi.id} does not have charging stations nearby."
       )
       (None, None)
     }
@@ -193,7 +193,7 @@ object ChargingBehavior extends LazyLogging {
     ev.destinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
         /* Check if free charging spots are even available */
-        val freeSpots: Int =
+        val freeSpots =
           currentlyAvailableChargingPoints.getOrElse(cs.uuid, 0)
 
         /* If no spots are available, the rating is 0. Otherwise, calculate a rating */

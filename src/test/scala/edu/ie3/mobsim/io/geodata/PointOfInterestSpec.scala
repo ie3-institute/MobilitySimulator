@@ -64,13 +64,13 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "prepare the charging stations" should {
       val prepareChargingStations =
-        PrivateMethod[Map[EvcsLocationType, Set[ChargingStation]]](
+        PrivateMethod[Map[EvcsLocationType, Seq[ChargingStation]]](
           Symbol("prepareChargingStations")
         )
 
       "filter out unsuitable assets" in {
         val actual = PointOfInterest invokePrivate prepareChargingStations(
-          Set(cs0, cs1, cs2, cs3, cs4, cs5)
+          Seq(cs0, cs1, cs2, cs3, cs4, cs5)
         )
 
         actual.keys should contain theSameElementsAs Seq(
@@ -80,8 +80,9 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         )
         /* Check, that an already assigned home-cs is not considered */
         actual.get(EvcsLocationType.HOME) match {
-          case Some(cs) => cs should contain theSameElementsAs Seq(cs0, cs1)
-          case None     => fail("Unable to determine cs of type home")
+          case Some(cs) =>
+            cs should contain theSameElementsAs Seq(cs0, cs1, cs5)
+          case None => fail("Unable to determine cs of type home")
         }
       }
     }
@@ -160,54 +161,6 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
       }
     }
 
-    "find the nearest charging stations" should {
-      val findNearestChargingStations =
-        PrivateMethod[Map[ChargingStation, ComparableQuantity[Length]]](
-          Symbol("findNearestChargingStations")
-        )
-
-      "find a two charging stations for a home POI" in {
-        val expected = cs0
-        val actual = PointOfInterest invokePrivate findNearestChargingStations(
-          CategoricalLocationDictionary.HOME,
-          coordinate,
-          Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType),
-          Quantities.getQuantity(1000d, Units.METRE)
-        )
-
-        actual.keys should contain theSameElementsAs Seq(cs0, cs1)
-        actual.get(cs0) match {
-          case Some(distance) =>
-            distance should equalWithTolerance(
-              Quantities
-                .getQuantity(0.013113941716235453974464, Units.METRE)
-                .to(PowerSystemUnits.KILOMETRE)
-            )
-          case None => fail("Unable to get the questioned distance.")
-        }
-      }
-
-      "find nearby charging stations for work" in {
-        val actual = PointOfInterest invokePrivate findNearestChargingStations(
-          CategoricalLocationDictionary.WORK,
-          coordinate,
-          Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType),
-          Quantities.getQuantity(1000d, Units.METRE)
-        )
-        actual.keys should contain theSameElementsAs Seq(cs3)
-      }
-
-      "find nearby charging stations for other categorical locations" in {
-        val actual = PointOfInterest invokePrivate findNearestChargingStations(
-          CategoricalLocationDictionary.SPORTS,
-          coordinate,
-          Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType),
-          Quantities.getQuantity(1000d, Units.METRE)
-        )
-        actual.keys should contain theSameElementsAs Seq(cs2)
-      }
-    }
-
     "finding suitable charging stations for categorical location types" should {
       val suitableChargingStations =
         PrivateMethod[Set[ChargingStation]](Symbol("suitableChargingStations"))
@@ -236,13 +189,13 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "determining the nearest charging stations" should {
       val nearbyChargingStations =
-        PrivateMethod[Map[ChargingStation, ComparableQuantity[Length]]](
+        PrivateMethod[Seq[(ChargingStation, ComparableQuantity[Length])]](
           Symbol("nearbyChargingStations")
         )
 
       "find the nearest ones with correct distance" in {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
-          Set(cs0, cs1, cs2),
+          Seq(cs0, cs1, cs2),
           coordinate,
           Quantities.getQuantity(1000d, Units.METRE)
         )
@@ -258,9 +211,9 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
             .to(PowerSystemUnits.KILOMETRE)
         )
 
-        actual.keys should contain allElementsOf Seq(cs0, cs1, cs2)
+        actual.toMap.keys should contain allElementsOf Seq(cs0, cs1, cs2)
         Seq(cs0, cs1, cs2).foreach { cs =>
-          actual.get(cs).zip(expected.get(cs)) match {
+          actual.toMap.get(cs).zip(expected.get(cs)) match {
             case Some((actual, expected)) =>
               actual should equalWithTolerance(expected)
             case None => fail("Unable to determine the expected distance")
@@ -270,12 +223,12 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
       "filter out cs, that are too far away" in {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
-          Set(cs0, cs1, cs2),
+          Seq(cs0, cs1, cs2),
           coordinate,
           Quantities.getQuantity(100d, Units.METRE)
         )
 
-        actual.keys should contain allElementsOf Seq(cs0, cs1)
+        actual.toMap.keys should contain allElementsOf Seq(cs0, cs1)
       }
     }
   }
@@ -286,7 +239,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
       PointOfInterest.getFromFile(
         testFileName,
         ",",
-        Set(cs0),
+        Seq(cs1, cs3),
         Quantities.getQuantity(50d, Units.METRE),
         Quantities.getQuantity(30d, Units.METRE)
       ) match {

@@ -17,12 +17,11 @@ import edu.ie3.mobsim.exceptions.{
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
-import edu.ie3.mobsim.io.model.EvTypeInput
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
+import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
@@ -39,16 +38,13 @@ import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedSet, TreeSet}
-import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.{Failure, Random, Success}
 
 final class MobilitySimulator(
     evData: ExtEvData,
-    chargingStations: Set[ChargingStation],
+    chargingStations: Seq[ChargingStation],
     poisWithSizes: Map[
       CategoricalLocationDictionary.Value,
       ProbabilityDensityFunction[PointOfInterest]
@@ -58,13 +54,7 @@ final class MobilitySimulator(
     chargingHubTownIsPresent: Boolean,
     chargingHubHighwayIsPresent: Boolean,
     ioUtils: IoUtils,
-    categoricalLocation: CategoricalLocation,
-    drivingSpeed: DrivingSpeed,
-    firstDepartureOfDay: FirstDepartureOfDay,
-    lastTripOfDay: LastTripOfDay,
-    parkingTime: ParkingTime,
-    poiTransition: PoiTransition,
-    tripDistance: TripDistance,
+    tripProbabilities: TripProbabilities,
     maxDistanceFromPoi: ComparableQuantity[Length],
     thresholdChargingHubDistance: ComparableQuantity[Length]
 ) extends LazyLogging {
@@ -77,17 +67,20 @@ final class MobilitySimulator(
     )
 
     /* Receive available charging points of evcs from SIMONA and converting them to scala values */
-    val availableChargingPoints =
-      evData.requestAvailablePublicEvCs().asScala.toMap.map {
-        case (cs, freeLots) =>
-          (cs, freeLots.intValue())
-      }
+    val availableChargingPoints = evData
+      .requestAvailablePublicEvCs()
+      .asScala
+      .view
+      .mapValues(_.toInt)
+      .toMap
 
     /* Receive current prices for public evcs situation and converting them to scala values */
-    val currentPricesAtChargingStations =
-      evData.requestCurrentPrices().asScala.toMap.map { case (cs, price) =>
-        (cs, price.doubleValue())
-      }
+    val currentPricesAtChargingStations = evData
+      .requestCurrentPrices()
+      .asScala
+      .view
+      .mapValues(_.toDouble)
+      .toMap
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
@@ -104,13 +97,7 @@ final class MobilitySimulator(
     updateAndSimulateDepartedEvs(
       currentTime,
       departedEvsFromSimona,
-      categoricalLocation,
-      drivingSpeed,
-      firstDepartureOfDay,
-      lastTripOfDay,
-      parkingTime,
-      poiTransition,
-      tripDistance,
+      tripProbabilities,
       thresholdChargingHubDistance
     )
 
@@ -132,7 +119,7 @@ final class MobilitySimulator(
     newTicks
   }
 
-  /** Handover EVs to SIMONA which arrive at their destination POI or depart
+  /** Hand over EVs to SIMONA which arrive at their destination POI or depart
     * from their POI at current time, but only if there is a charging point
     * available at the charging station. Otherwise, the EV is not sent to
     * SIMONA. <p> Get updated EV models for all EVs that depart from a charging
@@ -253,8 +240,6 @@ final class MobilitySimulator(
       builder.addDeparture(cs, updatedEv.getUuid)
     }
 
-    updateElectricVehicles(departures)
-
     updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
   }
 
@@ -271,25 +256,21 @@ final class MobilitySimulator(
   private def handleDepartingEvs(
       evs: Set[ElectricVehicle]
   ): (Map[UUID, Int], Seq[Movement]) =
-    Await.result(
-      Future
-        .sequence(evs.toSeq.map(handleDepartingEv))
-        .map {
-          _.flatten match {
-            case movements =>
-              (
-                movements
-                  .map(_.cs)
-                  .groupBy(identity)
-                  .map { case (uuid, uuids) =>
-                    uuid -> uuids.size
-                  },
-                movements
-              )
-          }
-        },
-      Duration("1h")
-    )
+    evs.par.toSeq.flatMap(handleDepartingEv) match {
+      case movements =>
+        updateElectricVehicles(movements.seq)
+
+        (
+          movements
+            .map(_.cs)
+            .groupBy(identity)
+            .map { case (uuid, uuids) =>
+              uuid -> uuids.size
+            }
+            .seq,
+          movements.seq
+        )
+    }
 
   /** Handle a single departing ev. Empty information are handed back, if the
     * car either does not charge in SIMONA or there is no target charging
@@ -298,26 +279,24 @@ final class MobilitySimulator(
     * @param ev
     *   The car to handle
     * @return
-    *   An [[Future]] onto an [[Option]] of the target charging stations' UUID
-    *   as well as information about the movement
+    *   An [[Option]] of the target charging stations' UUID as well as
+    *   information about the movement
     */
   private def handleDepartingEv(
       ev: ElectricVehicle
-  ): Future[Option[Movement]] =
-    Future {
-      /* Determine the charging station, the car currently is connected to */
-      ev.chosenChargingStation match {
-        case Some(cs) =>
-          val updatedEv =
-            ev.removeChargingAtSimona().setChosenChargingStation(None)
+  ): Option[Movement] =
+    /* Determine the charging station, the car currently is connected to */
+    ev.chosenChargingStation match {
+      case Some(cs) =>
+        val updatedEv =
+          ev.removeChargingAtSimona().setChosenChargingStation(None)
 
-          Some(MobilitySimulator.Movement(cs, updatedEv))
-        case None =>
-          logger.warn(
-            s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
-          )
-          None
-      }
+        Some(MobilitySimulator.Movement(cs, updatedEv))
+      case None =>
+        logger.warn(
+          s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
+        )
+        None
     }
 
   /** Update the free charging lots per charging station.
@@ -334,8 +313,8 @@ final class MobilitySimulator(
       change: Map[UUID, Int]
   ): Map[UUID, Int] =
     freeLots.map { case (uuid, freeLots) =>
-      val lotDiff: Int = change.getOrElse(uuid, 0)
-      val newLots: Int = freeLots + lotDiff
+      val lotDiff = change.getOrElse(uuid, 0)
+      val newLots = freeLots + lotDiff
       uuid -> newLots
     } ++ change
       .filter { case (uuid, _) =>
@@ -346,8 +325,7 @@ final class MobilitySimulator(
       }
 
   /** Handle parking evs. Based on given surrounding information, a target
-    * charging station is sampled. The newly taken charging points as well as
-    * the movements are tracked and handed back.
+    * charging station is sampled. The movements are tracked and handed back.
     *
     * @param evs
     *   Collection of parking evs
@@ -388,7 +366,9 @@ final class MobilitySimulator(
             }
         }.getOrElse((updatedAvailableChargingPoints, movements))
     } match {
-      case (_, movements) => movements
+      case (_, arrivals) =>
+        updateElectricVehicles(arrivals)
+        arrivals
     }
 
   /** Handle a single arriving ev, that wants to charge
@@ -458,33 +438,15 @@ final class MobilitySimulator(
     *   current time
     * @param departedEvsFromSimona
     *   All EV objects were returned from SIMONA
-    * @param categoricalLocation
-    *   Meta-information to determine the next categorical location
-    * @param drivingSpeed
-    *   Meta-information to determine the next driving speed
-    * @param firstDepartureOfDay
-    *   Meta-information to determine the first departure of the day
-    * @param lastTripOfDay
-    *   Meta-information to determine if that trip is the last trip of the day
-    * @param parkingTime
-    *   Meta-information to determine the parking time
-    * @param poiTransition
-    *   Meta-information to determine the next POI transition
-    * @param tripDistance
-    *   Meta-information to determine the distance of the next trip
+    * @param tripProbabilities
+    *   Probabilities to generate new trips
     * @param thresholdChargingHubDistance
     *   Maximum permissible distance to next charging hub
     */
   private def updateAndSimulateDepartedEvs(
       currentTime: ZonedDateTime,
       departedEvsFromSimona: SortedSet[ElectricVehicle],
-      categoricalLocation: CategoricalLocation,
-      drivingSpeed: DrivingSpeed,
-      firstDepartureOfDay: FirstDepartureOfDay,
-      lastTripOfDay: LastTripOfDay,
-      parkingTime: ParkingTime,
-      poiTransition: PoiTransition,
-      tripDistance: TripDistance,
+      tripProbabilities: TripProbabilities,
       thresholdChargingHubDistance: ComparableQuantity[Length]
   ): Unit = {
 
@@ -514,13 +476,7 @@ final class MobilitySimulator(
           chargingHubHighwayIsPresent,
           chargingStations,
           ioUtils,
-          categoricalLocation,
-          drivingSpeed,
-          firstDepartureOfDay,
-          lastTripOfDay,
-          parkingTime,
-          poiTransition,
-          tripDistance,
+          tripProbabilities,
           thresholdChargingHubDistance
         )
       } else ev
@@ -656,7 +612,7 @@ object MobilitySimulator
       .getOrElse(
         throw InitializationException(
           s"Unable to parse config from given args '${getMainArgs
-            .mkString("Array(", ", ", ")")}'. " +
+              .mkString("Array(", ", ", ")")}'. " +
             s"They have to contain at least 'config=<config_location>'."
         )
       )
@@ -728,7 +684,7 @@ object MobilitySimulator
 
     /* Initialize all EV objects in the area */
     val evModelPdf =
-      EvTypeInput.getEvInputModelsWithProbabilities(
+      EvType.getEvInputModelsWithProbabilities(
         pathsAndSources.evInputModelPath,
         pathsAndSources.evSegmentPath
       )
@@ -738,7 +694,7 @@ object MobilitySimulator
     val start = System.currentTimeMillis()
     logger.info(
       s"Creating $numberOfEvsInArea evs with a targeted home charging share of ${"%.2f"
-        .format(targetShareOfHomeCharging * 100)} %."
+          .format(targetShareOfHomeCharging * 100)} %."
     )
     val evs = ElectricVehicle.createEvs(
       numberOfEvsInArea,
@@ -766,8 +722,8 @@ object MobilitySimulator
 
     logger.info(
       s"Created ${evs.size} EVs in ${"%.2f"
-        .format((System.currentTimeMillis() - start) / 1000d)} s, of which ${evs
-        .count(_.chargingAtHomePossible)} can charge at home."
+          .format((System.currentTimeMillis() - start) / 1000d)} s, of which ${evs
+          .count(_.chargingAtHomePossible)} can charge at home."
     )
 
     /* Calculate and print total number of charging points at charging stations */
@@ -883,6 +839,16 @@ object MobilitySimulator
     }
     logger.debug("Done loading probabilities for trip distance")
 
+    val tripProbabilities = TripProbabilities(
+      categoricalLocation,
+      drivingSpeed,
+      firstDepartureOfDay,
+      lastTripOfDay,
+      parkingTime,
+      poiTransition,
+      tripDistance
+    )
+
     val mobSim = new MobilitySimulator(
       availableEvData,
       chargingStations,
@@ -892,13 +858,7 @@ object MobilitySimulator
       chargingHubTownIsPresent,
       chargingHubHighwayIsPresent,
       ioUtils,
-      categoricalLocation,
-      drivingSpeed,
-      firstDepartureOfDay,
-      lastTripOfDay,
-      parkingTime,
-      poiTransition,
-      tripDistance,
+      tripProbabilities,
       maxDistanceFromPoi,
       thresholdChargingHubDistance
     )

@@ -6,6 +6,8 @@
 
 package edu.ie3.mobsim.utils
 
+import edu.ie3.mobsim.model.ElectricVehicle
+import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATT,
@@ -41,8 +43,8 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       val compareString: String = s"$uuid;" +
         s"$currentTime;" +
         s"${firstEv.uuid};$status;" +
-        s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.batteryCapacity.getValue
-          .doubleValue()};" +
+        s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.evType.capacity.getValue
+            .doubleValue()};" +
         s"${firstEv.destinationPoi.id};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
         s"${firstEv.departureTime};" +
@@ -70,27 +72,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val firstEvString: String = s"${firstEv.uuid};" +
-        s"${firstEv.id};" +
-        s"${firstEv.model};" +
-        s"${firstEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
-        s"${firstEv.acChargingPower.to(KILOWATT).getValue.doubleValue()};" +
-        s"${firstEv.dcChargingPower.to(KILOWATT).getValue.doubleValue()};" +
-        s"${firstEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
-        s"${firstEv.homePoi.id};" +
-        s"${firstEv.workPoi.id};" +
-        s"${firstEv.chargingAtHomePossible}"
+      val firstEvString: String = evString(firstEv)
 
-      val secondEvString: String = s"${secondEv.uuid};" +
-        s"${secondEv.id};" +
-        s"${secondEv.model};" +
-        s"${secondEv.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
-        s"${secondEv.acChargingPower.to(KILOWATT).getValue.doubleValue()};" +
-        s"${secondEv.dcChargingPower.to(KILOWATT).getValue.doubleValue()};" +
-        s"${secondEv.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
-        s"${secondEv.homePoi.id};" +
-        s"${secondEv.workPoi.id};" +
-        s"${secondEv.chargingAtHomePossible}"
+      val secondEvString: String = evString(secondEv)
 
       list.forEach { str =>
         if (str.contains(firstEv.uuid.toString)) {
@@ -205,5 +189,20 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         }
       }
     }
+  }
+}
+object IoUtilsSpec {
+
+  def evString(ev: ElectricVehicle): String = {
+    s"${ev.uuid};" +
+      s"${ev.id};" +
+      s"${ev.evType.model};" +
+      s"${ev.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
+      s"${ev.evType.acPower.to(KILOWATT).getValue.doubleValue()};" +
+      s"${ev.evType.dcPower.to(KILOWATT).getValue.doubleValue()};" +
+      s"${ev.evType.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
+      s"${ev.homePoi.id};" +
+      s"${ev.workPoi.id};" +
+      s"${ev.chargingAtHomePossible}"
   }
 }
