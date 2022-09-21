@@ -7,7 +7,6 @@
 package edu.ie3.mobsim.io.probabilities
 
 import com.typesafe.scalalogging.LazyLogging
-import edu.ie3.mobsim.MobilitySimulator.logger
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.probabilities.factories.{
   CategoricalLocationFactory,

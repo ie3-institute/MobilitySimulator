@@ -12,13 +12,11 @@ import edu.ie3.mobsim.MobilitySimulator.Movement
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
-  SourceException,
   UninitializedException
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
-import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
@@ -40,7 +38,7 @@ import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Random, Success}
+import scala.util.Random
 
 final class MobilitySimulator(
     evData: ExtEvData,

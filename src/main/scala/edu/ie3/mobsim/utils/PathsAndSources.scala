@@ -20,7 +20,7 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY
 
 import java.io.{File, FileFilter}
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Path, Paths}
 import scala.collection.Seq
 
 final case class PathsAndSources private (
