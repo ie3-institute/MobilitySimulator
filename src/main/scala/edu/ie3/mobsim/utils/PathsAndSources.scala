@@ -186,7 +186,7 @@ object PathsAndSources extends LazyLogging {
       .listFiles(DIRECTORY.asInstanceOf[FileFilter])
 
     val dir = if (!outputDir.exists() || outputPathFiles.isEmpty) {
-      Seq(baseOutputDir, "mobilitySimulator").mkString(File.separator)
+      baseOutputDir
     } else {
       outputPathFiles
         .maxByOption(_.lastModified())
