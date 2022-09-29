@@ -212,7 +212,6 @@ object IoUtils {
         filePath,
         Array(
           "uuid",
-          "origin_departure",
           "ev",
           "status",
           "soc",

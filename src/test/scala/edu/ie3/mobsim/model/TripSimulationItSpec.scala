@@ -81,6 +81,8 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
       "pois.csv"
     )
 
+    // todo: simulation end for car when car departure > simulation end
+
     val simulationStart =
       TimeUtil.withDefaults.toZonedDateTime("2022-09-01 00:00:00")
 

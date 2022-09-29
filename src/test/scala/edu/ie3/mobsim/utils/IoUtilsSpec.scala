@@ -48,7 +48,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         s"${firstEv.storedEnergy.getValue.doubleValue() / firstEv.evType.capacity.getValue
             .doubleValue()};" +
         s"${firstEv.destinationPoi.id};" +
-        s"${firstEv.destinationPoi.getPoiType.toString};" +
+        s"${firstEv.destinationPoiType.toString};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
         s"${firstEv.parkingTimeStart.toString};" +
         s"${firstEv.departureTime};" +
