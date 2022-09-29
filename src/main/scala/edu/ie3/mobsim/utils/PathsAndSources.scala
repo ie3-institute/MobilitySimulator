@@ -185,18 +185,19 @@ object PathsAndSources extends LazyLogging {
     val outputPathFiles = outputDir
       .listFiles(DIRECTORY.asInstanceOf[FileFilter])
 
-    if (!outputDir.exists() || outputPathFiles.isEmpty) {
-      return Seq(baseOutputDir, "mobilitySimulator").mkString(File.separator)
+    val dir = if (!outputDir.exists() || outputPathFiles.isEmpty) {
+      Seq(baseOutputDir, "mobilitySimulator").mkString(File.separator)
+    } else {
+      outputPathFiles
+        .maxByOption(_.lastModified())
+        .map(_.toString)
+        .getOrElse {
+          logger.warn(
+            "Unable to determine most recent output directory. Write to base path!"
+          )
+          baseOutputDir
+        }
     }
-
-    val dir = outputPathFiles
-      .maxByOption(_.lastModified())
-      .getOrElse {
-        logger.warn(
-          "Unable to determine most recent output directory. Write to base path!"
-        )
-        baseOutputDir
-      }
     Seq(dir, "mobilitySimulator").mkString(File.separator)
   }
 }
