@@ -15,43 +15,53 @@ import java.nio.file.Paths
 
 class PathsAndSourcesSpec extends UnitSpec {
 
-  "Paths and sources are built correctly" in {
-    val basePath = Paths.get("").toAbsolutePath.toString
+  "Paths and sources are built correctly" when {
+    val basePath = Paths.get("").toAbsolutePath
 
-    val inputConfigRelative = Input(
-      Grid("myGrid", CsvParams(",", "relativePath/grid")),
-      Mobility(CsvParams(",", "relativePath/mobility"))
-    )
-    val inputConfigAbsolute = Input(
-      Grid("myGrid", CsvParams(",", "relativePath/grid")),
-      Mobility(CsvParams(",", "/absolutePath/mobility"))
-    )
+    "using relative paths" in {
 
-    val actualRelative =
-      PathsAndSources(
-        "mySimulation",
-        inputConfigRelative,
-        Some("relativePath/results")
-      )
-    val actualAbsolute =
-      PathsAndSources(
-        "mySimulation",
-        inputConfigAbsolute,
-        Some("/absolutePath/results")
+      val inputConfigRelative = Input(
+        Grid("myGrid", CsvParams(",", "relativePath/grid")),
+        Mobility(CsvParams(",", "relativePath/mobility"))
       )
 
-    actualRelative.mobSimInputDir shouldBe Paths
-      .get(basePath, "relativePath", "mobility")
-      .toString
-    actualRelative.outputDir shouldBe Paths
-      .get(basePath, "relativePath", "results")
-      .toString
-    actualAbsolute.mobSimInputDir shouldBe Paths
-      .get("/absolutePath", "mobility")
-      .toString
-    actualAbsolute.outputDir shouldBe Paths
-      .get("/absolutePath", "results")
-      .toString
+      val actualRelative =
+        PathsAndSources(
+          "mySimulation",
+          inputConfigRelative,
+          Some("relativePath/results")
+        )
+
+      val relPath = basePath.resolve("relativePath")
+
+      actualRelative.mobSimInputDir shouldBe relPath
+        .resolve("mobility")
+        .toString
+      actualRelative.outputDir shouldBe relPath.resolve("results").toString
+    }
+
+    "using absolute paths" in {
+
+      val absPath = basePath.resolve("absolutePath")
+
+      val inputConfigAbsolute = Input(
+        Grid("myGrid", CsvParams(",", absPath.resolve("grid").toString)),
+        Mobility(CsvParams(",", absPath.resolve("mobility").toString))
+      )
+
+      val actualAbsolute =
+        PathsAndSources(
+          "mySimulation",
+          inputConfigAbsolute,
+          Some(absPath.resolve("results").toString)
+        )
+
+      actualAbsolute.mobSimInputDir shouldBe absPath
+        .resolve("mobility")
+        .toString
+      actualAbsolute.outputDir shouldBe absPath.resolve("results").toString
+    }
+
   }
 
 }
