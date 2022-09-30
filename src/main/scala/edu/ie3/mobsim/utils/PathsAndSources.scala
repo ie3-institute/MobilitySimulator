@@ -185,7 +185,7 @@ object PathsAndSources extends LazyLogging {
     val outputPathFiles = outputDir
       .listFiles(DIRECTORY.asInstanceOf[FileFilter])
 
-    val dir = if (!outputDir.exists() || outputPathFiles.isEmpty) {
+    val dir = if (!outputDir.exists()) {
       baseOutputDir
     } else {
       outputPathFiles
