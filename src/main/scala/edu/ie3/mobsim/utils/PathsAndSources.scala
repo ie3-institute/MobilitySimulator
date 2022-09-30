@@ -17,11 +17,9 @@ import edu.ie3.datamodel.io.source.csv.{
 import edu.ie3.datamodel.io.source.{RawGridSource, SystemParticipantSource}
 import edu.ie3.mobsim.config.MobSimConfig
 import org.apache.commons.io.FilenameUtils
-import org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY
 
-import java.io.{File, FileFilter}
-import java.nio.file.{Path, Paths}
-import scala.collection.Seq
+import java.nio.file.{Files, Path, Paths}
+import scala.jdk.CollectionConverters._
 
 final case class PathsAndSources private (
     mobSimInputDir: String,
@@ -63,60 +61,53 @@ object PathsAndSources extends LazyLogging {
     /* Build the different directory paths */
     val mobSimDirPath = Paths.get(mobSimDir)
     val mobSimInputDir =
-      if (mobSimDirPath.isAbsolute) mobSimDirPath.toString
-      else Seq(basePath, mobSimDir).mkString(File.separator)
-    val poiPath =
-      Seq(mobSimInputDir, "poi", inputConfig.grid.name, "poi.csv")
-        .mkString(File.separator)
+      if (mobSimDirPath.isAbsolute) mobSimDirPath
+      else basePath.resolve(mobSimDir)
+    val poiPath = {
+      mobSimInputDir
+        .resolve("poi")
+        .resolve(inputConfig.grid.name)
+        .resolve("poi.csv")
+        .toString
+    }
+
     val evModelPath =
-      Seq(mobSimInputDir, "ev_models").mkString(File.separator)
+      mobSimInputDir.resolve("ev_models")
     val evInputModelPath =
-      Seq(evModelPath, "ev_models.csv").mkString(File.separator)
+      evModelPath.resolve("ev_models.csv").toString
     val evSegmentPath =
-      Seq(evModelPath, "segment_probabilities.csv").mkString(File.separator)
+      evModelPath.resolve("segment_probabilities.csv").toString
+
     val probabilitiesPath =
-      Seq(mobSimInputDir, "trip_probabilities").mkString(File.separator)
+      mobSimInputDir.resolve("trip_probabilities")
     val categoricalLocationPath =
-      Seq(probabilitiesPath, "categorical_location.csv")
-        .mkString(File.separator)
+      probabilitiesPath.resolve("categorical_location.csv").toString
     val drivingSpeedPath =
-      Seq(probabilitiesPath, "driving_speed.csv").mkString(
-        File.separator
-      )
+      probabilitiesPath.resolve("driving_speed.csv").toString
     val firstDepartureOfDayPath =
-      Seq(probabilitiesPath, "departure.csv").mkString(
-        File.separator
-      )
+      probabilitiesPath.resolve("departure.csv").toString
     val lastTripPath =
-      Seq(probabilitiesPath, "last_trip.csv").mkString(
-        File.separator
-      )
+      probabilitiesPath.resolve("last_trip.csv").toString
     val parkingTimePath =
-      Seq(probabilitiesPath, "parking_time.csv").mkString(
-        File.separator
-      )
+      probabilitiesPath.resolve("parking_time.csv").toString
     val poiTransitionPath =
-      Seq(probabilitiesPath, "transition.csv")
-        .mkString(File.separator)
+      probabilitiesPath.resolve("transition.csv").toString
     val tripDistancePath =
-      Seq(probabilitiesPath, "trip_distance.csv").mkString(
-        File.separator
-      )
+      probabilitiesPath.resolve("trip_distance.csv").toString
+
     val outputDir = maybeOutputDir match {
       case Some(dir) =>
         if (Paths.get(dir).isAbsolute) dir
-        else {
-          Paths.get(basePath.toString, dir).toString
-        }
+        else basePath.resolve(dir).toString
       case None =>
         determineRecentOutputDirectory(
-          Seq(basePath, "output", simulationName).mkString(File.separator)
+          basePath.resolve("output").resolve(simulationName).toString
         )
     }
 
     /* Build the actual sources */
     // TODO: Consider for hierarchic directory structure
-    val powerSystemModelDir = Seq(basePath, gridDir).mkString(File.separator)
+    val powerSystemModelDir = basePath.resolve(gridDir).toString
     val fileNamingStrategy = new FileNamingStrategy()
     val typeSource =
       new CsvTypeSource(gridColSep, powerSystemModelDir, fileNamingStrategy)
@@ -143,7 +134,7 @@ object PathsAndSources extends LazyLogging {
     )
 
     new PathsAndSources(
-      mobSimInputDir,
+      mobSimInputDir.toString,
       poiPath,
       evInputModelPath,
       evSegmentPath,
@@ -183,23 +174,23 @@ object PathsAndSources extends LazyLogging {
     */
   private def determineRecentOutputDirectory(baseOutputDir: String): String = {
     /* find last modified directory in output path -> this is where SIMONA writes into during the simulation */
-    val outputDir = new File(baseOutputDir)
-    val outputPathFiles = outputDir
-      .listFiles(DIRECTORY.asInstanceOf[FileFilter])
+    val outputDir = Paths.get(baseOutputDir)
 
-    val dir = if (!outputDir.exists()) {
-      baseOutputDir
-    } else {
-      outputPathFiles
-        .maxByOption(_.lastModified())
-        .map(_.toString)
-        .getOrElse {
-          logger.warn(
-            "Unable to determine most recent output directory. Write to base path!"
-          )
-          baseOutputDir
-        }
-    }
-    Seq(dir, "mobilitySimulator").mkString(File.separator)
+    val dir =
+      if (!Files.exists(outputDir)) outputDir
+      else {
+        Files
+          .newDirectoryStream(outputDir)
+          .asScala
+          .filter(Files.isDirectory(_))
+          .maxByOption(Files.getLastModifiedTime(_))
+          .getOrElse {
+            logger.warn(
+              "Unable to determine most recent output directory. Write to base path!"
+            )
+            outputDir
+          }
+      }
+    dir.resolve("mobilitySimulator").toString
   }
 }
