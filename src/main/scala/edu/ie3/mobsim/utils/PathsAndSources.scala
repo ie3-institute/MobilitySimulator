@@ -105,7 +105,9 @@ object PathsAndSources extends LazyLogging {
     val outputDir = maybeOutputDir match {
       case Some(dir) =>
         if (Paths.get(dir).isAbsolute) dir
-        else Seq(basePath, dir).mkString(File.separator)
+        else {
+          Paths.get(basePath.toString, dir).toString
+        }
       case None =>
         determineRecentOutputDirectory(
           Seq(basePath, "output", simulationName).mkString(File.separator)
