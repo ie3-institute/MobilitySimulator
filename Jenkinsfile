@@ -25,9 +25,6 @@ urls = [
 
 def sonarqubeProjectKey = "edu.ie3:mobilitySimulator"
 
-/// code coverage token id
-codeCovTokenId = "mob-codecov-token"
-
 //// internal jenkins credentials link for git ssh keys
 //// requires the ssh key to be stored in the internal jenkins credentials keystore
 def sshCredentialsId = "19f16959-8a0d-4a60-bd1f-5adb4572b702"
@@ -124,14 +121,6 @@ if (env.BRANCH_NAME == "main") {
           stage('publish reports + coverage') {
             // publish reports
             publishReports(projects.get(0))
-
-            // inform codecov.io
-            withCredentials([
-              string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
-            ]) {
-              // call codecov
-              sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
-            }
 
           }
 
@@ -231,14 +220,6 @@ if (env.BRANCH_NAME == "main") {
           stage('publish reports + coverage') {
             // publish reports
             publishReports(projects.get(0))
-
-            // inform codecov.io
-            withCredentials([
-              string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
-            ]) {
-              // call codecov
-              sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
-            }
 
           }
 
@@ -361,13 +342,6 @@ if (env.BRANCH_NAME == "main") {
         stage('post processing') {
           // publish reports
           publishReports(projects.get(0))
-
-          withCredentials([
-            string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
-          ]) {
-            // call codecov
-            sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
-          }
         }
       } catch (Exception e) {
         // set build result to failure
