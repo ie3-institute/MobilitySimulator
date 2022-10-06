@@ -4,11 +4,11 @@ plugins {
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
   id 'com.diffplug.spotless' version '6.11.0'//code format
-  id "de.undercouch.download" version "5.2.0" // downloads plugin
+  id "de.undercouch.download" version "5.2.1" // downloads plugin
   id "org.sonarqube" version "3.4.0.2513" // sonarqube
   id "org.scoverage" version "7.0.1" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.32" // run scalatest without specific spec task
-  id "com.jfrog.artifactory" version "4.29.0"
+  id "com.jfrog.artifactory" version "4.29.1"
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
   id "com.github.johnrengelman.shadow" version "7.1.2"
 }
@@ -22,7 +22,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.0.0'
-  scapegoatVersion = '1.4.15'
+  scapegoatVersion = '1.4.16'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -67,7 +67,7 @@ dependencies {
   testImplementation "com.typesafe.akka:akka-actor_${scalaVersion}:${akkaVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.4.0'
+  implementation 'ch.qos.logback:logback-classic:1.4.1'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
 
   /* Scala compiler plugin for static code analysis */
@@ -82,7 +82,7 @@ dependencies {
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 
   /* Testing */
-  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.13"
+  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.14"
   testRuntimeClasspath 'com.vladsch.flexmark:flexmark-all:0.64.0'
 }
 
