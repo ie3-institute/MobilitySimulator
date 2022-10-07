@@ -49,6 +49,32 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
             seed shouldBe randomSeed
         }
       }
+
+      "produce the correct cdf given 0 probabilities" in {
+        val givenPdf = Map(
+          1 -> 5.0,
+          2 -> 0d,
+          3 -> 70.0,
+          4 -> 0d,
+          5 -> 25.0
+        ) // Can be seen as percent
+        val expectedCdf =
+          TreeMap(0.25 -> 5, 0.3 -> 1, 1.0 -> 3)
+
+        ProbabilityDensityFunction(givenPdf, randomSeed) match {
+          case ProbabilityDensityFunction(pdf, cdf, seed) =>
+            pdf shouldBe givenPdf
+            expectedCdf.zip(cdf).foreach {
+              case (
+                    (expectedWeight, expectedValue),
+                    (actualWeight, actualValue)
+                  ) =>
+                actualWeight shouldBe expectedWeight +- 1e-6
+                actualValue shouldBe expectedValue
+            }
+            seed shouldBe randomSeed
+        }
+      }
     }
 
     "sampling" should {
