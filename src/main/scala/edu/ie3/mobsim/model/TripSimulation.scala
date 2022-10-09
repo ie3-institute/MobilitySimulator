@@ -618,14 +618,8 @@ object TripSimulation extends LazyLogging {
       .to(KILOMETRE_PER_HOUR)
 
     /* Calculate driving time based on planned values */
-    val plannedDrivingTime: Int = math.max(
-      (math rint (plannedDrivingDistance
-        .to(KILOMETRE)
-        .divide(plannedDrivingSpeed.to(KILOMETRE_PER_HOUR))
-        .getValue
-        .doubleValue() * 60)).toInt,
-      1
-    )
+    val plannedDrivingTime: Int =
+      calculateDrivingTime(plannedDrivingDistance, plannedDrivingSpeed)
 
     /* Calculate start of parking time based on planned values */
     val plannedParkingTimeStart: ZonedDateTime =
@@ -644,6 +638,20 @@ object TripSimulation extends LazyLogging {
       plannedStoredEnergyEndOfTrip,
       plannedParkingTimeStart,
       plannedDepartureTime
+    )
+  }
+
+  def calculateDrivingTime(
+      drivingDistance: ComparableQuantity[Length],
+      drivingSpeed: ComparableQuantity[Speed]
+  ): Int = {
+    math.max(
+      (math rint (drivingDistance
+        .to(KILOMETRE)
+        .divide(drivingSpeed.to(KILOMETRE_PER_HOUR))
+        .getValue
+        .doubleValue() * 60)).toInt,
+      1
     )
   }
 
@@ -1223,6 +1231,50 @@ object TripSimulation extends LazyLogging {
       .doubleValue() * 60).toLong
 
     math.max(neededChargingTimeInMinutes, 1)
+  }
+
+  /** As we want to start out with the same initial conditions every day we
+    * simulate a final trip to the respective home of the car to make sure every
+    * car starts a new day from its home and the sampled initial departure
+    * follows the "first departure of day" distribution.
+    *
+    * @param tripStart
+    *   the point in time at which the trip takes place
+    * @param ev
+    *   electric vehicle that is drives home
+    * @param tripProbabilities
+    *   the probabilites for parameter sampling
+    * @return
+    *   an updated [[ElectricVehicle]]
+    */
+  def simulateLastDailyTripToHome(
+      tripStart: ZonedDateTime,
+      ev: ElectricVehicle,
+      tripProbabilities: TripProbabilities
+  ): ElectricVehicle = {
+    val destinationPoiType = PoiTypeDictionary.HOME
+    val destinationPoi = ev.homePoi
+    val distance = tripProbabilities.tripDistance.sample(
+      tripStart,
+      ev.destinationPoiType,
+      destinationPoiType
+    )
+    val drivingSpeed =
+      tripProbabilities.drivingSpeed.sample(tripStart, distance)
+    val drivingTime = calculateDrivingTime(distance, drivingSpeed)
+    val parkingTimeStart = tripStart.plusMinutes(drivingTime)
+    val destinationDepartureTime =
+      tripProbabilities.firstDepartureOfDay.sample(parkingTimeStart)
+
+    // we do not update the SOC as we change the trip after the fact and
+    // the original trip consumption has already been considered
+
+    ev.copy(
+      destinationPoi = destinationPoi,
+      destinationPoiType = destinationPoiType,
+      parkingTimeStart = parkingTimeStart,
+      departureTime = destinationDepartureTime
+    )
   }
 
 }
