@@ -50,9 +50,13 @@ object ProbabilityDensityFunction {
         pdf
           .foldLeft(0d, TreeMap.empty[Double, T]) {
             case ((previousWeightSum, tempCdf), (value, weight)) =>
-              val relativeWeight = weight / weightSum
-              val currentWeightSum = previousWeightSum + relativeWeight
-              (currentWeightSum, tempCdf + (currentWeightSum -> value))
+              if (weight == 0) {
+                (previousWeightSum, tempCdf)
+              } else {
+                val relativeWeight = weight / weightSum
+                val currentWeightSum = previousWeightSum + relativeWeight
+                (currentWeightSum, tempCdf + (currentWeightSum -> value))
+              }
           }
           ._2
       }
