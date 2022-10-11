@@ -74,57 +74,6 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
-    "not simulate a new trip and keep charging when SoC < 10 % and charging is available" in {
-      TripSimulation.simulateNextTrip(
-        givenSimulationStart,
-        evLowSoC,
-        poisWithSizes,
-        chargingHubTownIsPresent = true,
-        chargingHubHighwayIsPresent = true,
-        chargingStations,
-        ioUtils,
-        tripProbabilities,
-        maxDistance
-      ) match {
-        case ElectricVehicle(
-              simulationStart,
-              uuid,
-              id,
-              evType,
-              homePoi,
-              workPoi,
-              storedEnergy,
-              destinationPoi,
-              destinationPoiType,
-              parkingTimeStart,
-              departureTime,
-              chargingAtHomePossible,
-              chosenChargingStation,
-              chargingAtSimona,
-              finalDestinationPoi,
-              finalDestinationPoiType,
-              remainingDistanceAfterChargingHub,
-              chargingPricesMemory
-            ) =>
-          simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev1.getUuid
-          id shouldBe "car_1"
-          evType shouldBe givenModel
-          homePoi shouldBe givenHomePoi
-          workPoi shouldBe givenWorkPoi
-          storedEnergy shouldBe zero
-          chargingAtSimona shouldBe false
-          destinationPoi shouldBe supermarket
-          parkingTimeStart shouldBe simulationStart.plusMinutes(1)
-          departureTime shouldBe simulationStart.plusHours(1).plusMinutes(1)
-          chargingAtHomePossible shouldBe true
-          chosenChargingStation shouldBe None
-          finalDestinationPoi shouldBe None
-          remainingDistanceAfterChargingHub shouldBe None
-          chargingPricesMemory shouldBe mutable.Queue[Double]()
-      }
-    }
-
     // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
       TripSimulation.makeTripToChargingHub(
