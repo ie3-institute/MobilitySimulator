@@ -12,7 +12,6 @@ import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
 import edu.ie3.mobsim.utils.PathsAndSources
 import edu.ie3.test.common.UnitSpec
 
-import java.io.File
 import java.nio.file.Paths
 
 class TripProbabilitiesSpec extends UnitSpec {
@@ -21,7 +20,7 @@ class TripProbabilitiesSpec extends UnitSpec {
 
     val gridConf = Grid("grid", CsvParams("/some/Path", ","))
     val mobSimPath =
-      Paths.get(new File(".").getAbsolutePath, "input/mobilitySimulator")
+      Paths.get("input", "mobilitySimulator")
 
     val mobilityConf = Mobility(CsvParams("", mobSimPath.toString))
     val pathsAndSources =
