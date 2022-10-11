@@ -21,8 +21,8 @@ ext {
   scalaBinaryVersion = '2.13.8'
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
-  tscfgVersion = '1.0.0'
-  scapegoatVersion = '1.4.15'
+  tscfgVersion = '1.0.2'
+  scapegoatVersion = '1.4.17'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -67,7 +67,7 @@ dependencies {
   testImplementation "com.typesafe.akka:akka-actor_${scalaVersion}:${akkaVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.4.1'
+  implementation 'ch.qos.logback:logback-classic:1.4.4'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
 
   /* Scala compiler plugin for static code analysis */
@@ -82,7 +82,7 @@ dependencies {
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 
   /* Testing */
-  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.13"
+  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.14"
   testRuntimeClasspath 'com.vladsch.flexmark:flexmark-all:0.64.0'
 }
 
