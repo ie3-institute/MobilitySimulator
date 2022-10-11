@@ -9,10 +9,7 @@ package edu.ie3.mobsim.model
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.TripSimulation.{
@@ -21,6 +18,7 @@ import edu.ie3.mobsim.model.TripSimulation.{
   simulateNextTrip
 }
 import edu.ie3.mobsim.model.TripSimulationItSpec.initializeEv
+import edu.ie3.mobsim.utils.IoUtils.IoMovement
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.TimeUtil
@@ -84,15 +82,16 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
     // todo: simulation end for car when car departure > simulation end
 
     val simulationStart =
-      TimeUtil.withDefaults.toZonedDateTime("2022-09-01 00:00:00")
+      TimeUtil.withDefaults.toZonedDateTime("2022-09-03 00:00:00")
 
     val tripProbabilities = TripProbabilities.read(pathsAndSources, ",")
     var evs =
-      (0 to 100).map(nr => initializeEv(nr, simulationStart, tripProbabilities))
-
+      (0 to 500).map(nr => initializeEv(nr, simulationStart, tripProbabilities))
+    var evMovements = evs.map(ev => ev.getUuid -> Seq(IoMovement(ev))).toMap
     var simulationTime = simulationStart
 
     val simulationEnd = simulationStart.plusDays(2)
+    var setOfLastDailys = Set.empty[UUID]
     while (simulationTime.isBefore(simulationEnd)) {
       val nextDepartureTime = evs
         .map(_.departureTime)
@@ -100,7 +99,7 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
         .getOrElse(throw new RuntimeException("No minimum departure time."))
       val nextDepartures = evs.filter(_.departureTime.equals(nextDepartureTime))
       nextDepartures.foreach(departingEv => {
-        val updatedEv = simulateNextTrip(
+        val ev = simulateNextTrip(
           currentTime = nextDepartureTime,
           ev = departingEv,
           poisWithSizes = poisWithSizes,
@@ -111,6 +110,41 @@ class TripSimulationItSpec extends UnitSpec with TripSimulationTestData {
           tripProbabilities = tripProbabilities,
           thresholdChargingHubDistance = Quantities.getQuantity(1000, KILOMETRE)
         )
+        // todo save movements as list and check
+        val updatedEv =
+          if (
+            ev.departureTime.getDayOfWeek != simulationTime.getDayOfWeek && ev.destinationPoiType != PoiTypeDictionary.HOME
+          ) {
+            val lastDaily = TripSimulation.simulateLastDailyTripToHome(
+              departingEv.departureTime,
+              departingEv,
+              tripProbabilities
+            )
+//            if (setOfLastDailys.contains(lastDaily.getUuid))
+//              ioUtils.writeMovement(ev, ev.departureTime, "departure")
+//            setOfLastDailys = setOfLastDailys + lastDaily.getUuid
+            lastDaily
+          } else {
+//            if (setOfLastDailys.contains(ev.getUuid))
+//              setOfLastDailys = setOfLastDailys - ev.getUuid
+            ev
+          }
+        evMovements = evMovements.get(ev.getUuid) match {
+          case Some(movements) =>
+            val newMovement = IoMovement(updatedEv)
+            if (
+              movements.lastOption
+                .getOrElse(
+                  throw new IllegalArgumentException("No trip existent")
+                )
+                .destinationDeparture
+                .isAfter(updatedEv.parkingTimeStart)
+            )
+              print("Found inconsistent trip")
+            evMovements.updated(ev.getUuid, movements :+ newMovement)
+          case None =>
+            throw new IllegalArgumentException(s"No movement for ${ev.getUuid}")
+        }
         evs = evs.updated(evs.indexOf(departingEv), updatedEv)
       })
       simulationTime = nextDepartureTime

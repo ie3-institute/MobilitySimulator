@@ -7,7 +7,10 @@
 package edu.ie3.mobsim.utils
 
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
-import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{
@@ -15,11 +18,13 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR,
   KILOWATTHOUR_PER_KILOMETRE
 }
+import tech.units.indriya.ComparableQuantity
 
 import java.io.File
 import java.nio.file.{Files, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
+import javax.measure.quantity.Energy
 import scala.jdk.CollectionConverters._
 
 final case class IoUtils private (
@@ -313,5 +318,31 @@ object IoUtils {
       poiWriter,
       csvSep
     )
+  }
+  final case class IoMovement(
+      uuid: UUID,
+      ev: UUID,
+      status: String,
+      soc: ComparableQuantity[Energy],
+      desintationPoi: PointOfInterest,
+      destinationPoiType: PoiTypeDictionary.Value,
+      destinationArrival: ZonedDateTime,
+      destinationDeparture: ZonedDateTime
+  )
+
+  object IoMovement {
+
+    def apply(ev: ElectricVehicle): IoMovement = {
+      IoMovement(
+        uuid = UUID.randomUUID(),
+        ev = ev.getUuid,
+        status = "Departure",
+        soc = ev.getEStorage,
+        desintationPoi = ev.destinationPoi,
+        destinationPoiType = ev.destinationPoiType,
+        destinationArrival = ev.parkingTimeStart,
+        destinationDeparture = ev.departureTime
+      )
+    }
   }
 }

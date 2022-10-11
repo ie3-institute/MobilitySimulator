@@ -102,23 +102,23 @@ object TripSimulation extends LazyLogging {
         )
       }
 
-      /* Check if SoC is < 10% at start of trip -> if yes, and EV could charge at its destination, do not depart */
-      else if (
-        socAtStartOfTrip < SOC_OF_10_PERCENT
-        && ev.destinationPoi.nearestChargingStations.nonEmpty
-      ) {
-        // logger.info(
-        s"${ev.getId} has SoC < 10% at planned departure, but EV could charged here. It stays until it can charge..."
-        // )
-        doNotDepartAndStayLongerAtDestination(
-          ev,
-          currentTime,
-          chargingStations,
-          tripProbabilities.firstDepartureOfDay,
-          tripProbabilities.lastTripOfDay,
-          tripProbabilities.parkingTime
-        )
-      }
+//      /* Check if SoC is < 10% at start of trip -> if yes, and EV could charge at its destination, do not depart */
+//      else if (
+//        socAtStartOfTrip < SOC_OF_10_PERCENT
+//        && ev.destinationPoi.nearestChargingStations.nonEmpty
+//      ) {
+//        // logger.info(
+//        s"${ev.getId} has SoC < 10% at planned departure, but EV could charged here. It stays until it can charge..."
+//        // )
+//        doNotDepartAndStayLongerAtDestination(
+//          ev,
+//          currentTime,
+//          chargingStations,
+//          tripProbabilities.firstDepartureOfDay,
+//          tripProbabilities.lastTripOfDay,
+//          tripProbabilities.parkingTime
+//        )
+//      }
 
       /* SoC is not critical (< 10%) or couldn't charge at destination -> depart and simulate a trip */
       else {
@@ -1273,6 +1273,8 @@ object TripSimulation extends LazyLogging {
 
     // we do not update the SOC as we change the trip after the fact and
     // the original trip consumption has already been considered
+
+    require(parkingTimeStart > tripStart)
 
     ev.copy(
       destinationPoi = destinationPoi,
