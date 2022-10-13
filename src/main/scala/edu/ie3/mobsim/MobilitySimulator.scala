@@ -498,7 +498,6 @@ final class MobilitySimulator(
         if (
           updatedEv.departureTime.getDayOfWeek != currentTime.getDayOfWeek && updatedEv.destinationPoiType != PoiTypeDictionary.HOME
         ) {
-          // todo: trip before has already been persisted
           TripSimulation.simulateLastDailyTripToHome(
             currentTime,
             ev,
