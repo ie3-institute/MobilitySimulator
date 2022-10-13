@@ -50,7 +50,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
             .doubleValue()
             .toString};" +
         s"${firstEv.destinationPoi.id};" +
-        s"${firstEv.getDestinationPoiType.toString};" +
+        s"${firstEv.destinationPoiType.toString};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
         s"${firstEv.parkingTimeStart.toString};" +
         s"${firstEv.departureTime};" +
