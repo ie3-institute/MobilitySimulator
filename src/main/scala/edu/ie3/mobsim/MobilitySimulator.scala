@@ -48,7 +48,7 @@ final class MobilitySimulator(
       ProbabilityDensityFunction[PointOfInterest]
     ],
     startTime: ZonedDateTime,
-    var electricVehicles: SortedSet[ElectricVehicle],
+    var electricVehicles: Set[ElectricVehicle],
     chargingHubTownIsPresent: Boolean,
     chargingHubHighwayIsPresent: Boolean,
     ioUtils: IoUtils,
@@ -139,7 +139,7 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: ComparableQuantity[Length]
-  ): (SortedSet[ElectricVehicle], Map[UUID, Set[ElectricVehicle]]) = {
+  ): (Set[ElectricVehicle], Map[UUID, Set[ElectricVehicle]]) = {
     val builder = new EvMovementsMessageBuilder
 
     /* Determine parking and departing evs in this tick */
@@ -180,7 +180,7 @@ final class MobilitySimulator(
         .sendEvPositions(movements)
         .asScala
         .map(ev => ev.asInstanceOf[ElectricVehicle])
-        .to(SortedSet)
+        .toSet
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
@@ -199,9 +199,9 @@ final class MobilitySimulator(
     *   both sets
     */
   private def defineMovements(
-      evs: SortedSet[ElectricVehicle],
+      evs: Set[ElectricVehicle],
       currentTime: ZonedDateTime
-  ): (SortedSet[ElectricVehicle], SortedSet[ElectricVehicle]) = {
+  ): (Set[ElectricVehicle], Set[ElectricVehicle]) = {
     val isParking = (ev: ElectricVehicle) => ev.parkingTimeStart == currentTime
     /* Relevant are only cars, that depart AND that are charging at a suitable charging station in SIMONA */
     val isDeparting = (ev: ElectricVehicle) =>
@@ -212,7 +212,7 @@ final class MobilitySimulator(
       }
       .partition(_.parkingTimeStart == currentTime) match {
       case (arrivals, departures) =>
-        (TreeSet.from(arrivals), TreeSet.from(departures))
+        (arrivals.seq, departures.seq)
     }
   }
 
@@ -343,7 +343,7 @@ final class MobilitySimulator(
     *   A collection of movements
     */
   private def handleParkingEvs(
-      evs: SortedSet[ElectricVehicle],
+      evs: Set[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
@@ -452,7 +452,7 @@ final class MobilitySimulator(
     */
   private def updateAndSimulateDepartedEvs(
       currentTime: ZonedDateTime,
-      departedEvsFromSimona: SortedSet[ElectricVehicle],
+      departedEvsFromSimona: Set[ElectricVehicle],
       tripProbabilities: TripProbabilities,
       thresholdChargingHubDistance: ComparableQuantity[Length]
   ): Unit = {
