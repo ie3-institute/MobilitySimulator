@@ -284,9 +284,9 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
         forAll(
           Table(
             ("targetAmount", "targetShare", "expectedAmountOfHomeCharging"),
-            (120, 1.0, 100)
-//            (120, 0.1, 12),
-//            (120, 0.12, 14)
+            (120, 1.0, 120),
+            (120, 0.1, 12),
+            (120, 0.12, 14)
           )
         ) {
           case (

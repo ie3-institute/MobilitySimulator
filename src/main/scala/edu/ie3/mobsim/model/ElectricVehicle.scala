@@ -187,7 +187,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
       firstDepartureOfDay: FirstDepartureOfDay
-  ): SortedSet[ElectricVehicle] = {
+  ): Set[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -207,7 +207,7 @@ case object ElectricVehicle extends LazyLogging {
 
     /* Build the remaining cars */
     val additionalCars = assignRemainingCars(
-      amountOfHomeChargingCars - unassignedEvs.size,
+      amountOfHomeChargingCars - initialHomeChargingCars.size,
       unassignedEvs,
       homePoiPdfWithHomeCharging,
       homePoiPdfWithoutHomeCharging,

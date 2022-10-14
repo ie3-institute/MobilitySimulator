@@ -6,7 +6,9 @@
 
 package edu.ie3.mobsim.utils
 
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.model.ElectricVehicle
+import edu.ie3.mobsim.utils
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.{
@@ -193,6 +195,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           str shouldBe compareString
         }
       }
+    }
+
+    "read ev inputs successfully" in {
+      val path = getClass.getResource("ev_input_data").getPath
+      val csvParams = CsvParams(
+        ",",
+        path
+      )
+      val evInputs = IoUtils.readEvInputs(csvParams)
+      evInputs should have size 1
     }
   }
 }
