@@ -272,7 +272,8 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
     "calculate stored energy at the end of trip" in {
       val energy: ComparableQuantity[Energy] =
         TripSimulation.calculateStoredEnergyAtEndOfTrip(
-          ev4.copyWith(ev4.getEStorage),
+          ev4.evType.consumption,
+          ev4.getEStorage,
           drivingDistance = Quantities.getQuantity(4000, METRE)
         )
 
