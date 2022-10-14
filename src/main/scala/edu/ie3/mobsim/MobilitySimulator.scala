@@ -700,28 +700,50 @@ object MobilitySimulator
       config.mobsim.input.mobility.source.colSep
     )
 
-    val evs = ElectricVehicle.createEvs(
-      numberOfEvsInArea,
-      poisWithSizes
-        .getOrElse(
-          CategoricalLocationDictionary.HOME,
-          throw InitializationException(
-            "Unable to obtain the probability density function for home POI."
-          )
-        )
-        .pdf,
-      poisWithSizes.getOrElse(
-        CategoricalLocationDictionary.WORK,
+    val homePOIsWithSizes = poisWithSizes
+      .getOrElse(
+        CategoricalLocationDictionary.HOME,
         throw InitializationException(
-          "Unable to obtain the probability density function for work POI."
+          "Unable to obtain the probability density function for home POI."
         )
-      ),
-      chargingStations,
-      startTime,
-      targetShareOfHomeCharging,
-      evModelPdf,
-      tripProbabilities.firstDepartureOfDay
+      )
+      .pdf
+
+    val workPoisWithSizes = poisWithSizes.getOrElse(
+      CategoricalLocationDictionary.WORK,
+      throw InitializationException(
+        "Unable to obtain the probability density function for work POI."
+      )
     )
+
+    val evs = config.mobsim.input.evSource match {
+      case Some(csvParams) =>
+        val evInputs =
+          IoUtils.readEvInputs(
+            csvParams
+          )
+        ElectricVehicle.createEvsFromEvInput(
+          evInputs,
+          homePOIsWithSizes,
+          workPoisWithSizes,
+          chargingStations,
+          startTime,
+          targetShareOfHomeCharging,
+          tripProbabilities.firstDepartureOfDay
+        )
+      case None =>
+        ElectricVehicle.createEvs(
+          numberOfEvsInArea,
+          homePOIsWithSizes,
+          workPoisWithSizes,
+          chargingStations,
+          startTime,
+          targetShareOfHomeCharging,
+          evModelPdf,
+          tripProbabilities.firstDepartureOfDay
+        )
+    }
+
     ioUtils.writeEvs(evs)
 
     logger.info(
