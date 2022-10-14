@@ -215,7 +215,9 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         Seq(cs0, cs1, cs2).foreach { cs =>
           actual.toMap.get(cs).zip(expected.get(cs)) match {
             case Some((actual, expected)) =>
-              actual should equalWithTolerance(expected)
+              actual.to(PowerSystemUnits.KILOMETRE) should equalWithTolerance(
+                expected
+              )
             case None => fail("Unable to determine the expected distance")
           }
         }
@@ -246,6 +248,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         case Failure(exception) =>
           fail("Getting points of interest from file did fail.", exception)
         case Success(pois) =>
+//          val poisWithAdjustedUnits = pois.map(poi => poi.)
           pois should contain theSameElementsAs itData
       }
     }

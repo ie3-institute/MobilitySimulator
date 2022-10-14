@@ -6,7 +6,7 @@
 
 package edu.ie3.mobsim.io.geodata
 
-import edu.ie3.datamodel.models.ElectricCurrentType
+import edu.ie3.datamodel.models.{ElectricCurrentType, StandardUnits}
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
@@ -15,7 +15,8 @@ import edu.ie3.util.quantities.PowerSystemUnits
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.METRE
+import tech.units.indriya.unit.Units
+import tech.units.indriya.unit.Units.{METRE, PERCENT}
 
 import java.util.UUID
 import javax.measure.quantity.Length
@@ -97,7 +98,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
-    Map(cs1 -> Quantities.getQuantity(0, PowerSystemUnits.KILOMETRE))
+    Map(cs1 -> Quantities.getQuantity(0, Units.METRE))
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
@@ -106,7 +107,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.41154872, 51.4833271),
     1549.4886151800551,
-    Map(cs3 -> Quantities.getQuantity(0, PowerSystemUnits.KILOMETRE))
+    Map(cs3 -> Quantities.getQuantity(0, Units.METRE))
   )
 
   protected val bbpgPoi: PointOfInterest = PointOfInterest(
