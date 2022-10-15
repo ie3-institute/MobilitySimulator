@@ -24,7 +24,7 @@ class TripProbabilitiesSpec extends UnitSpec {
 
     val mobilityConf = Mobility(CsvParams("", mobSimPath.toString))
     val pathsAndSources =
-      PathsAndSources("testSim", Input(gridConf, mobilityConf), None)
+      PathsAndSources("testSim", Input(None, gridConf, mobilityConf), None)
     val tripProbabilities = TripProbabilities.read(pathsAndSources, ",")
 
     tripProbabilities.categoricalLocation.probabilitiesWeekday.size shouldBe 42

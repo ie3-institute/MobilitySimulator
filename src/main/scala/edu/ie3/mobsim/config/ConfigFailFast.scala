@@ -19,7 +19,7 @@ object ConfigFailFast {
   }
 
   private def check(config: MobSimConfig.Mobsim.Input): Unit = config match {
-    case Input(Grid(_, gridSource), Mobility(mobilitySource)) =>
+    case Input(None, Grid(_, gridSource), Mobility(mobilitySource)) =>
       check(gridSource)
       check(mobilitySource)
   }

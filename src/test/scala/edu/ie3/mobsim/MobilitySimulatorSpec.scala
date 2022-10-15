@@ -12,7 +12,6 @@ import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
 import java.util.UUID
-import scala.collection.immutable.SortedSet
 
 class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
   "MobilitySimulator" should {
@@ -21,27 +20,27 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val defineMovements =
-        PrivateMethod[(SortedSet[ElectricVehicle], SortedSet[ElectricVehicle])](
+        PrivateMethod[(Set[ElectricVehicle], Set[ElectricVehicle])](
           Symbol("defineMovements")
         )
 
       val cases = Table(
         ("parkingEvs", "departingEvs"),
         (
-          setEvsAsParking(SortedSet(ev1, ev2, ev3)),
-          SortedSet.empty[ElectricVehicle]
+          setEvsAsParking(Set(ev1, ev2, ev3)),
+          Set.empty[ElectricVehicle]
         ),
         (
-          setEvsAsParking(SortedSet(ev1, ev2)),
-          setEvsAsDeparting(SortedSet(ev3))
+          setEvsAsParking(Set(ev1, ev2)),
+          setEvsAsDeparting(Set(ev3))
         ),
         (
-          setEvsAsParking(SortedSet(ev1)),
-          setEvsAsDeparting(SortedSet(ev2, ev3))
+          setEvsAsParking(Set(ev1)),
+          setEvsAsDeparting(Set(ev2, ev3))
         ),
         (
-          SortedSet.empty[ElectricVehicle],
-          setEvsAsDeparting(SortedSet(ev1, ev2, ev3))
+          Set.empty[ElectricVehicle],
+          setEvsAsDeparting(Set(ev1, ev2, ev3))
         )
       )
 
@@ -67,9 +66,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("departingEvs", "expectedChargingPoints"),
-        (SortedSet(ev1), 1),
-        (SortedSet(ev1, ev2), 2),
-        (SortedSet(ev1, ev2, ev3), 3)
+        (Set(ev1), 1),
+        (Set(ev1, ev2), 2),
+        (Set(ev1, ev2, ev3), 3)
       )
 
       forAll(cases) { (departingEvs, expectedCsCount) =>
@@ -96,9 +95,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         ("evs", "expectedFreeCs"),
-        (SortedSet(ev1), Map(cs6.uuid -> 1)),
-        (SortedSet(ev1, ev2), Map(cs6.uuid -> 2)),
-        (SortedSet(ev1, ev2, ev3), Map(cs6.uuid -> 3))
+        (Set(ev1), Map(cs6.uuid -> 1)),
+        (Set(ev1, ev2), Map(cs6.uuid -> 2)),
+        (Set(ev1, ev2, ev3), Map(cs6.uuid -> 3))
       )
 
       forAll(cases) { (evs, expectedFreeCs) =>
@@ -212,9 +211,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       val cases = Table(
         "evs",
-        setEvsAsParking(SortedSet(ev1)),
-        setEvsAsParking(SortedSet(ev1, ev2)),
-        setEvsAsParking(SortedSet(ev1, ev2, ev3))
+        setEvsAsParking(Set(ev1)),
+        setEvsAsParking(Set(ev1, ev2)),
+        setEvsAsParking(Set(ev1, ev2, ev3))
       )
 
       forAll(cases) { evs =>
