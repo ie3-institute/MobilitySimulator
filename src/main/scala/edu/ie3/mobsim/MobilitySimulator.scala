@@ -43,7 +43,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Random
@@ -81,12 +80,9 @@ final class MobilitySimulator(
       .toMap
 
     /* Receive current prices for public evcs situation and converting them to scala values */
-    val currentPricesAtChargingStations = evData
-      .requestCurrentPrices()
-      .asScala
-      .view
-      .mapValues(_.toDouble)
-      .toMap
+    // FIXME mock values, since we're currently not using prices
+    val currentPricesAtChargingStations =
+      chargingStations.map(_.uuid -> 0d).toMap
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val (
