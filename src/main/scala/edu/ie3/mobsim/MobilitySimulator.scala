@@ -691,7 +691,7 @@ object MobilitySimulator
       config.mobsim.simulation.targetHomeChargingShare
     val start = System.currentTimeMillis()
     logger.info(
-      s"Creating $numberOfEvsInArea evs with a targeted home charging share of ${"%.2f"
+      s"Creating evs with a targeted home charging share of ${"%.2f"
           .format(targetShareOfHomeCharging * 100)} %."
     )
 
@@ -716,7 +716,7 @@ object MobilitySimulator
       )
     )
 
-    val evs = config.mobsim.input.evSource match {
+    val evs = config.mobsim.input.evInputSource match {
       case Some(csvParams) =>
         val evInputs =
           IoUtils.readEvInputs(

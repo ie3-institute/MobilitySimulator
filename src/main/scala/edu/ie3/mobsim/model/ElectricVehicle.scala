@@ -221,7 +221,7 @@ case object ElectricVehicle extends LazyLogging {
     )
 
     val evs = initialHomeChargingCars.toSet ++ additionalCars
-    logger.debug(s"Created ${evs.size} EVs during setup.")
+    logger.info(s"Created ${evs.size} EVs from EvInputs during setup.")
     evs
   }
 
@@ -268,7 +268,7 @@ case object ElectricVehicle extends LazyLogging {
     )
 
     val evs = initialHomeChargingCars.toSet ++ additionalCars
-    logger.debug(s"Created ${evs.size} EVs during setup.")
+    logger.info(s"Created ${evs.size} EVs by model sampling during setup.")
     evs
   }
 
