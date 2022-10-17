@@ -395,8 +395,9 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Option[Movement] = {
+    val minParkingTimeForCharging = 15
     val staysLongEnough = ev.parkingTimeStart
-      .until(ev.departureTime, ChronoUnit.MINUTES) >= 15
+      .until(ev.departureTime, ChronoUnit.MINUTES) >= minParkingTimeForCharging
     if (staysLongEnough) {
       val (chosenCsOpt, updatedEvOpt) = chooseChargingStation(
         ev,
@@ -439,7 +440,7 @@ final class MobilitySimulator(
         }
     } else {
       logger.debug(
-        s"s${ev.id} parks but does not charge, since parking time is below 15 minutes."
+        s"s${ev.id} parks but does not charge, since parking time is below $minParkingTimeForCharging minutes."
       )
       None
     }
