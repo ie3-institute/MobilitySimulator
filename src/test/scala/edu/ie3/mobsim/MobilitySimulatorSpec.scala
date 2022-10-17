@@ -6,7 +6,7 @@
 
 package edu.ie3.mobsim
 
-import edu.ie3.mobsim.MobilitySimulator.Movement
+import edu.ie3.mobsim.model.Movement
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
@@ -62,26 +62,43 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val handleDepartures =
-        PrivateMethod[Map[UUID, Int]](Symbol("handleDepartures"))
+        PrivateMethod[(Seq[Movement], Map[UUID, Int])](
+          Symbol("handleDepartures")
+        )
 
       val cases = Table(
-        ("departingEvs", "expectedChargingPoints"),
-        (SortedSet(ev1), 1),
-        (SortedSet(ev1, ev2), 2),
-        (SortedSet(ev1, ev2, ev3), 3)
+        ("departingEvs", "expectedChargingPoints", "expectedMovements"),
+        (SortedSet(ev1), 1, Seq(Movement(cs6.uuid, ev1))),
+        (
+          SortedSet(ev1, ev2),
+          2,
+          Seq(Movement(cs6.uuid, ev1), Movement(cs6.uuid, ev2))
+        ),
+        (
+          SortedSet(ev1, ev2, ev3),
+          3,
+          Seq(
+            Movement(cs6.uuid, ev1),
+            Movement(cs6.uuid, ev2),
+            Movement(cs6.uuid, ev3)
+          )
+        )
       )
 
-      forAll(cases) { (departingEvs, expectedCsCount) =>
-        val actualChargingPoints =
+      forAll(cases) { (departingEvs, expectedCsCount, expectedMovements) =>
+        val (movements, actualChargingPoints) =
           mobilitySimulator invokePrivate handleDepartures(
             setEvsAsDeparting(departingEvs),
-            chargingPointsAllTaken,
-            builder
+            chargingPointsAllTaken
           )
 
         actualChargingPoints shouldBe Map(
           cs6.uuid -> expectedCsCount
         )
+        movements.map(_.cs) shouldBe expectedMovements.map(_.cs)
+        movements.map(
+          _.ev.uuid
+        ) should contain theSameElementsAs expectedMovements.map(_.ev.uuid)
       }
     }
 

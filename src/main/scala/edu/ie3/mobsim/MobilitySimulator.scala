@@ -8,7 +8,6 @@ package edu.ie3.mobsim
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
-import edu.ie3.mobsim.MobilitySimulator.Movement
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
@@ -19,10 +18,9 @@ import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
+import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType, Movement}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
-import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -66,7 +64,7 @@ final class MobilitySimulator(
 
     /* Receive available charging points of evcs from SIMONA and converting them to scala values */
     val availableChargingPoints = evData
-      .requestAvailablePublicEvCs()
+      .requestAvailablePublicEvcs()
       .asScala
       .view
       .mapValues(_.toInt)
@@ -140,7 +138,6 @@ final class MobilitySimulator(
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: ComparableQuantity[Length]
   ): (SortedSet[ElectricVehicle], Map[UUID, Set[ElectricVehicle]]) = {
-    val builder = new EvMovementsMessageBuilder
 
     /* Determine parking and departing evs in this tick */
     val (parkingEvs, departingEvs) =
@@ -148,8 +145,16 @@ final class MobilitySimulator(
 
     /* !!! Attention - Departing and parking evs have to be treated sequentially !!!
      * The departing cars offer additional free lots to the parking cars */
-    val updatedChargingPoints =
-      handleDepartures(departingEvs, availableChargingPoints, builder)
+    val (departures, updatedChargingPoints) =
+      handleDepartures(departingEvs, availableChargingPoints)
+
+    val departedEvs = evData
+      .requestDepartingEvs(
+        Movement.buildMovementsUuidMap(departures)
+      )
+      .asScala
+      .map(_.asInstanceOf[ElectricVehicle])
+      .to(SortedSet)
 
     /* Add EVs that start parking to movements and assign to Evcs UUID */
     val arrivals = handleParkingEvs(
@@ -158,9 +163,10 @@ final class MobilitySimulator(
       updatedChargingPoints,
       maxDistance
     )
-    arrivals.foreach { case Movement(cs, updatedEv) =>
-      builder.addArrival(cs, updatedEv)
-    }
+
+    evData.provideArrivingEvs(
+      Movement.buildMovementsMap(arrivals)
+    )
 
     // compile map from evcs to their parked evs
     val evcsToParkedEvs = electricVehicles
@@ -173,14 +179,6 @@ final class MobilitySimulator(
         ev
       }
 
-    /* Send to SIMONA and receive departed EVs */
-    val movements = builder.build()
-    val departedEvs =
-      evData
-        .sendEvPositions(movements)
-        .asScala
-        .map(ev => ev.asInstanceOf[ElectricVehicle])
-        .to(SortedSet)
     departedEvs.foreach(ev =>
       ioUtils.writeMovement(ev, currentTime, "departure")
     )
@@ -229,16 +227,15 @@ final class MobilitySimulator(
     */
   private def handleDepartures(
       evs: Set[ElectricVehicle],
-      availableChargingPoints: Map[UUID, Int],
-      builder: EvMovementsMessageBuilder
-  ): Map[UUID, Int] = {
+      availableChargingPoints: Map[UUID, Int]
+  ): (Seq[Movement], Map[UUID, Int]) = {
     val (additionallyFreeChargingPoints, departures) =
       handleDepartingEvs(evs)
-    departures.foreach { case Movement(cs, updatedEv) =>
-      builder.addDeparture(cs, updatedEv.getUuid)
-    }
 
-    updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
+    (
+      departures,
+      updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
+    )
   }
 
   /** Handle all departing evs. If they are charging in SIMONA, determine the
@@ -294,7 +291,7 @@ final class MobilitySimulator(
         val updatedEv =
           ev.removeChargingAtSimona().setChosenChargingStation(None)
 
-        Some(MobilitySimulator.Movement(cs, updatedEv))
+        Some(Movement(cs, updatedEv))
       case None =>
         logger.warn(
           s"Ev '$ev' is meant to charge in SIMONA, but no charging station is set."
@@ -556,16 +553,6 @@ object MobilitySimulator
     with ExtEvSimulation
     with ExtDataSimulation
     with LazyLogging {
-
-  /** Class to describe a movement at a charging station. If it is a deparutre
-    * or arrival is given by the context
-    *
-    * @param cs
-    *   Unique identifier of the charging station
-    * @param ev
-    *   Ev model
-    */
-  final case class Movement(cs: UUID, ev: ElectricVehicle)
 
   private var simulator: Option[MobilitySimulator] = None
 
