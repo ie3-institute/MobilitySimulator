@@ -126,6 +126,7 @@ final case class ElectricVehicle(
     copy(
       storedEnergy = storedEnergy,
       destinationPoi = destinationPoi,
+      destinationPoiType = destinationPoiType,
       parkingTimeStart = parkingTimeStart,
       departureTime = departureTime
     )
