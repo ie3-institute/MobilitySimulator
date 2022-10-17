@@ -26,7 +26,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     evs.map { ev =>
       ev.copy(
         storedEnergy = zero,
-        destinationPoi = charging_hub_highwayPoi,
+        destinationPoi = chargingHubHighwayPoi,
         parkingTimeStart = givenSimulationStart,
         departureTime = givenSimulationStart.plusHours(5)
       )
@@ -59,7 +59,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
 
   protected val arrivingEv: ElectricVehicle = {
     ev1.copy(
-      destinationPoi = charging_hub_highwayPoi
+      destinationPoi = chargingHubHighwayPoi
     )
   }
 

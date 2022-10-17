@@ -6,7 +6,11 @@
 
 package edu.ie3.mobsim.utils
 
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.model.ElectricVehicle
+import edu.ie3.mobsim.utils
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.{
@@ -146,9 +150,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val compareString: String = s"${charging_hub_townPoi.id};" +
-        s"${charging_hub_townPoi.getPoiType};" +
-        s"${charging_hub_townPoi.size};" +
+      val compareString: String = s"${chargingHubTownPoi.id};" +
+        s"${PoiTypeDictionary.CHARGING_HUB_TOWN};" +
+        s"${chargingHubTownPoi.size};" +
         s"$cs4;" +
         s"${0.0}"
 

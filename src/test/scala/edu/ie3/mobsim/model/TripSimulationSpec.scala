@@ -59,7 +59,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe half
           chargingAtSimona shouldBe false
-          destinationPoi shouldBe charging_hub_townPoi
+          destinationPoi shouldBe chargingHubTownPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(4).plusMinutes(33)
           chargingAtHomePossible shouldBe true
@@ -159,12 +159,12 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoi shouldBe charging_hub_townPoi
+          destinationPoi shouldBe chargingHubTownPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi shouldBe Some(charging_hub_townPoi)
+          finalDestinationPoi shouldBe Some(chargingHubTownPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(-7000, METRE)
           )
@@ -211,7 +211,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoi shouldBe charging_hub_townPoi
+          destinationPoi shouldBe chargingHubTownPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true

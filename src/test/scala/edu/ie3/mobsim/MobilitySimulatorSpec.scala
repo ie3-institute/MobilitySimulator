@@ -331,7 +331,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           Movement(
             cs0.uuid,
             ev1.copy(
-              homePoi = charging_hub_highwayPoi,
+              homePoi = chargingHubHighwayPoi,
               chargingAtHomePossible = false
             )
           )
@@ -345,7 +345,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           Movement(cs0.uuid, ev2.setChargingAtSimona()),
           Movement(
             cs0.uuid,
-            ev3.copy(finalDestinationPoi = Some(charging_hub_townPoi))
+            ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
           )
         )
       )
