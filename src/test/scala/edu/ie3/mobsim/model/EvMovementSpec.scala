@@ -26,7 +26,7 @@ class EvMovementSpec extends UnitSpec with TripSimulationTestData {
     "build ev model maps correctly" in {
       val actualMap = EvMovement.buildMovementsMap(movements)
       val expectedMap = Map(
-        csUuidA -> Seq(ev1.asInstanceOf[EvModel]).asJava,
+        csUuidA -> Seq(ev1).asJava,
         csUuidB -> Seq(
           ev2,
           ev3
