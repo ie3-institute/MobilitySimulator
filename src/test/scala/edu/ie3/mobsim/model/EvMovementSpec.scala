@@ -6,11 +6,10 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.test.common.UnitSpec
 
 import java.util.UUID
-import scala.jdk.CollectionConverters.{MapHasAsJava, SeqHasAsJava}
+import scala.jdk.CollectionConverters._
 
 class EvMovementSpec extends UnitSpec with TripSimulationTestData {
 
