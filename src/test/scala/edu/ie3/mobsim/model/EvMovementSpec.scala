@@ -10,34 +10,33 @@ import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.test.common.UnitSpec
 
 import java.util.UUID
-import scala.collection.immutable.Seq
 import scala.jdk.CollectionConverters.{MapHasAsJava, SeqHasAsJava}
 
-class MovementSpec extends UnitSpec with TripSimulationTestData {
+class EvMovementSpec extends UnitSpec with TripSimulationTestData {
 
   "Movement" should {
     val csUuidA = UUID.randomUUID()
     val csUuidB = UUID.randomUUID()
     val movements = Seq(
-      Movement(csUuidA, ev1),
-      Movement(csUuidB, ev2),
-      Movement(csUuidB, ev3)
+      EvMovement(csUuidA, ev1),
+      EvMovement(csUuidB, ev2),
+      EvMovement(csUuidB, ev3)
     )
 
     "build ev model maps correctly" in {
-      val actualMap = Movement.buildMovementsMap(movements)
+      val actualMap = EvMovement.buildMovementsMap(movements)
       val expectedMap = Map(
         csUuidA -> Seq(ev1.asInstanceOf[EvModel]).asJava,
         csUuidB -> Seq(
-          ev2.asInstanceOf[EvModel],
-          ev3.asInstanceOf[EvModel]
+          ev2,
+          ev3
         ).asJava
       ).asJava
       actualMap shouldBe expectedMap
     }
 
     "build ev uuid maps correctly" in {
-      val actualMap = Movement.buildMovementsUuidMap(movements)
+      val actualMap = EvMovement.buildMovementsUuidMap(movements)
       val expectedMap = Map(
         csUuidA -> Seq(ev1.uuid).asJava,
         csUuidB -> Seq(

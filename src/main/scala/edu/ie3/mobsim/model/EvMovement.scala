@@ -11,20 +11,20 @@ import edu.ie3.simona.api.data.ev.model.EvModel
 import java.util.UUID
 import scala.jdk.CollectionConverters.{MapHasAsJava, SeqHasAsJava}
 
-/** Class to describe a movement at a charging station. If it is a deparutre or
-  * arrival is given by the context
+/** Class to describe a movement at a charging station. Whether it is a
+  * departure or arrival is given by the context
   *
   * @param cs
   *   Unique identifier of the charging station
   * @param ev
   *   Ev model
   */
-final case class Movement(cs: UUID, ev: ElectricVehicle)
+final case class EvMovement(cs: UUID, ev: ElectricVehicle)
 
-object Movement {
+object EvMovement {
 
   def buildMovementsMap(
-      movements: Seq[Movement]
+      movements: Seq[EvMovement]
   ): java.util.Map[UUID, java.util.List[EvModel]] = {
     movements
       .groupBy(_.cs)
@@ -35,7 +35,7 @@ object Movement {
   }
 
   def buildMovementsUuidMap(
-      movements: Seq[Movement]
+      movements: Seq[EvMovement]
   ): java.util.Map[UUID, java.util.List[UUID]] = {
     movements
       .groupBy(_.cs)
