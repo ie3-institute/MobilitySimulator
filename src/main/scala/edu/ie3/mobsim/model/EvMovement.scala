@@ -29,7 +29,7 @@ object EvMovement {
     movements
       .groupBy(_.cs)
       .map { case (cs, movements) =>
-        (cs, movements.map(_.ev.asInstanceOf[EvModel]).asJava)
+        (cs, movements.map(_.ev: EvModel).asJava)
       }
       .asJava
   }
