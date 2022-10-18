@@ -18,8 +18,8 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
   val evData: ExtEvData = new ExtEvData(ActorRef.noSender, ActorRef.noSender)
 
   def setEvsAsParking(
-      evs: SortedSet[ElectricVehicle]
-  ): SortedSet[ElectricVehicle] =
+      evs: Set[ElectricVehicle]
+  ): Set[ElectricVehicle] =
     evs.map { ev =>
       ev.copy(
         storedEnergy = zero,
@@ -30,8 +30,8 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     }
 
   def setEvsAsDeparting(
-      evs: SortedSet[ElectricVehicle]
-  ): SortedSet[ElectricVehicle] =
+      evs: Set[ElectricVehicle]
+  ): Set[ElectricVehicle] =
     evs.map { ev =>
       ev.copy(
         storedEnergy = half,
