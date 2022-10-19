@@ -6,11 +6,13 @@
 
 package edu.ie3.mobsim
 
-import edu.ie3.mobsim.model.EvMovement
+import edu.ie3.mobsim.MobilitySimulator.Movement
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
 import java.util.UUID
+import scala.collection.immutable.SortedSet
 
 class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
   "MobilitySimulator" should {
@@ -19,27 +21,27 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val defineMovements =
-        PrivateMethod[(Set[ElectricVehicle], Set[ElectricVehicle])](
+        PrivateMethod[(SortedSet[ElectricVehicle], SortedSet[ElectricVehicle])](
           Symbol("defineMovements")
         )
 
       val cases = Table(
         ("parkingEvs", "departingEvs"),
         (
-          setEvsAsParking(Set(ev1, ev2, ev3)),
-          Set.empty[ElectricVehicle]
+          setEvsAsParking(SortedSet(ev1, ev2, ev3)),
+          SortedSet.empty[ElectricVehicle]
         ),
         (
-          setEvsAsParking(Set(ev1, ev2)),
-          setEvsAsDeparting(Set(ev3))
+          setEvsAsParking(SortedSet(ev1, ev2)),
+          setEvsAsDeparting(SortedSet(ev3))
         ),
         (
-          setEvsAsParking(Set(ev1)),
-          setEvsAsDeparting(Set(ev2, ev3))
+          setEvsAsParking(SortedSet(ev1)),
+          setEvsAsDeparting(SortedSet(ev2, ev3))
         ),
         (
-          Set.empty[ElectricVehicle],
-          setEvsAsDeparting(Set(ev1, ev2, ev3))
+          SortedSet.empty[ElectricVehicle],
+          setEvsAsDeparting(SortedSet(ev1, ev2, ev3))
         )
       )
 
@@ -61,43 +63,26 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val handleDepartures =
-        PrivateMethod[(Seq[EvMovement], Map[UUID, Int])](
-          Symbol("handleDepartures")
-        )
+        PrivateMethod[Map[UUID, Int]](Symbol("handleDepartures"))
 
       val cases = Table(
-        ("departingEvs", "expectedChargingPoints", "expectedMovements"),
-        (Set(ev1), 1, Seq(EvMovement(cs6.uuid, ev1))),
-        (
-          Set(ev1, ev2),
-          2,
-          Seq(EvMovement(cs6.uuid, ev1), EvMovement(cs6.uuid, ev2))
-        ),
-        (
-          Set(ev1, ev2, ev3),
-          3,
-          Seq(
-            EvMovement(cs6.uuid, ev1),
-            EvMovement(cs6.uuid, ev2),
-            EvMovement(cs6.uuid, ev3)
-          )
-        )
+        ("departingEvs", "expectedChargingPoints"),
+        (SortedSet(ev1), 1),
+        (SortedSet(ev1, ev2), 2),
+        (SortedSet(ev1, ev2, ev3), 3)
       )
 
-      forAll(cases) { (departingEvs, expectedCsCount, expectedMovements) =>
-        val (movements, actualChargingPoints) =
+      forAll(cases) { (departingEvs, expectedCsCount) =>
+        val actualChargingPoints =
           mobilitySimulator invokePrivate handleDepartures(
             setEvsAsDeparting(departingEvs),
-            chargingPointsAllTaken
+            chargingPointsAllTaken,
+            builder
           )
 
         actualChargingPoints shouldBe Map(
           cs6.uuid -> expectedCsCount
         )
-        movements.map(_.cs) shouldBe expectedMovements.map(_.cs)
-        movements.map(
-          _.ev.uuid
-        ) should contain theSameElementsAs expectedMovements.map(_.ev.uuid)
       }
     }
 
@@ -105,15 +90,15 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val mobilitySimulator = mobSim()
 
       val handleDepartingEvs =
-        PrivateMethod[(Map[UUID, Int], Seq[EvMovement])](
+        PrivateMethod[(Map[UUID, Int], Seq[Movement])](
           Symbol("handleDepartingEvs")
         )
 
       val cases = Table(
         ("evs", "expectedFreeCs"),
-        (Set(ev1), Map(cs6.uuid -> 1)),
-        (Set(ev1, ev2), Map(cs6.uuid -> 2)),
-        (Set(ev1, ev2, ev3), Map(cs6.uuid -> 3))
+        (SortedSet(ev1), Map(cs6.uuid -> 1)),
+        (SortedSet(ev1, ev2), Map(cs6.uuid -> 2)),
+        (SortedSet(ev1, ev2, ev3), Map(cs6.uuid -> 3))
       )
 
       forAll(cases) { (evs, expectedFreeCs) =>
@@ -123,7 +108,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           )
 
         val expectedMovements = evs.toSeq.map { ev =>
-          EvMovement(
+          Movement(
             cs6.uuid,
             ev.copy(
               storedEnergy = half,
@@ -154,7 +139,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     "handle departing ev" in {
       val mobilitySimulator = mobSim()
 
-      val handleDepartingEv = PrivateMethod[Option[EvMovement]](
+      val handleDepartingEv = PrivateMethod[Option[Movement]](
         Symbol("handleDepartingEv")
       )
 
@@ -163,7 +148,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           evChargingAtSimonaWithStation,
           Some(
-            EvMovement(
+            Movement(
               cs6.uuid,
               evChargingAtSimonaWithStation
                 .removeChargingAtSimona()
@@ -181,7 +166,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         actualResults shouldBe expectedResults
 
         actualResults match {
-          case Some(EvMovement(cs, ev)) =>
+          case Some(Movement(cs, ev)) =>
             cs shouldBe cs6.uuid
 
             ev.chosenChargingStation shouldBe None
@@ -221,15 +206,15 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     "handle parking evs" in {
       val mobilitySimulator = mobSim()
 
-      val handleParkingEvs = PrivateMethod[Seq[EvMovement]](
+      val handleParkingEvs = PrivateMethod[Seq[Movement]](
         Symbol("handleParkingEvs")
       )
 
       val cases = Table(
         "evs",
-        setEvsAsParking(Set(ev1)),
-        setEvsAsParking(Set(ev1, ev2)),
-        setEvsAsParking(Set(ev1, ev2, ev3))
+        setEvsAsParking(SortedSet(ev1)),
+        setEvsAsParking(SortedSet(ev1, ev2)),
+        setEvsAsParking(SortedSet(ev1, ev2, ev3))
       )
 
       forAll(cases) { evs =>
@@ -240,8 +225,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           maxDistance
         )
 
-        val expectedMovements: Seq[EvMovement] = evs.toSeq.map { ev =>
-          EvMovement(
+        val expectedMovements: Seq[Movement] = evs.toSeq.map { ev =>
+          Movement(
             cs6.uuid,
             ev.setChargingAtSimona().setChosenChargingStation(Some(cs6.uuid))
           )
@@ -262,7 +247,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     "handle arriving ev" in {
       val mobilitySimulator = mobSim()
 
-      val handleArrivingEv = PrivateMethod[Option[EvMovement]](
+      val handleArrivingEv = PrivateMethod[Option[Movement]](
         Symbol("handleArrivingEv")
       )
 
@@ -273,7 +258,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           Map(cs6.uuid -> 0.0),
           Map(cs6.uuid -> 1),
           Some(
-            EvMovement(
+            Movement(
               cs6.uuid,
               arrivingEv
                 .setChargingAtSimona()
@@ -345,7 +330,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val cases = Table(
         "updatedMovements",
         Seq(
-          EvMovement(
+          Movement(
             cs0.uuid,
             ev1.copy(
               homePoi = charging_hub_highwayPoi,
@@ -354,13 +339,13 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           )
         ),
         Seq(
-          EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
-          EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+          Movement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
+          Movement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
         ),
         Seq(
-          EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
-          EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
-          EvMovement(
+          Movement(cs0.uuid, ev1.copy(storedEnergy = zero)),
+          Movement(cs0.uuid, ev2.setChargingAtSimona()),
+          Movement(
             cs0.uuid,
             ev3.copy(finalDestinationPoi = Some(charging_hub_townPoi))
           )
