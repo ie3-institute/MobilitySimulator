@@ -8,11 +8,9 @@ package edu.ie3.mobsim
 
 import akka.actor.ActorRef
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
-import edu.ie3.mobsim.io.probabilities.TripProbabilities
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
-import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
 
 import java.util.UUID
 import scala.collection.immutable.SortedSet
