@@ -6,9 +6,8 @@
 
 package edu.ie3.mobsim
 
-import edu.ie3.mobsim.MobilitySimulator.Movement
-import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.EvMovement
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.test.common.UnitSpec
 
