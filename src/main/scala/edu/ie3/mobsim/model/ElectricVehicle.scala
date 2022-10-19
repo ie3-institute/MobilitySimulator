@@ -199,7 +199,7 @@ case object ElectricVehicle extends LazyLogging {
       targetSharePrivateCharging: Double,
       evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay
-  ): SortedSet[ElectricVehicle] = {
+  ): Set[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -228,8 +228,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime
     )
 
-    val evs = SortedSet
-      .empty[ElectricVehicle] ++ initialHomeChargingCars ++ additionalCars
+    val evs = initialHomeChargingCars.toSet ++ additionalCars
     logger.debug(s"Created ${evs.size} EVs during setup.")
     evs
   }
