@@ -13,17 +13,15 @@ import edu.ie3.mobsim.exceptions.{
   InitializationException,
   UninitializedException
 }
-import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{
-  ChargingStation,
-  ElectricVehicle,
-  EvMovement,
-  EvType
-}
+import edu.ie3.mobsim.model._
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
@@ -38,7 +36,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Random
@@ -103,8 +100,8 @@ final class MobilitySimulator(
     )
 
     /* Get time until next event for one of the EVs and return corresponding tick to SIMONA */
-    val timeUntilNextEvent =
-      getTimeUntilNextEvent(electricVehicles, currentTime)
+    val nextEvent =
+      tick + getTimeUntilNextEvent(electricVehicles, currentTime)
 
     /* Save occupancy of charging stations for csv output */
     chargingStations.foreach(cs =>
@@ -116,7 +113,7 @@ final class MobilitySimulator(
     )
 
     val newTicks = new java.util.ArrayList[java.lang.Long](1)
-    newTicks.add(tick + timeUntilNextEvent)
+    newTicks.add(nextEvent)
     newTicks
   }
 
@@ -165,7 +162,7 @@ final class MobilitySimulator(
             s"Got unexpected EvModel type ${unexpected.getClass}"
           )
       }
-      .to(SortedSet)
+      .toSet
 
     /* Add EVs that start parking to movements and assign to Evcs UUID */
     val arrivals = handleParkingEvs(
@@ -428,7 +425,7 @@ final class MobilitySimulator(
         } else {
           logger.debug(
             s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
-              s"(${ev.getDestinationPoiType}) because all charging points " +
+              s"(${ev.destinationPoiType}) because all charging points " +
               s"at $cs were taken."
           )
           None
@@ -481,7 +478,7 @@ final class MobilitySimulator(
           }
           .getOrElse(ev)
 
-        simulateNextTrip(
+        val updatedEv = simulateNextTrip(
           currentTime,
           targetEv,
           poisWithSizes,
@@ -492,6 +489,17 @@ final class MobilitySimulator(
           tripProbabilities,
           thresholdChargingHubDistance
         )
+
+        if (
+          updatedEv.departureTime.getDayOfWeek != currentTime.getDayOfWeek && updatedEv.destinationPoiType != PoiTypeDictionary.HOME
+        ) {
+          TripSimulation.simulateLastDailyTripToHome(
+            currentTime,
+            ev,
+            tripProbabilities
+          )
+        } else updatedEv
+
       } else ev
     })
 

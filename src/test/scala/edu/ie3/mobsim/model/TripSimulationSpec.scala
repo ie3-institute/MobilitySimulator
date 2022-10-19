@@ -21,7 +21,7 @@ import scala.collection.mutable
 class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
 
   "TripSimulation" should {
-    "not simulate a new trip and keep charging when SoC < 70 %" in {
+    "not simulate a new trip and keep charging when SoC < 70 and is at charging hub %" in {
       TripSimulation.simulateNextTrip(
         givenSimulationStart,
         evAtChargingHub,
@@ -42,12 +42,14 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               workPoi,
               storedEnergy,
               destinationPoi,
+              destinationPoiType,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
               finalDestinationPoi,
+              finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
             ) =>
@@ -60,60 +62,13 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           storedEnergy shouldBe half
           chargingAtSimona shouldBe false
           destinationPoi shouldBe charging_hub_townPoi
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(4).plusMinutes(33)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
           finalDestinationPoi shouldBe None
-          remainingDistanceAfterChargingHub shouldBe None
-          chargingPricesMemory shouldBe mutable.Queue[Double]()
-      }
-    }
-
-    "not simulate a new trip and keep charging when SoC < 10 % and charging is available" in {
-      TripSimulation.simulateNextTrip(
-        givenSimulationStart,
-        evLowSoC,
-        poisWithSizes,
-        chargingHubTownIsPresent = true,
-        chargingHubHighwayIsPresent = true,
-        chargingStations,
-        ioUtils,
-        tripProbabilities,
-        maxDistance
-      ) match {
-        case ElectricVehicle(
-              simulationStart,
-              uuid,
-              id,
-              evType,
-              homePoi,
-              workPoi,
-              storedEnergy,
-              destinationPoi,
-              parkingTimeStart,
-              departureTime,
-              chargingAtHomePossible,
-              chosenChargingStation,
-              chargingAtSimona,
-              finalDestinationPoi,
-              remainingDistanceAfterChargingHub,
-              chargingPricesMemory
-            ) =>
-          simulationStart shouldBe givenSimulationStart
-          uuid shouldBe ev1.getUuid
-          id shouldBe "car_1"
-          evType shouldBe givenModel
-          homePoi shouldBe givenHomePoi
-          workPoi shouldBe givenWorkPoi
-          storedEnergy shouldBe zero
-          chargingAtSimona shouldBe false
-          destinationPoi shouldBe supermarket
-          parkingTimeStart shouldBe simulationStart.plusMinutes(1)
-          departureTime shouldBe simulationStart.plusHours(1).plusMinutes(1)
-          chargingAtHomePossible shouldBe true
-          chosenChargingStation shouldBe None
-          finalDestinationPoi shouldBe None
+          finalDestinationPoiType shouldBe None
           remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
@@ -130,6 +85,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         0.2,
         Quantities.getQuantity(1000, METRE),
         plannedDestinationPoi,
+        plannedDestinationPoiType,
         chargingStations,
         speed
       ) match {
@@ -142,12 +98,14 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               workPoi,
               storedEnergy,
               destinationPoi,
+              destinationPoiType,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
               finalDestinationPoi,
+              finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
             ) =>
@@ -160,11 +118,13 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
           destinationPoi shouldBe charging_hub_townPoi
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
-          finalDestinationPoi shouldBe Some(charging_hub_townPoi)
+          finalDestinationPoi shouldBe Some(plannedDestinationPoi)
+          finalDestinationPoiType shouldBe Some(plannedDestinationPoiType)
           remainingDistanceAfterChargingHub shouldBe Some(
             Quantities.getQuantity(-7000, METRE)
           )
@@ -182,6 +142,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         0.2,
         Quantities.getQuantity(1000, METRE),
         supermarketPoi,
+        PoiTypeDictionary.SHOPPING,
         chargingStations,
         speed
       ) match {
@@ -194,12 +155,14 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               workPoi,
               storedEnergy,
               destinationPoi,
+              destinationPoiType,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
               finalDestinationPoi,
+              finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
             ) =>
@@ -212,6 +175,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
           destinationPoi shouldBe charging_hub_townPoi
+          destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
@@ -229,6 +193,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         ev4,
         plannedStoredEnergyEndOfTrip,
         plannedDestinationPoi,
+        plannedDestinationPoiType,
         plannedParkingTimeStart,
         plannedDepartureTime
       ) match {
@@ -241,12 +206,14 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               workPoi,
               storedEnergy,
               destinationPoi,
+              destinationPoiType,
               parkingTimeStart,
               departureTime,
               chargingAtHomePossible,
               chosenChargingStation,
               chargingAtSimona,
               finalDestinationPoi,
+              finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
               chargingPricesMemory
             ) =>
@@ -259,11 +226,13 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           storedEnergy shouldBe plannedStoredEnergyEndOfTrip
           chargingAtSimona shouldBe false
           destinationPoi shouldBe plannedDestinationPoi
+          destinationPoiType shouldBe plannedDestinationPoiType
           parkingTimeStart shouldBe plannedParkingTimeStart
           departureTime shouldBe plannedDepartureTime
           chargingAtHomePossible shouldBe true
           chosenChargingStation shouldBe None
           finalDestinationPoi shouldBe None
+          finalDestinationPoiType shouldBe None
           remainingDistanceAfterChargingHub shouldBe None
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
