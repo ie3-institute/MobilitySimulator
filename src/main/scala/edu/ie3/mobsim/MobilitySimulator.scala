@@ -21,13 +21,7 @@ import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{
-  ChargingStation,
-  ElectricVehicle,
-  EvMovement,
-  EvType,
-  TripSimulation
-}
+import edu.ie3.mobsim.model._
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
@@ -42,7 +36,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Random
@@ -169,7 +162,7 @@ final class MobilitySimulator(
             s"Got unexpected EvModel type ${unexpected.getClass}"
           )
       }
-      .to(SortedSet)
+      .toSet
 
     /* Add EVs that start parking to movements and assign to Evcs UUID */
     val arrivals = handleParkingEvs(
