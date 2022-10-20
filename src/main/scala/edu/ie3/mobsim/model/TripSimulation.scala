@@ -25,6 +25,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR
 }
 import edu.ie3.util.quantities.QuantityUtil
+import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
 
@@ -73,7 +74,7 @@ object TripSimulation extends LazyLogging {
       thresholdChargingHubDistance: ComparableQuantity[Length]
   ): ElectricVehicle = {
 
-    /* Save EV to csv before trip */
+    /* Save EV movement to csv before trip */
     ioUtils.writeMovement(ev, currentTime, "departure")
 
     val socAtStartOfTrip: Double = ev.getStoredEnergy
@@ -577,7 +578,8 @@ object TripSimulation extends LazyLogging {
     /* Calculate stored energy at the end of the trip based on planned values */
     val plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy] =
       calculateStoredEnergyAtEndOfTrip(
-        ev: ElectricVehicle,
+        ev.evType.consumption,
+        ev.getStoredEnergy,
         plannedDrivingDistance: ComparableQuantity[Length]
       )
 
@@ -1024,28 +1026,31 @@ object TripSimulation extends LazyLogging {
   /** Calculate stored energy at the end of the trip based on the trip distance.
     * The minimum stored energy is zero, even if the trip is longer.
     *
-    * @param ev
-    *   The ev for which the stored energy shall be calculated
+    * @param consumption
+    *   Consumption of the ev
+    * @param storedEnergy
+    *   Stored energy of the ev
     * @param drivingDistance
     *   The driving distance of the ev
     * @return
     *   stored energy at the end of the trip
     */
   def calculateStoredEnergyAtEndOfTrip(
-      ev: ElectricVehicle,
+      consumption: ComparableQuantity[SpecificEnergy],
+      storedEnergy: ComparableQuantity[Energy],
       drivingDistance: ComparableQuantity[Length]
   ): ComparableQuantity[Energy] = {
 
     /* Calculate consumed energy during the trip */
     val consumedEnergy: ComparableQuantity[Energy] = drivingDistance
-      .multiply(ev.evType.consumption)
+      .multiply(consumption)
       .asType(classOf[Energy])
       .to(KILOWATTHOUR)
 
     /* Calculate storedEnergy at end of trip */
-    if (ev.getStoredEnergy.subtract(consumedEnergy).isLessThan(ZERO_ENERGY))
+    if (storedEnergy.subtract(consumedEnergy).isLessThan(ZERO_ENERGY))
       ZERO_ENERGY
-    else ev.getStoredEnergy.subtract(consumedEnergy)
+    else storedEnergy.subtract(consumedEnergy)
   }
 
   /** Calculate departure time for the trip. The next departure might be sampled

@@ -7,22 +7,19 @@
 package edu.ie3.mobsim
 
 import akka.actor.ActorRef
-import edu.ie3.mobsim.io.probabilities.TripProbabilities
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
-import edu.ie3.simona.api.data.ev.ontology.builder.EvMovementsMessageBuilder
 
 import java.util.UUID
 import scala.collection.immutable.SortedSet
 
 trait MobilitySimulatorTestData extends IoUtilsTestData {
   val evData: ExtEvData = new ExtEvData(ActorRef.noSender, ActorRef.noSender)
-  val builder = new EvMovementsMessageBuilder
 
   def setEvsAsParking(
-      evs: SortedSet[ElectricVehicle]
-  ): SortedSet[ElectricVehicle] =
+      evs: Set[ElectricVehicle]
+  ): Set[ElectricVehicle] =
     evs.map { ev =>
       ev.copy(
         storedEnergy = zero,
@@ -33,8 +30,8 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     }
 
   def setEvsAsDeparting(
-      evs: SortedSet[ElectricVehicle]
-  ): SortedSet[ElectricVehicle] =
+      evs: Set[ElectricVehicle]
+  ): Set[ElectricVehicle] =
     evs.map { ev =>
       ev.copy(
         storedEnergy = half,
