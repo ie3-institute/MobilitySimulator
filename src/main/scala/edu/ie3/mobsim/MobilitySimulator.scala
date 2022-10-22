@@ -19,7 +19,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 }
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
-import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
+import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.{
   ChargingStation,
@@ -401,45 +401,55 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       maxDistance: ComparableQuantity[Length]
   ): Option[EvMovement] = {
-    val (chosenCsOpt, updatedEvOpt) = chooseChargingStation(
-      ev,
-      pricesAtChargingStation,
-      availableChargingPoints,
-      MobilitySimulator.seed,
-      maxDistance
-    )
+    val minParkingTimeForCharging = 15
+    val staysLongEnough = ev.parkingTimeStart
+      .until(ev.departureTime, ChronoUnit.MINUTES) >= minParkingTimeForCharging
+    if (staysLongEnough) {
+      val (chosenCsOpt, updatedEvOpt) = chooseChargingStation(
+        ev,
+        pricesAtChargingStation,
+        availableChargingPoints,
+        MobilitySimulator.seed,
+        maxDistance
+      )
 
-    chosenCsOpt
-      .map { cs =>
-        val availableChargingPointsAtStation =
-          availableChargingPoints.getOrElse(cs, 0)
-        if (availableChargingPointsAtStation > 0) {
+      chosenCsOpt
+        .map { cs =>
+          val availableChargingPointsAtStation =
+            availableChargingPoints.getOrElse(cs, 0)
+          if (availableChargingPointsAtStation > 0) {
 
-          val updatedEv = updatedEvOpt
-            .getOrElse(ev)
-            .setChargingAtSimona()
-            .setChosenChargingStation(Some(cs))
+            val updatedEv = updatedEvOpt
+              .getOrElse(ev)
+              .setChargingAtSimona()
+              .setChosenChargingStation(Some(cs))
 
+            logger.debug(
+              s"${ev.getId} starts charging at $cs."
+            )
+
+            Some(EvMovement(cs, updatedEv))
+          } else {
+            logger.debug(
+              s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
+                s"(${ev.destinationPoiType}) because all charging points " +
+                s"at $cs were taken."
+            )
+            None
+          }
+        }
+        .getOrElse {
           logger.debug(
-            s"${ev.getId} starts charging at $cs."
-          )
-
-          Some(EvMovement(cs, updatedEv))
-        } else {
-          logger.debug(
-            s"${ev.getId} could not be charged at destination ${ev.destinationPoi} " +
-              s"(${ev.destinationPoiType}) because all charging points " +
-              s"at $cs were taken."
+            s"${ev.getId} parks but does not charge."
           )
           None
         }
-      }
-      .getOrElse {
-        logger.debug(
-          s"${ev.getId} parks but does not charge."
-        )
-        None
-      }
+    } else {
+      logger.debug(
+        s"s${ev.id} parks but does not charge, since parking time is below $minParkingTimeForCharging minutes."
+      )
+      None
+    }
   }
 
   /** Update and simulate EVs which are ending their parking at current time.

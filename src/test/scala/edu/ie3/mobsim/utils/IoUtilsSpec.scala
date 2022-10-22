@@ -150,9 +150,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val compareString: String = s"${charging_hub_townPoi.id};" +
+      val compareString: String = s"${chargingHubTownPoi.id};" +
         s"${PoiTypeDictionary.CHARGING_HUB_TOWN};" +
-        s"${charging_hub_townPoi.size};" +
+        s"${chargingHubTownPoi.size};" +
         s"$cs4;" +
         s"${0.0}"
 
