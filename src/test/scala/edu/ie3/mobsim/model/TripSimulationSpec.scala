@@ -175,7 +175,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe storedEnergyValue
           chargingAtSimona shouldBe false
-          destinationPoi shouldBe charging_hub_townPoi
+          destinationPoi shouldBe chargingHubTownPoi
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
           chargingAtHomePossible shouldBe true
