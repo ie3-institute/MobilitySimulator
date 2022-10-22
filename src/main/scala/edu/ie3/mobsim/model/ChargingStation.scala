@@ -233,10 +233,13 @@ object ChargingStation extends LazyLogging {
       )
     val requiredEnergy =
       ev.getEStorage.subtract(ev.getStoredEnergy).to(KILOWATTHOUR)
-    math.min(
-      possibleChargeableEnergy.divide(requiredEnergy).getValue.doubleValue(),
-      1.0
-    )
+    if (requiredEnergy.getValue.doubleValue() == 0) 1
+    else {
+      math.min(
+        possibleChargeableEnergy.divide(requiredEnergy).getValue.doubleValue(),
+        1.0
+      )
+    }
   }
 
   private def priceRating(
