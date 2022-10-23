@@ -7,6 +7,7 @@
 package edu.ie3.mobsim
 
 import akka.actor.ActorRef
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
@@ -24,6 +25,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
       ev.copy(
         storedEnergy = zero,
         destinationPoi = charging_hub_highwayPoi,
+        destinationPoiType = PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
         parkingTimeStart = givenSimulationStart,
         departureTime = givenSimulationStart.plusHours(5)
       )
@@ -36,6 +38,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
       ev.copy(
         storedEnergy = half,
         destinationPoi = workPoi,
+        destinationPoiType = PoiTypeDictionary.WORK,
         parkingTimeStart = givenSimulationStart.plusHours(-4),
         departureTime = givenSimulationStart
       ).setChargingAtSimona()
@@ -56,7 +59,8 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
 
   protected val arrivingEv: ElectricVehicle = {
     ev1.copy(
-      destinationPoi = charging_hub_highwayPoi
+      destinationPoi = charging_hub_highwayPoi,
+      destinationPoiType = PoiTypeDictionary.CHARGING_HUB_HIGHWAY
     )
   }
 
