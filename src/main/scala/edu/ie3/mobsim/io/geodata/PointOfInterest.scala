@@ -221,7 +221,7 @@ case object PointOfInterest {
         val nearestCs =
           nearbyChargingStations(chargingStations, poi.geoPosition, maxDistance)
 
-        poi -> SortedSet.from(nearestCs)(Ordering.by(_._2))
+        poi -> nearestCs.sortBy(_._2)
       }.toList
     }
       .map(assignHomeChargingStations)
@@ -239,7 +239,7 @@ case object PointOfInterest {
       poiWithNearbyChargingStations: Seq[
         (
             PointOfInterest,
-            SortedSet[(ChargingStation, ComparableQuantity[Length])]
+            Seq[(ChargingStation, ComparableQuantity[Length])]
         )
       ]
   ): Seq[PointOfInterest] =

@@ -12,5 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
+- We now track destination poi types explicitly [#85](https://github.com/ie3-institute/MobilitySimulator/issues/85)
+- Fixed unintentional filtering of nearest cs with equal distance [#125](https://github.com/ie3-institute/MobilitySimulator/issues/125)
 
 [Unreleased]: https://github.com/ie3-institute/MobilitySimulator

@@ -60,6 +60,8 @@ import scala.util.{Failure, Success, Try}
   *   whether the car will charge at SIMONA
   * @param finalDestinationPoi
   *   stores final destination if making a trip to charging hub
+  * @param finalDestinationPoiType
+  *   stores the final destination poi type if making a trip to charging hub
   * @param remainingDistanceAfterChargingHub
   *   distance remaining when departing from charging hub
   * @param chargingPricesMemory
