@@ -85,6 +85,7 @@ object EvBuilderFromEvInput extends LazyLogging {
         val (homePoi, ev) = poiWithEv
         buildEvWithType(
           s"EV_$idx",
+          ev.getUuid,
           EvType(ev.getType),
           workPoiPdf,
           firstDepartureOfDay,
@@ -119,6 +120,7 @@ object EvBuilderFromEvInput extends LazyLogging {
 
       buildEvWithType(
         s"EV_$idx",
+        ev.getUuid,
         EvType(ev.getType),
         workPoiPdf,
         firstDepartureOfDay,

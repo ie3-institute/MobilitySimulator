@@ -264,6 +264,7 @@ case object ElectricVehicle extends LazyLogging {
 
   def buildEvWithType(
       id: String,
+      uuid: UUID,
       evType: EvType,
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       firstDepartureOfDay: FirstDepartureOfDay,
@@ -285,7 +286,8 @@ case object ElectricVehicle extends LazyLogging {
       workPoi,
       startTime,
       firstDeparture,
-      isHomeChargingPossible
+      isHomeChargingPossible,
+      uuid
     )
   }
 
@@ -315,11 +317,12 @@ case object ElectricVehicle extends LazyLogging {
       workPoi: PointOfInterest,
       simulationStart: ZonedDateTime,
       firstDeparture: ZonedDateTime,
-      isChargingAtHomePossible: Boolean
+      isChargingAtHomePossible: Boolean,
+      uuid: UUID = UUID.randomUUID()
   ): ElectricVehicle = {
     ElectricVehicle(
       simulationStart = simulationStart,
-      uuid = UUID.randomUUID(),
+      uuid = uuid,
       id = id,
       // todo: check if this is neccessary
       evType = evType.copy(

@@ -47,11 +47,22 @@ object HomePoiMapping {
   implicit val homePoiDecoder: RowDecoder[HomePoiMapping] =
     RowDecoder.decoder(0, 1, 2)(HomePoiMapping.apply)
 
-  def readPois(csvParams: CsvParams): Seq[HomePoiMapping] = {
+  def readPoiMapping(csvParams: CsvParams): Seq[HomePoiMapping] = {
     IoUtils.readCaseClassSeq(
       homePoiDecoder,
       csvParams.path,
       csvParams.colSep.charAt(0)
     )
+  }
+
+  def getMaps(
+      mappingEntries: Seq[HomePoiMapping]
+  ): (Map[UUID, UUID], Map[UUID, UUID]) = {
+    val ev2poi = mappingEntries
+      .flatMap(entry => entry.evs.map(_ -> entry.poi))
+      .toMap
+    val poi2evcs =
+      mappingEntries.map(entry => entry.poi -> entry.evcs).toMap
+    (ev2poi, poi2evcs)
   }
 }

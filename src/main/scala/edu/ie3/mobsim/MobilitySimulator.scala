@@ -739,12 +739,8 @@ object MobilitySimulator
 
         csvParams.homePoiMapping match {
           case Some(mappingSource) =>
-            val mappingEntries = HomePoiMapping.readPois(mappingSource)
-            val ev2poi = mappingEntries
-              .flatMap(entry => entry.evs.map(_ -> entry.poi))
-              .toMap
-            val poi2evcs =
-              mappingEntries.map(entry => entry.poi -> entry.evcs).toMap
+            val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
+            val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
 
             EvBuilderFromEvInputWithEvcsMapping.build(
               evInputs,

@@ -19,6 +19,7 @@ import edu.ie3.mobsim.model.ElectricVehicle.{
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 
 import java.time.ZonedDateTime
+import java.util.UUID
 
 object EvBuilderFromRandomModel extends LazyLogging {
 
@@ -239,6 +240,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
     val evType = evModelPdf.sample()
     buildEvWithType(
       id,
+      UUID.randomUUID(),
       evType,
       workPoiPdf,
       firstDepartureOfDay,

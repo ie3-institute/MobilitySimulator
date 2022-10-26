@@ -44,6 +44,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
     val evType2homeChargingEv = ElectricVehicle.buildEvWithType(
       _,
       _,
+      _,
       workPoiPdf,
       firstDepartureOfDay,
       startTime,
@@ -60,7 +61,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
     )
 
     // assign rest of evs to home poi that is not inside mapping
-    val homeChargingPoisUuids = homePoi2evcs.values.toSet
+    val homeChargingPoisUuids = homePoi2evcs.keys.toSet
     val (_, homePoisWithoutCharging) =
       homePOIsWithSizes.partition { case (poi, _) =>
         homeChargingPoisUuids.contains(poi.uuid)
@@ -70,6 +71,8 @@ object EvBuilderFromEvInputWithEvcsMapping {
     val homePoiPdfWithoutHomeCharging = ProbabilityDensityFunction(
       homePoisWithoutCharging
     )
+
+    // every ev that does not have a mapped evcs does not have the option to charge at home
     val nonHomeChargingCars = electricVehicles
       .filter(ev => !homeChargingCarsUuidSet.contains(ev.getUuid))
       .zipWithIndex
@@ -77,6 +80,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
         val homePoi = homePoiPdfWithoutHomeCharging.sample()
         evType2homeChargingEv(
           s"EV_$idx",
+          ev.getUuid,
           EvType(ev.getType),
           homePoi,
           false
@@ -92,13 +96,13 @@ object EvBuilderFromEvInputWithEvcsMapping {
   ): Map[UUID, PointOfInterest] = {
     homePoi2EvcsUuid.map { case (homePoiUuid, evcsUuid) =>
       val evcs = evcsMap.getOrElse(
-        homePoiUuid,
+        evcsUuid,
         throw new IllegalArgumentException(
           s"Evcs with UUID: $evcsUuid could not be found"
         )
       )
       val homePoi = homePoiMap.getOrElse(
-        evcsUuid,
+        homePoiUuid,
         throw new IllegalArgumentException(
           s"Home poi with UUID: $evcsUuid could not be found"
         )
@@ -121,7 +125,13 @@ object EvBuilderFromEvInputWithEvcsMapping {
       ev2homePoiUuid: Map[UUID, UUID],
       homePoiMap: Map[UUID, PointOfInterest],
       evMap: Map[UUID, EvInput],
-      evType2ev: (String, EvType, PointOfInterest, Boolean) => ElectricVehicle
+      evType2ev: (
+          String,
+          UUID,
+          EvType,
+          PointOfInterest,
+          Boolean
+      ) => ElectricVehicle
   ): Seq[ElectricVehicle] = {
     ev2homePoiUuid.zipWithIndex.map { case ((evUuid, poiUuid), idx) =>
       val ev = evMap.getOrElse(
@@ -136,7 +146,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
           s"Home poi with UUID: $poiUuid could not be found"
         )
       )
-      evType2ev(s"EV_$idx", EvType(ev.getType), homePoi, true)
+      evType2ev(s"EV_$idx", ev.getUuid, EvType(ev.getType), homePoi, true)
     }.toSeq
   }
 }
