@@ -89,7 +89,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
     (homeChargingCars ++ nonHomeChargingCars).toSet
   }
 
-  def assignEvcsToHomePoi(
+  private def assignEvcsToHomePoi(
       homePoi2EvcsUuid: Map[UUID, UUID],
       homePoiMap: Map[UUID, PointOfInterest],
       evcsMap: Map[UUID, ChargingStation]
@@ -121,7 +121,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
 
   }
 
-  def assignEvToHomePoiWithMapping(
+  private def assignEvToHomePoiWithMapping(
       ev2homePoiUuid: Map[UUID, UUID],
       homePoiMap: Map[UUID, PointOfInterest],
       evMap: Map[UUID, EvInput],
