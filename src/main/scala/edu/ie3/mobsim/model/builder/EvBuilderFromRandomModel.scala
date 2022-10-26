@@ -90,7 +90,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
     * @return
     *   A collection of electric vehicles assigned to home chargers
     */
-  def assignInitialHomeChargingCars(
+  private def assignInitialHomeChargingCars(
       amountOfHomeChargingCars: Int,
       homePoiPdfWithHomeCharging: ProbabilityDensityFunction[PointOfInterest],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
@@ -142,7 +142,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
     * @return
     *   A collection of evs with and without home charging
     */
-  def assignRemainingCars(
+  private def assignRemainingCars(
       amountOfEvsInArea: Int,
       amountOfHomeChargingCars: Int,
       amountOfAssignedCars: Int,

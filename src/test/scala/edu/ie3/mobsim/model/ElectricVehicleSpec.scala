@@ -125,7 +125,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           )
         ) { case (amountOfHomeChargingCars: Int, expectedAmount: Int) =>
           val initialCars =
-            ElectricVehicle invokePrivate assignInitialHomeChargingCars(
+            EvBuilderFromRandomModel invokePrivate assignInitialHomeChargingCars(
               amountOfHomeChargingCars,
               ProbabilityDensityFunction(
                 Range(0, 100)
@@ -174,7 +174,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 expectedHomeChargingAmount: Int,
                 expectedOverallAmount: Int
               ) =>
-            ElectricVehicle invokePrivate determineUnassignedCars(
+            EvBuilderFromRandomModel invokePrivate determineUnassignedCars(
               amountOfEvsInArea,
               amountOfHomeChargingCars,
               amountOfAssignedCars
@@ -199,7 +199,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 expectedOverallAmount: Int
               ) =>
             val additionalCars =
-              ElectricVehicle invokePrivate assignRemainingCars(
+              EvBuilderFromRandomModel invokePrivate assignRemainingCars(
                 amountOfEvsInArea,
                 amountOfHomeChargingCars,
                 amountOfAssignedCars,
