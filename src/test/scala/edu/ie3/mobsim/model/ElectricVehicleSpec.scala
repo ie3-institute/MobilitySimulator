@@ -7,6 +7,10 @@
 package edu.ie3.mobsim.model
 
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
+import edu.ie3.mobsim.model.builder.{
+  EvBuilderFromEvInput,
+  EvBuilderFromRandomModel
+}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
@@ -245,7 +249,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 targetShare: Double,
                 expectedAmountOfHomeCharging: Int
               ) =>
-            val evs = ElectricVehicle.createEvs(
+            val evs = EvBuilderFromRandomModel.build(
               targetAmount,
               homePoisWithSizes,
               givenWorkPoiPdf,
@@ -294,7 +298,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 targetShare: Double,
                 expectedAmountOfHomeCharging: Int
               ) =>
-            val evs = ElectricVehicle.createEvsFromEvInput(
+            val evs = EvBuilderFromEvInput.build(
               evInputs,
               homePoisWithSizes,
               givenWorkPoiPdf,

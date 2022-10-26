@@ -14,10 +14,15 @@ import edu.ie3.mobsim.exceptions.{
   UninitializedException
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
-import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingBehavior.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
+import edu.ie3.mobsim.model.builder.{
+  EvBuilderFromEvInput,
+  EvBuilderFromEvInputWithEvcsMapping,
+  EvBuilderFromRandomModel
+}
 import edu.ie3.mobsim.model.{
   ChargingStation,
   ElectricVehicle,
@@ -705,7 +710,7 @@ object MobilitySimulator
       )
       .pdf
 
-    val workPoisWithSizes = poisWithSizes.getOrElse(
+    val workPoiPdf = poisWithSizes.getOrElse(
       CategoricalLocationDictionary.WORK,
       throw InitializationException(
         "Unable to obtain the probability density function for work POI."
@@ -716,22 +721,46 @@ object MobilitySimulator
       case Some(csvParams) =>
         val evInputs =
           IoUtils.readEvInputs(
-            csvParams
+            csvParams.source
           )
-        ElectricVehicle.createEvsFromEvInput(
-          evInputs,
-          homePOIsWithSizes,
-          workPoisWithSizes,
-          chargingStations,
-          startTime,
-          targetShareOfHomeCharging,
-          tripProbabilities.firstDepartureOfDay
-        )
+
+        csvParams.homePoiMapping match {
+          case Some(mappingSource) =>
+            val mappingEntries = HomePoiMapping.readPois(mappingSource)
+            val ev2poi = mappingEntries
+              .flatMap(entry => entry.evs.map(_ -> entry.poi))
+              .toMap
+            val poi2evcs =
+              mappingEntries.map(entry => entry.poi -> entry.evcs).toMap
+
+            EvBuilderFromEvInputWithEvcsMapping.build(
+              evInputs,
+              homePOIsWithSizes,
+              workPoiPdf,
+              chargingStations,
+              startTime,
+              tripProbabilities.firstDepartureOfDay,
+              ev2poi,
+              poi2evcs
+            )
+
+          case None =>
+            EvBuilderFromEvInput.build(
+              evInputs,
+              homePOIsWithSizes,
+              workPoiPdf,
+              chargingStations,
+              startTime,
+              targetShareOfHomeCharging,
+              tripProbabilities.firstDepartureOfDay
+            )
+        }
+
       case None =>
-        ElectricVehicle.createEvs(
+        EvBuilderFromRandomModel.build(
           numberOfEvsInArea,
           homePOIsWithSizes,
-          workPoisWithSizes,
+          workPoiPdf,
           chargingStations,
           startTime,
           targetShareOfHomeCharging,

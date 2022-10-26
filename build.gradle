@@ -58,6 +58,7 @@ dependencies {
   implementation 'tech.units:indriya:2.1.3' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
   implementation 'commons-io:commons-io:2.11.0' // I/O functionalities
+  implementation 'com.nrinaudo:kantan.csv-generic_2.13:0.7.0' // csv parsing
 
   /* CORE Scala */
   implementation "org.scala-lang:scala-library:${scalaBinaryVersion}"
