@@ -32,7 +32,8 @@ object PoiUtils extends LazyLogging {
       chargingStations: Seq[ChargingStation],
       poiPath: String,
       maxDistanceFromPoi: ComparableQuantity[Length],
-      maxDistanceFromHomePoi: ComparableQuantity[Length]
+      maxDistanceFromHomePoi: ComparableQuantity[Length],
+      assignHomeNearestChargingStations: Boolean
   ): Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
     val start = System.currentTimeMillis()
     PointOfInterest
@@ -41,7 +42,8 @@ object PoiUtils extends LazyLogging {
         ",",
         chargingStations,
         maxDistanceFromPoi,
-        maxDistanceFromHomePoi
+        maxDistanceFromHomePoi,
+        assignHomeNearestChargingStations
       )
       .map { allPois =>
         allPois.groupBy(_.categoricalLocation).map { case (catLoc, pois) =>

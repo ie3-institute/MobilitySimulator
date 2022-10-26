@@ -8,6 +8,7 @@ package edu.ie3.mobsim
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
+import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
@@ -662,11 +663,23 @@ object MobilitySimulator
       config.mobsim.simulation.location.chargingHubThresholdDistance,
       PowerSystemUnits.KILOMETRE
     )
+
+    /* in case we defined an explicit home poi to evcs mapping we don't need to assign
+    nearest charging stations to home pois by their distance */
+    val assignHomeNearestChargingStations =
+      config.mobsim.input.evInputSource match {
+        case Some(EvInputSource(homePoiMapping, _))
+            if homePoiMapping.isDefined =>
+          false
+        case _ => true
+      }
+
     val pois = PoiUtils.loadPOIs(
       chargingStations,
       pathsAndSources.poiPath,
       maxDistanceFromPoi,
-      maxDistanceFromHomePoi
+      maxDistanceFromHomePoi,
+      assignHomeNearestChargingStations
     )
     ioUtils.writePois(pois)
     val poisWithSizes = PoiUtils.createPoiPdf(pois)
