@@ -231,7 +231,7 @@ case object PointOfInterest {
               maxDistance
             )
           else
-            Map.empty
+            Seq.empty
         poi -> SortedSet.from(nearestCs)(Ordering.by(_._2))
       }.toList
     }
