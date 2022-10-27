@@ -229,7 +229,7 @@ case object PointOfInterest {
               maxDistance
             )
           else
-            Map.empty
+            Seq.empty
         poi -> nearestCs.sortBy(_._2)
       }.toList
     }
