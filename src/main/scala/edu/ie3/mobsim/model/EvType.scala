@@ -6,8 +6,8 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.datamodel.models.input.system.`type`.EvTypeInput
+import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.util.quantities.PowerSystemUnits

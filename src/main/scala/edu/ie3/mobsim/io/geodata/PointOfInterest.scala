@@ -76,7 +76,8 @@ case object PointOfInterest {
       csvSep: String,
       evcs: Seq[ChargingStation],
       maxDistanceFromPoi: ComparableQuantity[Length],
-      maxDistanceFromHomePoi: ComparableQuantity[Length]
+      maxDistanceFromHomePoi: ComparableQuantity[Length],
+      assignHomeNearestChargingStations: Boolean
   ): Try[Seq[PointOfInterest]] =
     Using(Source.fromFile(filePath).bufferedReader()) { reader =>
       /* Determine order of headline */
@@ -112,7 +113,8 @@ case object PointOfInterest {
             homePois,
             colToIndex,
             homeCs,
-            maxDistanceFromHomePoi
+            maxDistanceFromHomePoi,
+            assignHomeNearestChargingStations
           )
           /* Other POIs can be treated in parallel */
           val otherFuture = Future(
@@ -202,7 +204,8 @@ case object PointOfInterest {
       entries: ParSeq[Array[String]],
       colToIndex: Map[String, Int],
       chargingStations: Seq[ChargingStation],
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: ComparableQuantity[Length],
+      assignNearestChargingStation: Boolean
   ): Future[Seq[PointOfInterest]] =
     Future {
       /* Build mapping from POI to distance asynchronously */
@@ -219,8 +222,14 @@ case object PointOfInterest {
           Map.empty[ChargingStation, ComparableQuantity[Length]]
         )
         val nearestCs =
-          nearbyChargingStations(chargingStations, poi.geoPosition, maxDistance)
-
+          if (assignNearestChargingStation)
+            nearbyChargingStations(
+              chargingStations,
+              poi.geoPosition,
+              maxDistance
+            )
+          else
+            Map.empty
         poi -> nearestCs.sortBy(_._2)
       }.toList
     }

@@ -8,6 +8,7 @@ package edu.ie3.mobsim
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
+import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
@@ -17,10 +18,15 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
   PoiTypeDictionary
 }
-import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
+import edu.ie3.mobsim.model.builder.{
+  EvBuilderFromEvInput,
+  EvBuilderFromEvInputWithEvcsMapping,
+  EvBuilderFromRandomModel
+}
 import edu.ie3.mobsim.model.{
   ChargingStation,
   ElectricVehicle,
@@ -678,11 +684,23 @@ object MobilitySimulator
       config.mobsim.simulation.location.chargingHubThresholdDistance,
       PowerSystemUnits.KILOMETRE
     )
+
+    /* in case we defined an explicit home poi to evcs mapping we don't need to assign
+    nearest charging stations to home pois by their distance */
+    val assignHomeNearestChargingStations =
+      config.mobsim.input.evInputSource match {
+        case Some(EvInputSource(homePoiMapping, _))
+            if homePoiMapping.isDefined =>
+          false
+        case _ => true
+      }
+
     val pois = PoiUtils.loadPOIs(
       chargingStations,
       pathsAndSources.poiPath,
       maxDistanceFromPoi,
-      maxDistanceFromHomePoi
+      maxDistanceFromHomePoi,
+      assignHomeNearestChargingStations
     )
     ioUtils.writePois(pois)
     val poisWithSizes = PoiUtils.createPoiPdf(pois)
@@ -726,7 +744,7 @@ object MobilitySimulator
       )
       .pdf
 
-    val workPoisWithSizes = poisWithSizes.getOrElse(
+    val workPoiPdf = poisWithSizes.getOrElse(
       CategoricalLocationDictionary.WORK,
       throw InitializationException(
         "Unable to obtain the probability density function for work POI."
@@ -737,22 +755,42 @@ object MobilitySimulator
       case Some(csvParams) =>
         val evInputs =
           IoUtils.readEvInputs(
-            csvParams
+            csvParams.source
           )
-        ElectricVehicle.createEvsFromEvInput(
-          evInputs,
-          homePOIsWithSizes,
-          workPoisWithSizes,
-          chargingStations,
-          startTime,
-          targetShareOfHomeCharging,
-          tripProbabilities.firstDepartureOfDay
-        )
+
+        csvParams.homePoiMapping match {
+          case Some(mappingSource) =>
+            val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
+            val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
+
+            EvBuilderFromEvInputWithEvcsMapping.build(
+              evInputs,
+              homePOIsWithSizes,
+              workPoiPdf,
+              chargingStations,
+              startTime,
+              tripProbabilities.firstDepartureOfDay,
+              ev2poi,
+              poi2evcs
+            )
+
+          case None =>
+            EvBuilderFromEvInput.build(
+              evInputs,
+              homePOIsWithSizes,
+              workPoiPdf,
+              chargingStations,
+              startTime,
+              targetShareOfHomeCharging,
+              tripProbabilities.firstDepartureOfDay
+            )
+        }
+
       case None =>
-        ElectricVehicle.createEvs(
+        EvBuilderFromRandomModel.build(
           numberOfEvsInArea,
           homePOIsWithSizes,
-          workPoisWithSizes,
+          workPoiPdf,
           chargingStations,
           startTime,
           targetShareOfHomeCharging,

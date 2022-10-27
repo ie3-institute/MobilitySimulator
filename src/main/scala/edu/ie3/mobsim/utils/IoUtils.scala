@@ -24,9 +24,11 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR,
   KILOWATTHOUR_PER_KILOMETRE
 }
+import kantan.csv.{RowDecoder, _}
+import kantan.csv.ops.toCsvInputOps
 
 import java.io.{File, IOException}
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.jdk.CollectionConverters._
@@ -355,4 +357,29 @@ object IoUtils {
     }
     evs.asScala.toSeq
   }
+
+  def getProjectRootDir: String = {
+    System.getProperty("user.dir")
+  }
+
+  def getAbsolutePath(folderPath: String): Path = {
+    val path = Paths.get(folderPath)
+    if (!path.isAbsolute) Paths.get(getProjectRootDir, path.toString)
+    else path
+  }
+
+  def readCaseClassSeq[T](implicit
+      decoder: RowDecoder[T],
+      folderPath: String,
+      csvSep: Char
+  ): Seq[T] = {
+    val absolutePath = getAbsolutePath(folderPath).toUri
+    ReadResult.sequence(
+      absolutePath.readCsv[List, T](rfc.withHeader.withCellSeparator(csvSep))
+    ) match {
+      case Left(readError) => throw readError
+      case Right(values)   => values
+    }
+  }
+
 }

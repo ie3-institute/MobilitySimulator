@@ -243,7 +243,8 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         ",",
         Seq(cs1, cs3),
         Quantities.getQuantity(50d, Units.METRE),
-        Quantities.getQuantity(30d, Units.METRE)
+        Quantities.getQuantity(30d, Units.METRE),
+        assignHomeNearestChargingStations = true
       ) match {
         case Failure(exception) =>
           fail("Getting points of interest from file did fail.", exception)
