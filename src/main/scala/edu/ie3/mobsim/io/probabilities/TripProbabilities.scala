@@ -116,7 +116,7 @@ object TripProbabilities extends LazyLogging {
           "Unable to get probabilities for parking time from path.",
           exception
         )
-      case Success(value) => value
+      case Success(value) => value.copy(round15 = round15)
     }
     logger.debug("Done loading probabilities for parking time")
 
