@@ -22,4 +22,9 @@ object utils {
   def toTick(simulationStart: ZonedDateTime, time: ZonedDateTime): Long = {
     simulationStart.until(time, ChronoUnit.SECONDS)
   }
+
+  def roundToQuarterHourInMinutes(minutes: Int): Int = {
+    val intervals15 = (minutes / 15) + math.round((minutes.toDouble % 15) / 15)
+    math.max(15, intervals15 * 15).toInt
+  }
 }

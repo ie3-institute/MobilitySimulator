@@ -8,13 +8,15 @@ package edu.ie3.mobsim.io.probabilities
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.ParkingTime.ParkingTimeKey
+import edu.ie3.mobsim.utils.utils.roundToQuarterHourInMinutes
 
 import java.time.{DayOfWeek, ZonedDateTime}
 
 final case class ParkingTime(
     probabilitiesWeekday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]],
     probabilitiesSaturday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]],
-    probabilitiesSunday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]]
+    probabilitiesSunday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]],
+    round15: Boolean
 ) {
 
   /** Sample a parking time dependent on day type, day time and POI type. Using
@@ -44,7 +46,12 @@ final case class ParkingTime(
     val parkingTime = probabilities.get(
       ParkingTimeKey(timeQuarter, poiType)
     ) match {
-      case Some(pdf) => pdf.sample()
+      case Some(pdf) => {
+        val sampledTime = pdf.sample()
+        if (round15) {
+          roundToQuarterHourInMinutes(sampledTime)
+        } else sampledTime
+      }
       case _ =>
         throw new RuntimeException(
           "No pdf found"

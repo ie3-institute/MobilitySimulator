@@ -86,7 +86,8 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     ioUtils = ioUtils,
     tripProbabilities,
     maxDistanceFromPoi = maxDistance,
-    thresholdChargingHubDistance = maxDistance
+    thresholdChargingHubDistance = maxDistance,
+    round15 = false
   )
 
 }

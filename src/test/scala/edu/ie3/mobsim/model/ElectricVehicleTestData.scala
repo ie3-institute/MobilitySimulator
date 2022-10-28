@@ -80,7 +80,8 @@ trait ElectricVehicleTestData {
     FirstDepartureOfDay(
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability),
-      ProbabilityDensityFunction(departureProbability)
+      ProbabilityDensityFunction(departureProbability),
+      round15 = false
     )
 
   protected val givenChargingStation: ChargingStation = ChargingStation(

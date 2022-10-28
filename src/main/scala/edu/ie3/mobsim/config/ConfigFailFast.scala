@@ -35,7 +35,7 @@ object ConfigFailFast {
 
   private def check(config: MobSimConfig.Mobsim.Simulation): Unit =
     config match {
-      case Simulation(location, _, numberOfEv, _, targetHomeChargingShare) =>
+      case Simulation(location, _, numberOfEv, _, _, targetHomeChargingShare) =>
         check(location)
         if (numberOfEv < 0)
           throw IllegalConfigException(
