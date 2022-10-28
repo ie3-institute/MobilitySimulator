@@ -67,7 +67,8 @@ object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
               FirstDepartureOfDay(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
+                round15 = false
               )
             )
           case None =>

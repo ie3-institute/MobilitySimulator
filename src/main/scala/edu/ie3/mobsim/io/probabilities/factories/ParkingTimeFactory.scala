@@ -68,7 +68,8 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
               ParkingTime(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
+                round15 = false
               )
             )
           case None =>

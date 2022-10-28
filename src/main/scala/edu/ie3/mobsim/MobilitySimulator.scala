@@ -38,7 +38,7 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable.{SortedSet, TreeSet}
+import scala.collection.immutable.SortedSet
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Random
@@ -57,7 +57,8 @@ final class MobilitySimulator(
     ioUtils: IoUtils,
     tripProbabilities: TripProbabilities,
     maxDistanceFromPoi: ComparableQuantity[Length],
-    thresholdChargingHubDistance: ComparableQuantity[Length]
+    thresholdChargingHubDistance: ComparableQuantity[Length],
+    round15: Boolean
 ) extends LazyLogging {
   def doActivity(tick: Long): java.util.ArrayList[java.lang.Long] = {
     /* Update current time */
@@ -99,7 +100,8 @@ final class MobilitySimulator(
       currentTime,
       departedEvsFromSimona,
       tripProbabilities,
-      thresholdChargingHubDistance
+      thresholdChargingHubDistance,
+      round15
     )
 
     /* Get time until next event for one of the EVs and return corresponding tick to SIMONA */
@@ -460,7 +462,8 @@ final class MobilitySimulator(
       currentTime: ZonedDateTime,
       departedEvsFromSimona: Set[ElectricVehicle],
       tripProbabilities: TripProbabilities,
-      thresholdChargingHubDistance: ComparableQuantity[Length]
+      thresholdChargingHubDistance: ComparableQuantity[Length],
+      round15: Boolean
   ): Unit = {
 
     val allDepartedEvs: Set[UUID] = electricVehicles
@@ -490,7 +493,8 @@ final class MobilitySimulator(
           chargingStations,
           ioUtils,
           tripProbabilities,
-          thresholdChargingHubDistance
+          thresholdChargingHubDistance,
+          round15
         )
       } else ev
     })
@@ -693,7 +697,8 @@ object MobilitySimulator
 
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
-      config.mobsim.input.mobility.source.colSep
+      config.mobsim.input.mobility.source.colSep,
+      config.mobsim.simulation.round15
     )
 
     val evs = ElectricVehicle.createEvs(
@@ -772,7 +777,8 @@ object MobilitySimulator
       ioUtils,
       tripProbabilities,
       maxDistanceFromPoi,
-      thresholdChargingHubDistance
+      thresholdChargingHubDistance,
+      config.mobsim.simulation.round15
     )
     simulator = Some(mobSim)
 

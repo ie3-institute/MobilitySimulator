@@ -18,7 +18,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.utils.DefaultQuantities._
-import edu.ie3.mobsim.utils.IoUtils
+import edu.ie3.mobsim.utils.{IoUtils, utils}
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOMETRE,
   KILOWATT,
@@ -71,7 +71,8 @@ object TripSimulation extends LazyLogging {
       chargingStations: Seq[ChargingStation],
       ioUtils: IoUtils,
       tripProbabilities: TripProbabilities,
-      thresholdChargingHubDistance: ComparableQuantity[Length]
+      thresholdChargingHubDistance: ComparableQuantity[Length],
+      round15: Boolean
   ): ElectricVehicle = {
 
     /* Save EV movement to csv before trip */
@@ -169,7 +170,8 @@ object TripSimulation extends LazyLogging {
           tripProbabilities.drivingSpeed,
           tripProbabilities.firstDepartureOfDay,
           tripProbabilities.lastTripOfDay,
-          tripProbabilities.parkingTime
+          tripProbabilities.parkingTime,
+          round15
         )
 
         /* Decide whether EV makes a stop at a charging hub to recharge during the trip */
@@ -604,7 +606,8 @@ object TripSimulation extends LazyLogging {
       drivingSpeed: DrivingSpeed,
       firstDepartureOfDay: FirstDepartureOfDay,
       lastTripOfDay: LastTripOfDay,
-      parkingTime: ParkingTime
+      parkingTime: ParkingTime,
+      round15: Boolean
   ): (ComparableQuantity[Energy], ZonedDateTime, ZonedDateTime) = {
 
     /* Calculate stored energy at the end of the trip based on planned values */
@@ -621,7 +624,7 @@ object TripSimulation extends LazyLogging {
       .to(KILOMETRE_PER_HOUR)
 
     /* Calculate driving time based on planned values */
-    val plannedDrivingTime: Int = math.max(
+    val rawDrivingTime: Int = math.max(
       (math rint (plannedDrivingDistance
         .to(KILOMETRE)
         .divide(plannedDrivingSpeed.to(KILOMETRE_PER_HOUR))
@@ -629,6 +632,10 @@ object TripSimulation extends LazyLogging {
         .doubleValue() * 60)).toInt,
       1
     )
+
+    val plannedDrivingTime =
+      if (round15) utils.roundToQuarterHourInMinutes(rawDrivingTime)
+      else rawDrivingTime
 
     /* Calculate start of parking time based on planned values */
     val plannedParkingTimeStart: ZonedDateTime =

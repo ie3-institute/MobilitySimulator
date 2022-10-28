@@ -12,9 +12,10 @@ import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.METRE
+import tech.units.indriya.unit.Units.{METRE, SECOND}
 
-import java.time.ZonedDateTime
+import java.time.temporal.TemporalUnit
+import java.time.{LocalDateTime, ZonedDateTime}
 import javax.measure.quantity.Energy
 import scala.collection.mutable
 
@@ -31,7 +32,8 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         chargingStations,
         ioUtils,
         tripProbabilities,
-        maxDistance
+        maxDistance,
+        round15 = false
       ) match {
         case ElectricVehicle(
               simulationStart,
@@ -74,6 +76,56 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
+    "round trip times to 15 min values correctly" in {
+      TripSimulation.simulateNextTrip(
+        givenSimulationStart.withMinute(0),
+        ev4,
+        poisWithSizes,
+        chargingHubTownIsPresent = true,
+        chargingHubHighwayIsPresent = true,
+        chargingStations,
+        ioUtils,
+        tripProbabilities,
+        maxDistance,
+        round15 = true
+      ) match {
+        case ElectricVehicle(
+              simulationStart,
+              uuid,
+              id,
+              evType,
+              homePoi,
+              workPoi,
+              _,
+              _,
+              _,
+              parkingTimeStart,
+              departureTime,
+              chargingAtHomePossible,
+              chosenChargingStation,
+              _,
+              finalDestinationPoi,
+              finalDestinationPoiType,
+              remainingDistanceAfterChargingHub,
+              chargingPricesMemory
+            ) =>
+          simulationStart shouldBe givenSimulationStart
+          uuid shouldBe ev4.getUuid
+          id shouldBe "car_4"
+          evType shouldBe givenModel
+          homePoi shouldBe givenHomePoi
+          workPoi shouldBe givenWorkPoi
+          parkingTimeStart.getMinute % 15 shouldBe 0
+          departureTime.getMinute % 15 shouldBe 0
+          chargingAtHomePossible shouldBe true
+          chosenChargingStation shouldBe None
+          finalDestinationPoi shouldBe None
+          finalDestinationPoiType shouldBe None
+          remainingDistanceAfterChargingHub shouldBe None
+          chargingPricesMemory shouldBe mutable.Queue[Double]()
+      }
+    }
+
     "not simulate a new trip and keep charging when SoC < 10 % and charging is available" in {
       TripSimulation.simulateNextTrip(
         givenSimulationStart,
@@ -84,7 +136,8 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         chargingStations,
         ioUtils,
         tripProbabilities,
-        maxDistance
+        maxDistance,
+        round15 = false
       ) match {
         case ElectricVehicle(
               simulationStart,
@@ -125,7 +178,6 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
-    // testing makeTripToChargingHub
     "makeTripToChargingHub correctly" in {
       TripSimulation.makeTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,
@@ -183,7 +235,6 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
-    // testing makeModifiedTripToChargingHub
     "makeModifiedTripToChargingHub correctly" in {
       TripSimulation.makeModifiedTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,

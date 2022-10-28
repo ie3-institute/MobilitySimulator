@@ -138,6 +138,7 @@ object MobSimConfig {
         location: MobSimConfig.Mobsim.Simulation.Location,
         name: java.lang.String,
         numberOfEv: scala.Int,
+        round15: scala.Boolean,
         startDate: java.lang.String,
         targetHomeChargingShare: scala.Double
     )
@@ -184,6 +185,7 @@ object MobSimConfig {
           ),
           name = $_reqStr(parentPath, c, "name", $tsCfgValidator),
           numberOfEv = $_reqInt(parentPath, c, "numberOfEv", $tsCfgValidator),
+          round15 = c.hasPathOrNull("round15") && c.getBoolean("round15"),
           startDate = $_reqStr(parentPath, c, "startDate", $tsCfgValidator),
           targetHomeChargingShare =
             $_reqDbl(parentPath, c, "targetHomeChargingShare", $tsCfgValidator)
