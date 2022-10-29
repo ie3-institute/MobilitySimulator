@@ -13,14 +13,13 @@ import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvData
 
 import java.util.UUID
-import scala.collection.immutable.SortedSet
 
 trait MobilitySimulatorTestData extends IoUtilsTestData {
   val evData: ExtEvData = new ExtEvData(ActorRef.noSender, ActorRef.noSender)
 
   def setEvsAsParking(
-      evs: Set[ElectricVehicle]
-  ): Set[ElectricVehicle] =
+      evs: Seq[ElectricVehicle]
+  ): Seq[ElectricVehicle] =
     evs.map { ev =>
       ev.copy(
         storedEnergy = zero,
@@ -32,8 +31,8 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     }
 
   def setEvsAsDeparting(
-      evs: Set[ElectricVehicle]
-  ): Set[ElectricVehicle] =
+      evs: Seq[ElectricVehicle]
+  ): Seq[ElectricVehicle] =
     evs.map { ev =>
       ev.copy(
         storedEnergy = half,

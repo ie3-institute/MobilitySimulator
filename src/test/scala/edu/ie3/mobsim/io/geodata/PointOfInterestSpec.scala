@@ -163,7 +163,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "finding suitable charging stations for categorical location types" should {
       val suitableChargingStations =
-        PrivateMethod[Set[ChargingStation]](Symbol("suitableChargingStations"))
+        PrivateMethod[Seq[ChargingStation]](Symbol("suitableChargingStations"))
 
       "find the right charging stations for categorical location 'home'" in {
         PointOfInterest invokePrivate suitableChargingStations(

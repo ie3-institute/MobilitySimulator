@@ -64,7 +64,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write evs correctly" in {
-      ioUtils.writeEvs(evSet)
+      ioUtils.writeEvs(evs)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "evs.csv"))
@@ -115,7 +115,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       val chargingPoints: Int = cs6.chargingPoints
       val chargingEvs: String =
         chargingStationOccupancy
-          .getOrElse(cs6.uuid, Set.empty)
+          .getOrElse(cs6.uuid, Seq.empty)
           .map(_.uuid)
           .mkString("[", "|", "]")
 
