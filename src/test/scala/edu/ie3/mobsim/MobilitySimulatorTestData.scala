@@ -80,7 +80,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     chargingStations = chargingStations,
     poisWithSizes = poisWithSizes,
     startTime = givenSimulationStart,
-    electricVehicles = SortedSet(ev1, ev2, ev3, ev4, ev5),
+    electricVehicles = Seq(ev1, ev2, ev3, ev4, ev5),
     chargingHubTownIsPresent = true,
     chargingHubHighwayIsPresent = true,
     ioUtils = ioUtils,

@@ -74,7 +74,7 @@ final case class IoUtils private (
     *   Collection of electric vehicles
     */
   def writeEvs(
-      electricVehicles: Set[ElectricVehicle]
+      electricVehicles: Iterable[ElectricVehicle]
   ): Unit = electricVehicles.foreach { ev =>
     val fieldData = Map(
       "uuid" -> ev.getUuid.toString,
@@ -114,7 +114,7 @@ final case class IoUtils private (
     */
   def writeEvcs(
       cs: ChargingStation,
-      chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]],
+      chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]],
       currentTime: ZonedDateTime,
       uuid: UUID = UUID.randomUUID()
   ): Unit = {
