@@ -39,7 +39,9 @@ final case class FirstDepartureOfDay(
     }
 
     val departureTimeAsInt = if (round15) {
-      utils.roundToQuarterHourInMinutes(rawDepartureTimeAsInt)
+      val rounded = utils.roundToQuarterHourInMinutes(rawDepartureTimeAsInt)
+      // avoid sampling 12pm
+      math.min(rounded, 1425)
     } else
       rawDepartureTimeAsInt
 
