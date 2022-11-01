@@ -18,14 +18,13 @@ import edu.ie3.mobsim.io.probabilities.{
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length, Power}
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
 /** Class to denote electric vehicle and its current trip.
@@ -199,7 +198,7 @@ case object ElectricVehicle extends LazyLogging {
       targetSharePrivateCharging: Double,
       evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -228,7 +227,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime
     )
 
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
+    val evs = initialHomeChargingCars.toSeq ++ additionalCars
     logger.debug(s"Created ${evs.size} EVs during setup.")
     evs
   }

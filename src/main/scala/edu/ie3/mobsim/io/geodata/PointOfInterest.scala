@@ -20,7 +20,6 @@ import tech.units.indriya.ComparableQuantity
 import java.util.UUID
 import javax.measure.Quantity
 import javax.measure.quantity.Length
-import scala.collection.SortedSet
 import scala.collection.parallel.CollectionConverters.seqIsParallelizable
 import scala.collection.parallel.ParSeq
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -232,7 +231,7 @@ case object PointOfInterest {
     * @param poiWithNearbyChargingStations
     *   POIs with their nearest charging stations
     * @return
-    *   A [[Set]] of [[PointOfInterest]]s with its nearest home charging station
+    *   A [[Seq]] of [[PointOfInterest]]s with its nearest home charging station
     *   assigned, if available
     */
   private def assignHomeChargingStations(
