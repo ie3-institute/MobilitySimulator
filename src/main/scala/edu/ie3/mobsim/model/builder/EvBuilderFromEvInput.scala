@@ -31,7 +31,7 @@ object EvBuilderFromEvInput extends LazyLogging {
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
       firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -64,7 +64,7 @@ object EvBuilderFromEvInput extends LazyLogging {
       initialHomeChargingCars.size + additionalCars.size == electricVehicles.size
     )
 
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
+    val evs = initialHomeChargingCars.toSeq ++ additionalCars
     logger.info(s"Created ${evs.size} EVs from EvInputs during setup.")
     evs
   }

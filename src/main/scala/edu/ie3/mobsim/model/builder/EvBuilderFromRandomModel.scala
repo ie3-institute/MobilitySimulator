@@ -36,7 +36,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       targetSharePrivateCharging: Double,
       evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -65,7 +65,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       startTime
     )
 
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
+    val evs = initialHomeChargingCars.toSeq ++ additionalCars
     logger.info(s"Created ${evs.size} EVs by model sampling during setup.")
     evs
   }

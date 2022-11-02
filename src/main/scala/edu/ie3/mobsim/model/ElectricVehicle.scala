@@ -7,7 +7,6 @@
 package edu.ie3.mobsim.model
 
 import com.typesafe.scalalogging.LazyLogging
-import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
@@ -16,20 +15,16 @@ import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
   ProbabilityDensityFunction
 }
-import edu.ie3.mobsim.model.builder.EvBuilderFromEvInput
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
-import edu.ie3.util.geo.GeoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length, Power}
-import scala.collection.immutable
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
 /** Class to denote electric vehicle and its current trip.

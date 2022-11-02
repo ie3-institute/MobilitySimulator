@@ -29,7 +29,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
       firstDepartureOfDay: FirstDepartureOfDay,
       ev2homePoi: Map[UUID, UUID],
       homePoi2evcs: Map[UUID, UUID]
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val homePoiMap = homePOIsWithSizes.keys.map(poi => poi.uuid -> poi).toMap
     val evcsMap = chargingStations.map(evcs => evcs.uuid -> evcs).toMap
     val evMap = electricVehicles.map(ev => ev.getUuid -> ev).toMap
@@ -86,7 +86,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
           false
         )
       }
-    (homeChargingCars ++ nonHomeChargingCars).toSet
+    (homeChargingCars ++ nonHomeChargingCars)
   }
 
   private def assignEvcsToHomePoi(

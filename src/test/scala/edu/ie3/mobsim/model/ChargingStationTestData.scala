@@ -63,8 +63,8 @@ trait ChargingStationTestData extends TripSimulationTestData {
       .updated(cs7.uuid, 10.0)
   }
 
-  protected val chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]] = {
-    Set(ev1, ev2, ev3, ev4, ev5)
+  protected val chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]] = {
+    Seq(ev1, ev2, ev3, ev4, ev5)
       .flatMap { ev =>
         ev.chosenChargingStation.map(ev -> _)
       }

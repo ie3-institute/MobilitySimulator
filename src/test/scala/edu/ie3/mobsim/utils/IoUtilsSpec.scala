@@ -9,10 +9,13 @@ package edu.ie3.mobsim.utils
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
-import edu.ie3.mobsim.utils
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR, KILOWATTHOUR_PER_KILOMETRE}
+import edu.ie3.util.quantities.PowerSystemUnits.{
+  KILOWATT,
+  KILOWATTHOUR,
+  KILOWATTHOUR_PER_KILOMETRE
+}
 
 import java.io.{BufferedReader, File, FileReader}
 import java.util
@@ -62,7 +65,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write evs correctly" in {
-      ioUtils.writeEvs(evSet)
+      ioUtils.writeEvs(evs)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "evs.csv"))
@@ -113,7 +116,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       val chargingPoints: Int = cs6.chargingPoints
       val chargingEvs: String =
         chargingStationOccupancy
-          .getOrElse(cs6.uuid, Set.empty)
+          .getOrElse(cs6.uuid, Seq.empty)
           .map(_.uuid)
           .mkString("[", "|", "]")
 

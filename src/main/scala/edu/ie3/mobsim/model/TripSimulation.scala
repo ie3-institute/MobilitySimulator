@@ -125,8 +125,8 @@ object TripSimulation extends LazyLogging {
       tripProbabilities.firstDepartureOfDay,
       tripProbabilities.lastTripOfDay,
       tripProbabilities.parkingTime,
-          round15
-        )
+      round15
+    )
 
     /* Decide whether EV makes a stop at a charging hub to recharge during the trip */
     val (evWantsToChargeAtChargingHub, maybeSocAtArrival) =
