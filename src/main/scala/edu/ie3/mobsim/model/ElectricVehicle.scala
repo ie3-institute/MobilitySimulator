@@ -16,18 +16,16 @@ import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
   ProbabilityDensityFunction
 }
-import edu.ie3.mobsim.model
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length, Power}
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
 /** Class to denote electric vehicle and its current trip.
@@ -60,6 +58,8 @@ import scala.util.{Failure, Success, Try}
   *   whether the car will charge at SIMONA
   * @param finalDestinationPoi
   *   stores final destination if making a trip to charging hub
+  * @param finalDestinationPoiType
+  *   stores the final destination poi type if making a trip to charging hub
   * @param remainingDistanceAfterChargingHub
   *   distance remaining when departing from charging hub
   * @param chargingPricesMemory
@@ -193,7 +193,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
       firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -226,7 +226,7 @@ case object ElectricVehicle extends LazyLogging {
       initialHomeChargingCars.size + additionalCars.size == electricVehicles.size
     )
 
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
+    val evs = initialHomeChargingCars.toSeq ++ additionalCars
     logger.info(s"Created ${evs.size} EVs from EvInputs during setup.")
     evs
   }
@@ -244,7 +244,7 @@ case object ElectricVehicle extends LazyLogging {
       targetSharePrivateCharging: Double,
       evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -273,7 +273,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime
     )
 
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
+    val evs = initialHomeChargingCars.toSeq ++ additionalCars
     logger.info(s"Created ${evs.size} EVs by model sampling during setup.")
     evs
   }

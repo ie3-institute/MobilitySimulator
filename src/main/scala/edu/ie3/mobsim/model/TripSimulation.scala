@@ -319,7 +319,8 @@ object TripSimulation extends LazyLogging {
   }
 
   /** Properties of a target for a trip
-    *
+    * @param poiType
+    *   Type of the point of interest
     * @param poi
     *   Actual target POI
     * @param distance
@@ -656,6 +657,8 @@ object TripSimulation extends LazyLogging {
     *   planned trip distance
     * @param plannedDestinationPoi
     *   planned destination POI
+    * @param plannedDestinationPoiType
+    *   planned destination POI type
     * @param drivingSpeed
     *   Meta-information to determine the next driving speed
     * @return
