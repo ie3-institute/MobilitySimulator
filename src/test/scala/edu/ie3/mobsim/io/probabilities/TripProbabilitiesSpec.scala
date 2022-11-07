@@ -47,6 +47,7 @@ class TripProbabilitiesSpec extends UnitSpec {
     tripProbabilities.parkingTime.probabilitiesWeekday.size shouldBe 672
     tripProbabilities.parkingTime.probabilitiesSaturday.size shouldBe 672
     tripProbabilities.parkingTime.probabilitiesSunday.size shouldBe 672
+    tripProbabilities.parkingTime.round15 shouldBe true
 
     tripProbabilities.poiTransition.probabilitiesWeekday.size shouldBe 672
     tripProbabilities.poiTransition.probabilitiesSaturday.size shouldBe 672
