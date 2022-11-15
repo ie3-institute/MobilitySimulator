@@ -56,17 +56,18 @@ object TripProbabilities extends LazyLogging {
       averageCarUsage: Double
   ): TripProbabilities = {
 
-    val firstDepartureOfDay = FirstDepartureFactory(averageCarUsage).getFromFile(
-      pathsAndSources.firstDepartureOfDayPath,
-      colSep
-    ) match {
-      case Failure(exception) =>
-        throw SourceException(
-          "Unable to get probabilities for first departure of day from path.",
-          exception
-        )
-      case Success(value) => value
-    }
+    val firstDepartureOfDay =
+      FirstDepartureFactory(averageCarUsage).getFromFile(
+        pathsAndSources.firstDepartureOfDayPath,
+        colSep
+      ) match {
+        case Failure(exception) =>
+          throw SourceException(
+            "Unable to get probabilities for first departure of day from path.",
+            exception
+          )
+        case Success(value) => value
+      }
 
     val categoricalLocation = CategoricalLocationFactory.getFromFile(
       pathsAndSources.categoricalLocationPath,
