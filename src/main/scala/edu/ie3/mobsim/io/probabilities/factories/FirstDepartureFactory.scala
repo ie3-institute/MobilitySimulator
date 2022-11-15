@@ -15,7 +15,8 @@ import edu.ie3.mobsim.utils.DayType
 
 import scala.util.{Failure, Success, Try}
 
-object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
+final case class FirstDepartureFactory(averageCarUsage: Double)
+    extends ProbabilityFactory[FirstDepartureOfDay] {
   private val uuid = "uuid"
   private val dayType = "day_type"
   private val minute = "minute_of_day"
@@ -68,6 +69,7 @@ object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
                 weekdayProbability,
                 saturdayProbability,
                 sundayProbability,
+                averageCarUsage,
                 round15 = false
               )
             )

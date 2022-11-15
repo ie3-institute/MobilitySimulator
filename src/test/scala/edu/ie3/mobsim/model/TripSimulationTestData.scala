@@ -184,7 +184,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   }
 
   protected val firstDepartureOfDay: FirstDepartureOfDay = {
-    FirstDepartureFactory.getFromFile(
+    FirstDepartureFactory(0.6).getFromFile(
       departureFile,
       ","
     ) match {

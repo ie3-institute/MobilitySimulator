@@ -48,7 +48,6 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
-import scala.collection.immutable.{SortedSet, TreeSet}
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Random
@@ -736,6 +735,7 @@ object MobilitySimulator
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
       config.mobsim.input.mobility.source.colSep,
+      config.mobsim.simulation.averageCarUsage,
       config.mobsim.simulation.round15
     )
 

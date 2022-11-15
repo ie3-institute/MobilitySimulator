@@ -81,7 +81,8 @@ trait ElectricVehicleTestData {
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability),
-      round15 = false
+      round15 = false,
+      averageCarUsage = 0.6
     )
 
   protected val givenChargingStation: ChargingStation = ChargingStation(
