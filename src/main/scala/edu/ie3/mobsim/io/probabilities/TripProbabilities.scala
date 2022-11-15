@@ -52,10 +52,11 @@ object TripProbabilities extends LazyLogging {
 
   def read(
       pathsAndSources: PathsAndSources,
-      colSep: String
+      colSep: String,
+      averageCarUsage: Double
   ): TripProbabilities = {
 
-    val firstDepartureOfDay = FirstDepartureFactory.getFromFile(
+    val firstDepartureOfDay = FirstDepartureFactory(averageCarUsage).getFromFile(
       pathsAndSources.firstDepartureOfDayPath,
       colSep
     ) match {

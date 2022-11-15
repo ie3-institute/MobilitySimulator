@@ -15,7 +15,7 @@ import edu.ie3.mobsim.utils.DayType
 
 import scala.util.{Failure, Success, Try}
 
-object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
+final case class FirstDepartureFactory(averageCarUsage: Double) extends ProbabilityFactory[FirstDepartureOfDay] {
   private val uuid = "uuid"
   private val dayType = "day_type"
   private val minute = "minute_of_day"
@@ -31,7 +31,7 @@ object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
     *   A trial onto the instance
     */
   override protected def build(
-      entityFieldData: Seq[Map[String, String]]
+      entityFieldData: Seq[Map[String, String]],
   ): Try[FirstDepartureOfDay] = {
     val entryTrial = entityFieldData.map(Entry(_))
     entryTrial.find(_.isFailure) match {
@@ -67,7 +67,8 @@ object FirstDepartureFactory extends ProbabilityFactory[FirstDepartureOfDay] {
               FirstDepartureOfDay(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
+                averageCarUsage
               )
             )
           case None =>
