@@ -30,14 +30,14 @@ final case class FirstDepartureOfDay(
   def sample(time: ZonedDateTime): ZonedDateTime = {
 
     @tailrec
-    def sampleNextDayAtWhichATripOccurs(time: ZonedDateTime): ZonedDateTime = {
+    def sampleNextDayWithNewTrip(time: ZonedDateTime): ZonedDateTime = {
       if (random.nextDouble() <= averageCarUsage) time.plusDays(1)
-      else sampleNextDayAtWhichATripOccurs(time.plusDays(1))
+      else sampleNextDayWithNewTrip(time.plusDays(1))
     }
 
     /* We can say that the departure will be on the next day ( = today + 1 day) to get year, month and day.
      * Hour and minute can be determined using departureTimeAsInt. */
-    val nextDayWithNewTrip = sampleNextDayAtWhichATripOccurs(time)
+    val nextDayWithNewTrip = sampleNextDayWithNewTrip(time)
 
     /* Sample time of first departure as Int */
     val departureTimeAsInt: Int = nextDayWithNewTrip.getDayOfWeek match {
