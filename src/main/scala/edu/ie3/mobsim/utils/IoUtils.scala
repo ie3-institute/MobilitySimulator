@@ -28,7 +28,8 @@ final case class IoUtils private (
     evcsWriter: BufferedCsvWriter,
     evPosWriter: BufferedCsvWriter,
     poiWriter: BufferedCsvWriter,
-    csvSep: String
+    csvSep: String,
+    writeMovements: Boolean
 ) {
 
   /** Define relevant data for EV and call IO function to write it to csv.
@@ -201,6 +202,7 @@ object IoUtils {
       evcsFileName: String,
       evPosFileName: String,
       poiFileName: String,
+      writeMovements: Boolean,
       csvSep: String = ";"
   ): IoUtils = {
     Files.createDirectories(Paths.get(outputPath))
@@ -311,7 +313,8 @@ object IoUtils {
       evcsWriter,
       evPosWriter,
       poiWriter,
-      csvSep
+      csvSep,
+      writeMovements
     )
   }
 }

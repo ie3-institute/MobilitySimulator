@@ -75,7 +75,8 @@ object TripSimulation extends LazyLogging {
   ): ElectricVehicle = {
 
     /* Save EV movement to csv before trip */
-    ioUtils.writeMovement(ev, currentTime, "departure")
+    if (ioUtils.writeMovements)
+      ioUtils.writeMovement(ev, currentTime, "departure")
 
     val socAtStartOfTrip: Double = ev.getStoredEnergy
       .to(KILOWATTHOUR)
