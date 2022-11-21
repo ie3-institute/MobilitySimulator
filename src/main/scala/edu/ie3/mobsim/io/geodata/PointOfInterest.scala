@@ -20,7 +20,6 @@ import tech.units.indriya.ComparableQuantity
 import java.util.UUID
 import javax.measure.Quantity
 import javax.measure.quantity.Length
-import scala.collection.SortedSet
 import scala.collection.parallel.CollectionConverters.seqIsParallelizable
 import scala.collection.parallel.ParSeq
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -59,8 +58,6 @@ final case class PointOfInterest(
     else -1
   }
 
-  def getPoiType: PoiTypeDictionary.Value =
-    PoiTypeDictionary.apply(categoricalLocation)
 }
 
 case object PointOfInterest {
@@ -223,7 +220,7 @@ case object PointOfInterest {
         val nearestCs =
           nearbyChargingStations(chargingStations, poi.geoPosition, maxDistance)
 
-        poi -> SortedSet.from(nearestCs)(Ordering.by(_._2))
+        poi -> nearestCs.sortBy(_._2)
       }.toList
     }
       .map(assignHomeChargingStations)
@@ -234,14 +231,14 @@ case object PointOfInterest {
     * @param poiWithNearbyChargingStations
     *   POIs with their nearest charging stations
     * @return
-    *   A [[Set]] of [[PointOfInterest]]s with its nearest home charging station
+    *   A [[Seq]] of [[PointOfInterest]]s with its nearest home charging station
     *   assigned, if available
     */
   private def assignHomeChargingStations(
       poiWithNearbyChargingStations: Seq[
         (
             PointOfInterest,
-            SortedSet[(ChargingStation, ComparableQuantity[Length])]
+            Seq[(ChargingStation, ComparableQuantity[Length])]
         )
       ]
   ): Seq[PointOfInterest] =

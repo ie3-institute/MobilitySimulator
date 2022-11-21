@@ -58,7 +58,7 @@ final case class IoUtils private (
         .doubleValue()
         .toString,
       "destination_poi" -> ev.destinationPoi.id,
-      "destination_poi_type" -> ev.getDestinationPoiType.toString,
+      "destination_poi_type" -> ev.destinationPoiType.toString,
       "categorical_location" -> ev.destinationPoi.categoricalLocation.toString,
       "destination_arrival" -> ev.parkingTimeStart.toString,
       "destination_departure" -> ev.departureTime.toString,
@@ -74,7 +74,7 @@ final case class IoUtils private (
     *   Collection of electric vehicles
     */
   def writeEvs(
-      electricVehicles: Set[ElectricVehicle]
+      electricVehicles: Iterable[ElectricVehicle]
   ): Unit = electricVehicles.foreach { ev =>
     val fieldData = Map(
       "uuid" -> ev.getUuid.toString,
@@ -114,7 +114,7 @@ final case class IoUtils private (
     */
   def writeEvcs(
       cs: ChargingStation,
-      chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]],
+      chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]],
       currentTime: ZonedDateTime,
       uuid: UUID = UUID.randomUUID()
   ): Unit = {
@@ -124,7 +124,7 @@ final case class IoUtils private (
       "evcs" -> cs.uuid.toString,
       "charging_points" -> cs.chargingPoints.toString,
       "charging_evs" -> chargingStationOccupancy
-        .getOrElse(cs.uuid, Set.empty)
+        .getOrElse(cs.uuid, Seq.empty)
         .map(_.uuid)
         .mkString("[", "|", "]")
     ).asJava
