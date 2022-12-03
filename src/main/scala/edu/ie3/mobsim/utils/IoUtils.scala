@@ -149,7 +149,7 @@ final case class IoUtils private (
     *   POIs to write
     */
   def writePois(
-      pois: Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]]
+      pois: Map[CategoricalLocationDictionary.Value, Seq[PointOfInterest]]
   ): Unit = pois.foreach { case (poiType, typePois) =>
     typePois.foreach { poi =>
       /* Get all charging stations nearby */

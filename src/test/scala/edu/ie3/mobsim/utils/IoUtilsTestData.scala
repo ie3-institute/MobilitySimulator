@@ -37,11 +37,11 @@ trait IoUtilsTestData extends ChargingStationTestData {
   protected val evs: Seq[ElectricVehicle] = Seq(firstEv, secondEv)
 
   protected val poiMap
-      : Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
-    val poiSet: Set[PointOfInterest] = Set(chargingHubTownPoi)
+      : Map[CategoricalLocationDictionary.Value, Seq[PointOfInterest]] = {
+    val poiSet: Seq[PointOfInterest] = Seq(chargingHubTownPoi)
 
     poiSet.groupBy(_.categoricalLocation).map { case (catLoc, poi) =>
-      catLoc -> Set.from(poi)
+      catLoc -> Seq.from(poi)
     }
   }
 }

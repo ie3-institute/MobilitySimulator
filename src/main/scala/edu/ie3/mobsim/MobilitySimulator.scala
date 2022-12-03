@@ -10,30 +10,14 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
-import edu.ie3.mobsim.exceptions.{
-  InitializationException,
-  UninitializedException
-}
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
-import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.exceptions.{InitializationException, UninitializedException}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiEnums, PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.builder.{
-  EvBuilderFromEvInput,
-  EvBuilderFromEvInputWithEvcsMapping,
-  EvBuilderFromRandomModel
-}
-import edu.ie3.mobsim.model.{
-  ChargingStation,
-  ElectricVehicle,
-  EvMovement,
-  EvType,
-  TripSimulation
-}
+import edu.ie3.mobsim.model.builder.{EvBuilderFromEvInput, EvBuilderFromEvInputWithEvcsMapping, EvBuilderFromRandomModel}
+import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvMovement, EvType, TripSimulation}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
@@ -697,13 +681,40 @@ object MobilitySimulator
         case _ => true
       }
 
-    val pois = PoiUtils.loadPOIs(
+    val rawPois = PoiUtils.loadPOIs(
       chargingStations,
       pathsAndSources.poiPath,
       maxDistanceFromPoi,
       maxDistanceFromHomePoi,
       assignHomeNearestChargingStations
     )
+
+    // todo: THIS IS ONLY FOR PROJECT PURPOSES AND SHOULD BE REMOVED LATER
+    val publicLocations = CategoricalLocationDictionary.values -- Set(
+      CategoricalLocationDictionary.HOME,
+      CategoricalLocationDictionary.CHARGING_HUB_TOWN,
+      CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
+    )
+
+    val pois = rawPois.map{ case(locationType, pois) =>
+      if (publicLocations.contains(locationType)){
+        val reducedPois = pois.groupBy(_.id).flatMap{case (id, pois) =>
+          pois match {
+            case Seq(a, b, c) =>
+              Set(
+                a,
+                b.copy(nearestChargingStations = Map.empty),
+                c.copy(nearestChargingStations = Map.empty)
+              )
+            case seq: Seq[PointOfInterest] =>
+              throw new IllegalArgumentException(s"Expected exactly 3 pois but found ${seq.size} for id: $id")
+          }
+        }.toSeq
+        (locationType, reducedPois)
+      }
+      else (locationType, pois)
+    }
+
     ioUtils.writePois(pois)
     val poisWithSizes = PoiUtils.createPoiPdf(pois)
 

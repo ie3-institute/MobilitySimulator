@@ -34,7 +34,7 @@ object PoiUtils extends LazyLogging {
       maxDistanceFromPoi: ComparableQuantity[Length],
       maxDistanceFromHomePoi: ComparableQuantity[Length],
       assignHomeNearestChargingStations: Boolean
-  ): Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
+  ): Map[CategoricalLocationDictionary.Value, Seq[PointOfInterest]] = {
     val start = System.currentTimeMillis()
     PointOfInterest
       .getFromFile(
@@ -47,7 +47,7 @@ object PoiUtils extends LazyLogging {
       )
       .map { allPois =>
         allPois.groupBy(_.categoricalLocation).map { case (catLoc, pois) =>
-          catLoc -> TreeSet.from(pois)
+          catLoc -> Seq.from(pois)
         }
       } match {
       case Failure(exception) =>
@@ -79,7 +79,7 @@ object PoiUtils extends LazyLogging {
     *   Map with POIs and size for all POI types
     */
   def createPoiPdf(
-      pois: Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]]
+      pois: Map[CategoricalLocationDictionary.Value, Seq[PointOfInterest]]
   ): Map[CategoricalLocationDictionary.Value, ProbabilityDensityFunction[
     PointOfInterest
   ]] = {

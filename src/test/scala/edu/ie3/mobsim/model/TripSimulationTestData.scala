@@ -127,7 +127,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     ProbabilityDensityFunction[PointOfInterest]
   ] = PoiUtils.createPoiPdf(
     pois.map { poi =>
-      poi.categoricalLocation -> Set(poi)
+      poi.categoricalLocation -> Seq(poi)
     }.toMap
   )
 
