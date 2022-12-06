@@ -10,14 +10,24 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
-import edu.ie3.mobsim.exceptions.{InitializationException, UninitializedException}
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
-import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiEnums, PoiUtils, PointOfInterest}
+import edu.ie3.mobsim.exceptions.{
+  InitializationException,
+  UninitializedException
+}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
+import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.builder.{EvBuilderFromEvInput, EvBuilderFromEvInputWithEvcsMapping, EvBuilderFromRandomModel}
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvMovement, EvType, TripSimulation}
+import edu.ie3.mobsim.model.builder.{
+  EvBuilderFromEvInput,
+  EvBuilderFromEvInputWithEvcsMapping,
+  EvBuilderFromRandomModel
+}
+import edu.ie3.mobsim.model._
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
@@ -774,7 +784,7 @@ object MobilitySimulator
       )
     )
 
-    val evs = config.mobsim.input.evInputSource match {
+    val evs = (config.mobsim.input.evInputSource match {
       case Some(csvParams) =>
         val evInputs =
           IoUtils.readEvInputs(
@@ -820,7 +830,7 @@ object MobilitySimulator
           evModelPdf,
           tripProbabilities.firstDepartureOfDay
         )
-    }
+    }).map(ev => ev.copy(storedEnergy = ev.evType.capacity.multiply(0.5)))
 
     ioUtils.writeEvs(evs)
 
