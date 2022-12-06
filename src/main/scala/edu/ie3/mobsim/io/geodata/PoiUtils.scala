@@ -14,7 +14,6 @@ import edu.ie3.mobsim.model.ChargingStation
 import tech.units.indriya.ComparableQuantity
 
 import javax.measure.quantity.Length
-import scala.collection.immutable.{SortedMap, TreeSet}
 import scala.util.{Failure, Success}
 
 object PoiUtils extends LazyLogging {
@@ -87,13 +86,9 @@ object PoiUtils extends LazyLogging {
       (
         poiType,
         ProbabilityDensityFunction(
-          SortedMap.empty[PointOfInterest, Double] ++ setOfPOIs
+          Map.empty[PointOfInterest, Double] ++ setOfPOIs
             .map { poi =>
               (poi, poi.size)
-            }
-            .toSeq
-            .sortBy { case (poi, _) =>
-              poi.id
             }
         )
       )
