@@ -696,23 +696,31 @@ object MobilitySimulator
       CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
     )
 
-    val pois = rawPois.map{ case(locationType, pois) =>
-      if (publicLocations.contains(locationType)){
-        val reducedPois = pois.groupBy(_.id).flatMap{case (id, pois) =>
-          pois match {
-            case Seq(a, b, c) =>
-              Set(
-                a,
-                b.copy(nearestChargingStations = Map.empty),
-                c.copy(nearestChargingStations = Map.empty)
-              )
-            case seq: Seq[PointOfInterest] =>
-              throw new IllegalArgumentException(s"Expected exactly 3 pois but found ${seq.size} for id: $id")
+    val pois = rawPois.map { case (locationType, pois) =>
+      if (publicLocations.contains(locationType)) {
+        val reducedPois = pois
+          .groupBy(_.id)
+          .flatMap { case (id, pois) =>
+            pois match {
+              case Seq(a, b, c, d, e, f, g) =>
+                Set(
+                  a,
+                  b.copy(nearestChargingStations = Map.empty),
+                  c.copy(nearestChargingStations = Map.empty),
+                  d.copy(nearestChargingStations = Map.empty),
+                  e.copy(nearestChargingStations = Map.empty),
+                  f.copy(nearestChargingStations = Map.empty),
+                  g.copy(nearestChargingStations = Map.empty)
+                )
+              case seq: Seq[PointOfInterest] =>
+                throw new IllegalArgumentException(
+                  s"Expected exactly 6 pois but found ${seq.size} for id: $id"
+                )
+            }
           }
-        }.toSeq
+          .toSeq
         (locationType, reducedPois)
-      }
-      else (locationType, pois)
+      } else (locationType, pois)
     }
 
     ioUtils.writePois(pois)
