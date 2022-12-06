@@ -713,7 +713,7 @@ object MobilitySimulator
           .flatMap { case (id, pois) =>
             pois match {
               case Seq(a, b, c, d, e, f, g) =>
-                Set(
+                Seq(
                   a,
                   b.copy(nearestChargingStations = Map.empty),
                   c.copy(nearestChargingStations = Map.empty),
