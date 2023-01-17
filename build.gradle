@@ -40,11 +40,12 @@ repositories {
 }
 
 dependencies {
-  implementation('com.github.ie3-institute:PowerSystemUtils:1.6') {
+  implementation('com.github.ie3-institute:PowerSystemUtils:2.0-SNAPSHOT') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
+    exclude group: 'com.github.johanneshiry', module: 'OSMonaut'
   }
   implementation('com.github.ie3-institute:PowerSystemDataModel:3.0-SNAPSHOT') {
     exclude group: 'org.apache.logging.log4j'

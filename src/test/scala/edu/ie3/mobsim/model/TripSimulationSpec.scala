@@ -9,7 +9,8 @@ package edu.ie3.mobsim.model
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.PowerSystemUnits
+import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
+import org.scalatest.OptionValues._
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 import tech.units.indriya.unit.Units.METRE
@@ -166,7 +167,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
-          storedEnergy shouldBe storedEnergyValue
+          storedEnergy should equalWithTolerance(storedEnergyValue)
           chargingAtSimona shouldBe false
           destinationPoi shouldBe charging_hub_townPoi
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
@@ -176,8 +177,8 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           chosenChargingStation shouldBe None
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           finalDestinationPoiType shouldBe Some(plannedDestinationPoiType)
-          remainingDistanceAfterChargingHub shouldBe Some(
-            Quantities.getQuantity(-7000, METRE)
+          remainingDistanceAfterChargingHub.value should equalWithTolerance(
+            (-7000d).asMetre
           )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
@@ -223,7 +224,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
-          storedEnergy shouldBe storedEnergyValue
+          storedEnergy should equalWithTolerance(storedEnergyValue)
           chargingAtSimona shouldBe false
           destinationPoi shouldBe charging_hub_townPoi
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
@@ -297,7 +298,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           drivingDistance = Quantities.getQuantity(4000, METRE)
         )
 
-      energy shouldBe Quantities.getQuantity(60d, PowerSystemUnits.KILOWATTHOUR)
+      energy should equalWithTolerance(60d.asKiloWattHour)
     }
 
     "calculate departure time" in {
