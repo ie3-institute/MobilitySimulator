@@ -84,7 +84,7 @@ dependencies {
 
   /* Testing */
   testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.15"
-  testRuntimeClasspath 'com.vladsch.flexmark:flexmark-all:0.64.0'
+  testRuntimeClasspath 'com.vladsch.flexmark:flexmark-all:0.64.4'
 }
 
 group = 'edu.ie3'
