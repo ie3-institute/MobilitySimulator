@@ -98,7 +98,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
-    Map(cs1 -> 0d.asMetre)
+    Map(cs1 -> Quantities.getQuantity(0, METRE))
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
@@ -107,7 +107,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.41154872, 51.4833271),
     1549.4886151800551,
-    Map(cs3 -> 0d.asMetre)
+    Map(cs3 -> Quantities.getQuantity(0, METRE))
   )
 
   protected val bbpgPoi: PointOfInterest = PointOfInterest(
