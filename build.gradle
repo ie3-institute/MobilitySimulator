@@ -8,7 +8,7 @@ plugins {
   id "org.sonarqube" version "4.2.0.3129" // sonarqube
   id "org.scoverage" version "8.0.2" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.32" // run scalatest without specific spec task
-  id "com.jfrog.artifactory" version "4.31.9"
+  id "com.jfrog.artifactory" version "4.32.0"
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
   id "com.github.johnrengelman.shadow" version "7.1.2"
 }
