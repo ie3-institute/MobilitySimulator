@@ -102,7 +102,7 @@ if (env.BRANCH_NAME == "main") {
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
               // Will pick the global server connection from jenkins for sonarqube
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
+              gradle("sonar -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
 
@@ -193,7 +193,7 @@ if (env.BRANCH_NAME == "main") {
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
               // Will pick the global server connection from jenkins for sonarqube
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey ")
+              gradle("sonar -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey ")
             }
           }
 
@@ -296,7 +296,7 @@ if (env.BRANCH_NAME == "main") {
           withSonarQubeEnv() {
             // Will pick the global server connection from jenkins for sonarqube
 
-            String gradleCommand = "sonarqube -Dsonar.projectKey=$sonarqubeProjectKey"
+            String gradleCommand = "sonar -Dsonar.projectKey=$sonarqubeProjectKey"
 
             if (env.CHANGE_ID != null) {
               gradleCommand = gradleCommand + " -Dsonar.pullrequest.branch=${featureBranchName} -Dsonar.pullrequest.key=${env.CHANGE_ID} -Dsonar.pullrequest.base=main -Dsonar.pullrequest.github.repository=${orgNames.get(0)}/${projects.get(0)} -Dsonar.pullrequest.provider=Github"
