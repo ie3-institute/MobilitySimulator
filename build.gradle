@@ -55,7 +55,7 @@ dependencies {
 
   implementation 'com.github.ie3-institute:simonaAPI:0.1-SNAPSHOT'
 
-  implementation 'tech.units:indriya:2.1.4' // Physical units
+  implementation 'tech.units:indriya:2.2' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
   implementation 'commons-io:commons-io:2.13.0' // I/O functionalities
 
