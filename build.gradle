@@ -34,7 +34,7 @@ apply from: scriptsLocation + 'scoverage.gradle' // scoverage scala code coverag
 
 repositories {
   mavenCentral() // searches in Sonatype's central repository
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // sonatype snapshot repo
+  maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' } // sonatype snapshot repo
 }
 
 dependencies {
