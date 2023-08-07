@@ -65,7 +65,7 @@ dependencies {
   testImplementation "com.typesafe.akka:akka-actor_${scalaVersion}:${akkaVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.4.8'
+  implementation 'ch.qos.logback:logback-classic:1.4.9'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
 
   /* Scala compiler plugin for static code analysis */
