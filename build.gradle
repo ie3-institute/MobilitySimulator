@@ -55,7 +55,7 @@ dependencies {
 
   implementation 'tech.units:indriya:2.2' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.13.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.14.0' // I/O functionalities
 
   /* CORE Scala */
   implementation "org.scala-lang:scala-library:${scalaBinaryVersion}"
