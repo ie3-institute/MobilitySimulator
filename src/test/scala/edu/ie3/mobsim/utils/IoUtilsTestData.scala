@@ -25,7 +25,8 @@ trait IoUtilsTestData extends ChargingBehaviorTestData {
     "evs.csv",
     "evcs.csv",
     "positions.csv",
-    "pois.csv"
+    "pois.csv",
+    writeMovements = true
   )
 
   protected val currentTime: ZonedDateTime = ZonedDateTime.now()

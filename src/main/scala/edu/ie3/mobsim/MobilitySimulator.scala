@@ -190,7 +190,8 @@ final class MobilitySimulator(
       }
 
     departedEvs.foreach(ev =>
-      ioUtils.writeMovement(ev, currentTime, "departure")
+      if (ioUtils.writeMovements)
+        ioUtils.writeMovement(ev, currentTime, "departure")
     )
 
     (departedEvs, evcsToParkedEvs)
@@ -618,7 +619,7 @@ object MobilitySimulator
       PathsAndSources(
         config.mobsim.simulation.name,
         config.mobsim.input,
-        config.mobsim.outputDir
+        config.mobsim.output.outputDir
       )
 
     val ioUtils = IoUtils(
@@ -627,7 +628,8 @@ object MobilitySimulator
       "evs.csv",
       "evcs.csv",
       "positions.csv",
-      "pois.csv"
+      "pois.csv",
+      config.mobsim.output.writeMovements
     )
 
     /* Load charging stations in the grid */
