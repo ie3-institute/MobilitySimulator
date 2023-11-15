@@ -292,11 +292,6 @@ final class MobilitySimulator(
     /* Determine the charging station, the car currently is connected to */
     ev.chosenChargingStation match {
       case Some(cs) =>
-        /* Register departure */
-        logger.debug(
-          s"${ev.getId} departs from $cs."
-        )
-
         val updatedEv =
           ev.removeChargingAtSimona().setChosenChargingStation(None)
 
@@ -419,10 +414,6 @@ final class MobilitySimulator(
             .getOrElse(ev)
             .setChargingAtSimona()
             .setChosenChargingStation(Some(cs))
-
-          logger.debug(
-            s"${ev.getId} starts charging at $cs."
-          )
 
           Some(EvMovement(cs, updatedEv))
         } else {

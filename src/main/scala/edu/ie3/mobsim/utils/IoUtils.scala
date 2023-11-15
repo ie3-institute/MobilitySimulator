@@ -16,8 +16,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR_PER_KILOMETRE
 }
 
-import java.io.File
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.jdk.CollectionConverters._
@@ -209,7 +208,7 @@ object IoUtils {
 
     /* Create writer for ev movements and write headline */
     val movementWriter = {
-      val filePath = Seq(outputPath, movementFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, movementFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -232,7 +231,7 @@ object IoUtils {
 
     /* Create writer for evs and write headline */
     val evWriter = {
-      val filePath = Seq(outputPath, evFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -255,7 +254,7 @@ object IoUtils {
 
     /* Create writer for evcs and write headline */
     val evcsWriter = {
-      val filePath = Seq(outputPath, evcsFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evcsFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -273,7 +272,7 @@ object IoUtils {
 
     /* Create writer for ev positions and write headline */
     val evPosWriter = {
-      val filePath = Seq(outputPath, evPosFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evPosFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -290,7 +289,7 @@ object IoUtils {
 
     /* Create writer for points of interest and write headline */
     val poiWriter = {
-      val filePath = Seq(outputPath, poiFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, poiFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
