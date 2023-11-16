@@ -225,7 +225,6 @@ object TripSimulation extends LazyLogging {
         )
     }
 
-    updatedEv
   }
 
   /** Get planned POI information and distance for the next trip. If the
