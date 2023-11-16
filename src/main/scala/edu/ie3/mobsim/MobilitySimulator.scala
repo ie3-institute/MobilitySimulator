@@ -9,21 +9,13 @@ package edu.ie3.mobsim
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
-import edu.ie3.mobsim.exceptions.{
-  InitializationException,
-  UninitializedException
-}
+import edu.ie3.mobsim.exceptions.{InitializationException, UninitializedException}
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{
-  ChargingStation,
-  ElectricVehicle,
-  EvMovement,
-  EvType
-}
+import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvMovement, EvType}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
@@ -38,6 +30,7 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.UUID
 import javax.measure.quantity.Length
+
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Random
