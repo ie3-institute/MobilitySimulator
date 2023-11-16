@@ -137,7 +137,7 @@ object TripSimulation extends LazyLogging {
         plannedDepartureTime
       )
 
-    val updatedEv = maybeSocAtArrival match {
+    maybeSocAtArrival match {
       case Some(socAtArrival) if evWantsToChargeAtChargingHub =>
         (
           plannedDrivingDistance.isLessThanOrEqualTo(
