@@ -75,7 +75,8 @@ object TripSimulation extends LazyLogging {
   ): ElectricVehicle = {
 
     /* Save EV movement to csv before trip */
-    ioUtils.writeMovement(ev, currentTime, "departure")
+    if (ioUtils.writeMovements)
+      ioUtils.writeMovement(ev, currentTime, "departure")
 
     val socAtStartOfTrip: Double = ev.getStoredEnergy
       .to(KILOWATTHOUR)
@@ -146,9 +147,7 @@ object TripSimulation extends LazyLogging {
           chargingHubHighwayIsPresent
         ) match {
           case (true, true, _) =>
-            // logger.info(
-            s"${ev.getId} drives to a charging hub of type chargingHubTown."
-            // )
+
             makeTripToChargingHub(
               PoiTypeDictionary.CHARGING_HUB_TOWN,
               changedEv,
@@ -163,9 +162,9 @@ object TripSimulation extends LazyLogging {
               tripProbabilities.drivingSpeed
             )
           case (true, false, _) =>
-            // logger.info(
+             logger.debug(
             s"${ev.getId} wants to charge at charging hub on a <50km trip, but keeps its original trip because there are no chargingHubTown."
-            // )
+             )
             keepOriginalTrip(
               changedEv,
               plannedStoredEnergyEndOfTrip,
@@ -175,9 +174,7 @@ object TripSimulation extends LazyLogging {
               plannedDepartureTime
             )
           case (false, _, true) =>
-            // logger.info(
-            s"${ev.getId} drives to a charging hub of type chargingHubHighway."
-            // )
+
             makeTripToChargingHub(
               PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
               changedEv,
@@ -192,10 +189,7 @@ object TripSimulation extends LazyLogging {
               tripProbabilities.drivingSpeed
             )
           case (false, true, false) =>
-            // logger.info(
-            s"${ev.getId} drives to a charging hub of type chargingHubTown. " +
-              s"This is a modified trip, because there are no highway charging hubs."
-            // )
+
             makeModifiedTripToChargingHub(
               PoiTypeDictionary.CHARGING_HUB_TOWN,
               changedEv,
@@ -209,9 +203,9 @@ object TripSimulation extends LazyLogging {
               tripProbabilities.drivingSpeed
             )
           case (false, false, false) =>
-            // logger.info(
+             logger.debug(
             s"${ev.getId} wants to charge at charging hub on a >50km trip, but keeps its original trip because there are no chargingHubs at all."
-            // )
+             )
             keepOriginalTrip(
               changedEv,
               plannedStoredEnergyEndOfTrip,
@@ -223,9 +217,7 @@ object TripSimulation extends LazyLogging {
         }
       case _ =>
         /* Do not change the planned trip */
-        // logger.info(
-        s"${ev.getId} makes its planned trip."
-        // )
+
         keepOriginalTrip(
           changedEv,
           plannedStoredEnergyEndOfTrip,
@@ -1014,7 +1006,6 @@ object TripSimulation extends LazyLogging {
     def sampleDepartureTime(): ZonedDateTime = {
       /* Sample parking time */
       val pt = parkingTime.sample(parkingTimeStart, destinationPoiType)
-      // logger.info(s"Parking time: $parkingTime")
 
       /* Calculate and return departure time of EV using the sampled parking time */
       parkingTimeStart.plusMinutes(pt)

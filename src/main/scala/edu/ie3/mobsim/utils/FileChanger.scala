@@ -9,6 +9,7 @@ package edu.ie3.mobsim.utils
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
 
 import java.io.{File => JavaFile}
+import java.nio.file.Path
 import java.util.UUID
 import scala.io.Source
 import scala.jdk.CollectionConverters._
@@ -48,7 +49,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(poiDir, "pcm", "poi_altered.csv").mkString(JavaFile.separator)
+      Path.of(poiDir, "pcm", "poi_altered.csv")
     val targetHeader =
       Seq("uuid", "id", "size", "lat", "lon", "categoricallocation")
 
@@ -89,7 +90,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(probabilityDir, "departure.csv").mkString(JavaFile.separator)
+      Path.of(probabilityDir, "departure.csv")
     val targetHeader =
       Seq("uuid", "day_type", "minute_of_day", "probability")
 
@@ -141,7 +142,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(probabilityDir, "parking_time.csv").mkString(JavaFile.separator)
+      Path.of(probabilityDir, "parking_time.csv")
     val targetHeader =
       Seq(
         "uuid",
@@ -185,7 +186,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(probabilityDir, "driving_speed.csv").mkString(JavaFile.separator)
+      Path.of(probabilityDir, "driving_speed.csv")
     val targetHeader =
       Seq("uuid", "day_type", "time", "a", "b", "min")
 
@@ -233,9 +234,7 @@ object FileChanger extends App {
       )
     )
 
-    val targetPath = Seq(probabilityDir, "categorical_location.csv").mkString(
-      JavaFile.separator
-    )
+    val targetPath = Path.of(probabilityDir, "categorical_location.csv")
     val targetHeader =
       Seq(
         "uuid",
@@ -291,7 +290,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(probabilityDir, "transition.csv").mkString(JavaFile.separator)
+      Path.of(probabilityDir, "transition.csv")
     val targetHeader =
       Seq(
         "uuid",
@@ -350,7 +349,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(probabilityDir, "trip_distance.csv").mkString(JavaFile.separator)
+      Path.of(probabilityDir, "trip_distance.csv")
     val targetHeader =
       Seq(
         "uuid",
@@ -404,7 +403,7 @@ object FileChanger extends App {
     )
 
     val targetPath =
-      Seq(probabilityDir, "last_trip.csv").mkString(JavaFile.separator)
+      Path.of(probabilityDir, "last_trip.csv")
     val targetHeader =
       Seq("uuid", "day_type", "quarter_hour_of_day", "probability")
 
@@ -422,10 +421,10 @@ object FileChanger extends App {
     */
   private def mergeFiles(
       sources: Seq[SourceDefinition],
-      targetPath: String,
+      targetPath: Path,
       targetHeader: Seq[String]
   ): Unit = {
-    val targetFile = File(targetPath)
+    val targetFile = File(targetPath.toFile)
     if (!targetFile.exists)
       targetFile.createFile()
 
