@@ -65,7 +65,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy should equalWithTolerance(storedEnergyValue)
           chargingAtSimona shouldBe false
-          destinationPoi shouldBe chargingHubHighwayPoi
+          destinationPoi shouldBe chargingHubTownPoi
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           parkingTimeStart shouldBe simulationStart.plusMinutes(10)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(26)
@@ -122,7 +122,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy should equalWithTolerance(storedEnergyValue)
           chargingAtSimona shouldBe false
-          destinationPoi shouldBe chargingHubHighwayPoi
+          destinationPoi shouldBe chargingHubTownPoi
           destinationPoiType shouldBe PoiTypeDictionary.CHARGING_HUB_TOWN
           parkingTimeStart shouldBe simulationStart.plusMinutes(1)
           departureTime shouldBe simulationStart.plusHours(7).plusMinutes(17)
