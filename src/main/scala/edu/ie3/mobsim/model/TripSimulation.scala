@@ -147,7 +147,6 @@ object TripSimulation extends LazyLogging {
           chargingHubHighwayIsPresent
         ) match {
           case (true, true, _) =>
-
             makeTripToChargingHub(
               PoiTypeDictionary.CHARGING_HUB_TOWN,
               changedEv,
@@ -162,9 +161,9 @@ object TripSimulation extends LazyLogging {
               tripProbabilities.drivingSpeed
             )
           case (true, false, _) =>
-             logger.debug(
-            s"${ev.getId} wants to charge at charging hub on a <50km trip, but keeps its original trip because there are no chargingHubTown."
-             )
+            logger.debug(
+              s"${ev.getId} wants to charge at charging hub on a <50km trip, but keeps its original trip because there are no chargingHubTown."
+            )
             keepOriginalTrip(
               changedEv,
               plannedStoredEnergyEndOfTrip,
@@ -174,7 +173,6 @@ object TripSimulation extends LazyLogging {
               plannedDepartureTime
             )
           case (false, _, true) =>
-
             makeTripToChargingHub(
               PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
               changedEv,
@@ -189,7 +187,6 @@ object TripSimulation extends LazyLogging {
               tripProbabilities.drivingSpeed
             )
           case (false, true, false) =>
-
             makeModifiedTripToChargingHub(
               PoiTypeDictionary.CHARGING_HUB_TOWN,
               changedEv,
@@ -203,9 +200,9 @@ object TripSimulation extends LazyLogging {
               tripProbabilities.drivingSpeed
             )
           case (false, false, false) =>
-             logger.debug(
-            s"${ev.getId} wants to charge at charging hub on a >50km trip, but keeps its original trip because there are no chargingHubs at all."
-             )
+            logger.debug(
+              s"${ev.getId} wants to charge at charging hub on a >50km trip, but keeps its original trip because there are no chargingHubs at all."
+            )
             keepOriginalTrip(
               changedEv,
               plannedStoredEnergyEndOfTrip,
