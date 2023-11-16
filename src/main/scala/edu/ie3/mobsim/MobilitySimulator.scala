@@ -189,10 +189,6 @@ final class MobilitySimulator(
         ev
       }
 
-    departedEvs.foreach(ev =>
-      ioUtils.writeMovement(ev, currentTime, "departure")
-    )
-
     (departedEvs, evcsToParkedEvs)
   }
 
