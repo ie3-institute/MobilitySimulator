@@ -9,13 +9,21 @@ package edu.ie3.mobsim
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
-import edu.ie3.mobsim.exceptions.{InitializationException, UninitializedException}
+import edu.ie3.mobsim.exceptions.{
+  InitializationException,
+  UninitializedException
+}
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvMovement, EvType}
+import edu.ie3.mobsim.model.{
+  ChargingStation,
+  ElectricVehicle,
+  EvMovement,
+  EvType
+}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
@@ -406,8 +414,6 @@ final class MobilitySimulator(
               .getOrElse(ev)
               .setChargingAtSimona()
               .setChosenChargingStation(Some(cs))
-
-
 
             Some(EvMovement(cs, updatedEv))
           } else {
