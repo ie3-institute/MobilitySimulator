@@ -13,7 +13,6 @@ import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointT
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
-import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities.getQuantity
@@ -105,8 +104,8 @@ object ChargingStation extends LazyLogging {
     if (ev.destinationPoi.nearestChargingStations.nonEmpty) {
       /* Always charge if the EV makes charging stop at charging hub */
       if (
-        ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN
-        || ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_HIGHWAY
+        ev.destinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN
+        || ev.destinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_HIGHWAY
       ) {
         logger.debug(
           s"${ev.getId} arrives at charging hub and wants to start charging."
