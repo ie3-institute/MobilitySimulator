@@ -17,6 +17,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
   protected val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
     destinationPoi = supermarket,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
@@ -24,6 +25,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
   protected val evAtChargingHub: ElectricVehicle = ev2.copyWith(
     half,
     destinationPoi = chargingHubTownPoi,
+    destinationPoiType = PoiTypeDictionary.CHARGING_HUB_TOWN,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
@@ -31,6 +33,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
   protected val evNextTrip: ElectricVehicle = ev3.copyWith(
     ev3.getEStorage,
     destinationPoi = otherShopPoi,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
   )
@@ -38,6 +41,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
   protected val evChargingNeeded: ElectricVehicle = ev4.copyWith(
     zero,
     destinationPoi = supermarket,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
@@ -45,6 +49,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
   protected val evNoChargingStations: ElectricVehicle = ev5.copyWith(
     zero,
     destinationPoi = supermarketPoi,
+    destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(5)
   )
@@ -58,8 +63,8 @@ trait ChargingStationTestData extends TripSimulationTestData {
       .updated(cs7.uuid, 10.0)
   }
 
-  protected val chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]] = {
-    Set(ev1, ev2, ev3, ev4, ev5)
+  protected val chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]] = {
+    Seq(ev1, ev2, ev3, ev4, ev5)
       .flatMap { ev =>
         ev.chosenChargingStation.map(ev -> _)
       }

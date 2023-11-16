@@ -45,7 +45,7 @@ object MobSimConfig {
 
   final case class Mobsim(
       input: MobSimConfig.Mobsim.Input,
-      outputDir: scala.Option[java.lang.String],
+      output: MobSimConfig.Mobsim.Output,
       simulation: MobSimConfig.Mobsim.Simulation
   )
   object Mobsim {
@@ -130,6 +130,26 @@ object MobSimConfig {
             parentPath + "mobility.",
             $tsCfgValidator
           )
+        )
+      }
+    }
+
+    final case class Output(
+        outputDir: scala.Option[java.lang.String],
+        writeMovements: scala.Boolean
+    )
+    object Output {
+      def apply(
+          c: com.typesafe.config.Config,
+          parentPath: java.lang.String,
+          $tsCfgValidator: $TsCfgValidator
+      ): MobSimConfig.Mobsim.Output = {
+        MobSimConfig.Mobsim.Output(
+          outputDir =
+            if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
+            else None,
+          writeMovements =
+            !c.hasPathOrNull("writeMovements") || c.getBoolean("writeMovements")
         )
       }
     }
@@ -251,9 +271,12 @@ object MobSimConfig {
           parentPath + "input.",
           $tsCfgValidator
         ),
-        outputDir =
-          if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
-          else None,
+        output = MobSimConfig.Mobsim.Output(
+          if (c.hasPathOrNull("output")) c.getConfig("output")
+          else com.typesafe.config.ConfigFactory.parseString("output{}"),
+          parentPath + "output.",
+          $tsCfgValidator
+        ),
         simulation = MobSimConfig.Mobsim.Simulation(
           if (c.hasPathOrNull("simulation")) c.getConfig("simulation")
           else com.typesafe.config.ConfigFactory.parseString("simulation{}"),

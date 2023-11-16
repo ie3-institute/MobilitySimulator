@@ -6,9 +6,7 @@
 
 package edu.ie3.mobsim.utils
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
@@ -53,7 +51,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
             .doubleValue()
             .toString};" +
         s"${firstEv.destinationPoi.id};" +
-        s"${firstEv.getDestinationPoiType.toString};" +
+        s"${firstEv.destinationPoiType.toString};" +
         s"${firstEv.destinationPoi.categoricalLocation};" +
         s"${firstEv.parkingTimeStart.toString};" +
         s"${firstEv.departureTime};" +
@@ -67,7 +65,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write evs correctly" in {
-      ioUtils.writeEvs(evSet)
+      ioUtils.writeEvs(evs)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "evs.csv"))
@@ -118,7 +116,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       val chargingPoints: Int = cs6.chargingPoints
       val chargingEvs: String =
         chargingStationOccupancy
-          .getOrElse(cs6.uuid, Set.empty)
+          .getOrElse(cs6.uuid, Seq.empty)
           .map(_.uuid)
           .mkString("[", "|", "]")
 

@@ -6,6 +6,7 @@
 
 package edu.ie3.mobsim.model
 
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
@@ -40,12 +41,14 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 workPoi,
                 storedEnergy,
                 destinationPoi,
+                destinationPoiType,
                 parkingTimeStart,
                 departureTime,
                 chargingAtHomePossible,
                 chosenChargingStation,
                 chargingAtSimona,
                 finalDestinationPoi,
+                finalDestinationPoiType,
                 remainingDistanceAfterChargingHub,
                 chargingPricesMemory
               ) =>
@@ -57,11 +60,13 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
             storedEnergy shouldBe givenModel.capacity
             chargingAtSimona shouldBe false
             destinationPoi shouldBe givenHomePoi
+            destinationPoiType shouldBe PoiTypeDictionary.HOME
             parkingTimeStart shouldBe simulationStart
             departureTime shouldBe givenFirstDeparture
             chosenChargingStation shouldBe None
             chargingAtHomePossible shouldBe true
             finalDestinationPoi shouldBe None
+            finalDestinationPoiType shouldBe None
             remainingDistanceAfterChargingHub shouldBe None
             chargingPricesMemory shouldBe Queue[Double]()
         }
@@ -304,11 +309,12 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
         val ev: ElectricVehicle = ev1.copyWith(
           storedEnergy = ev1.storedEnergy,
           bbpgPoi,
+          PoiTypeDictionary.LEISURE,
           parkingTimeStart = ev1.parkingTimeStart,
           departureTime = ev1.departureTime
         )
 
-        ev.getDestinationPoiType shouldBe bbpgPoi.getPoiType
+        ev.destinationPoiType shouldBe PoiTypeDictionary.LEISURE
       }
 
       "return the correct departure tick" in {
@@ -317,6 +323,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
         val ev: ElectricVehicle = ev1.copyWith(
           storedEnergy = ev1.storedEnergy,
           destinationPoi = ev1.destinationPoi,
+          destinationPoiType = ev1.destinationPoiType,
           parkingTimeStart = ev1.parkingTimeStart,
           time
         )

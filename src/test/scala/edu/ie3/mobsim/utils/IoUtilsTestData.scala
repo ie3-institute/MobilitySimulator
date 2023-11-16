@@ -25,7 +25,8 @@ trait IoUtilsTestData extends ChargingStationTestData {
     "evs.csv",
     "evcs.csv",
     "positions.csv",
-    "pois.csv"
+    "pois.csv",
+    writeMovements = true
   )
 
   protected val currentTime: ZonedDateTime = ZonedDateTime.now()
@@ -34,11 +35,11 @@ trait IoUtilsTestData extends ChargingStationTestData {
   protected val firstEv: ElectricVehicle = ev1
   protected val secondEv: ElectricVehicle = ev2
 
-  protected val evSet: Set[ElectricVehicle] = Seq(firstEv, secondEv).toSet
+  protected val evs: Seq[ElectricVehicle] = Seq(firstEv, secondEv)
 
   protected val poiMap
       : Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
-    val poiSet: Set[PointOfInterest] = Seq(chargingHubTownPoi).toSet
+    val poiSet: Set[PointOfInterest] = Set(chargingHubTownPoi)
 
     poiSet.groupBy(_.categoricalLocation).map { case (catLoc, poi) =>
       catLoc -> Set.from(poi)

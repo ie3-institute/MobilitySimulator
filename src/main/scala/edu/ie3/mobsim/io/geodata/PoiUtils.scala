@@ -86,10 +86,10 @@ object PoiUtils extends LazyLogging {
         poiType,
         ProbabilityDensityFunction(
           SortedMap.empty[PointOfInterest, Double] ++ setOfPOIs
-            .map { POI =>
-              (POI, POI.size)
+            .map { poi =>
+              (poi, poi.size)
             }
-            .toVector
+            .toSeq
             .sortBy { case (poi, _) =>
               poi.id
             }
