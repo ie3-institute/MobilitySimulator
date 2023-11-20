@@ -36,11 +36,11 @@ import tech.units.indriya.unit.Units
 
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
-import java.util.UUID
+import java.util.{Optional, UUID}
 import javax.measure.quantity.Length
-
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
+import scala.jdk.OptionConverters._
 import scala.util.Random
 
 final class MobilitySimulator(
@@ -59,7 +59,7 @@ final class MobilitySimulator(
     maxDistanceFromPoi: ComparableQuantity[Length],
     thresholdChargingHubDistance: ComparableQuantity[Length]
 ) extends LazyLogging {
-  def doActivity(tick: Long): java.util.ArrayList[java.lang.Long] = {
+  def doActivity(tick: Long): Optional[java.lang.Long] = {
     /* Update current time */
     val currentTime = startTime.plusSeconds(tick)
 
@@ -115,9 +115,7 @@ final class MobilitySimulator(
       )
     )
 
-    val newTicks = new java.util.ArrayList[java.lang.Long](1)
-    newTicks.add(tick + timeUntilNextEvent)
-    newTicks
+    Some(long2Long(tick + timeUntilNextEvent)).toJava
   }
 
   /** Hand over EVs to SIMONA which arrive at their destination POI or depart
@@ -583,9 +581,9 @@ object MobilitySimulator
     * @param tick
     *   Current time tick
     * @return
-    *   Time tick (as ArrayList) when simulation should be triggered again
+    *   Next time tick when simulation should be triggered again
     */
-  protected def doActivity(tick: Long): java.util.ArrayList[java.lang.Long] = {
+  override protected def doActivity(tick: Long): Optional[java.lang.Long] = {
     simulator
       .map(_.doActivity(tick))
       .getOrElse(
@@ -598,7 +596,7 @@ object MobilitySimulator
     * necessary data such as probabilities, EV models, etc. and creates all
     * objects such as EVs, POIs, and charging stations.
     */
-  protected def initialize(): java.util.ArrayList[java.lang.Long] = {
+  override protected def initialize(): Optional[java.lang.Long] = {
 
     val availableEvData = evData.getOrElse(
       throw InitializationException(
