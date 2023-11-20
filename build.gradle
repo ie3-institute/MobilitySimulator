@@ -51,7 +51,7 @@ dependencies {
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.2.0'
+  implementation 'com.github.ie3-institute:simonaAPI:0.3.0'
 
   implementation 'tech.units:indriya:2.2' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
