@@ -102,7 +102,7 @@ if (env.BRANCH_NAME == "main") {
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
               // Will pick the global server connection from jenkins for sonarqube
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
+              gradle("sonar -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
 
@@ -121,7 +121,6 @@ if (env.BRANCH_NAME == "main") {
           stage('publish reports + coverage') {
             // publish reports
             publishReports(projects.get(0))
-
           }
 
           // deploy snapshot version to oss sonatype
@@ -137,10 +136,8 @@ if (env.BRANCH_NAME == "main") {
               // see https://docs.gradle.org/6.0.1/release-notes.html "Publication of SHA256 and SHA512 checksums"
               def preventSHACheckSums = "-Dorg.gradle.internal.publish.checksums.insecure=true"
               gradle("${deployGradleTasks} $preventSHACheckSums")
-
             }
           }
-
         } catch (Exception e) {
           // set build result to failure
           currentBuild.result = 'FAILURE'
@@ -152,12 +149,8 @@ if (env.BRANCH_NAME == "main") {
           Date date = new Date()
           println("[ERROR] [${date.format("dd/MM/yyyy")} - ${date.format("HH:mm:ss")}]" + e)
         }
-
       }
-
     }
-
-
   } else {
     // merge of features
 
@@ -200,7 +193,7 @@ if (env.BRANCH_NAME == "main") {
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
               // Will pick the global server connection from jenkins for sonarqube
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey ")
+              gradle("sonar -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey ")
             }
           }
 
@@ -220,7 +213,6 @@ if (env.BRANCH_NAME == "main") {
           stage('publish reports + coverage') {
             // publish reports
             publishReports(projects.get(0))
-
           }
 
 
@@ -235,12 +227,8 @@ if (env.BRANCH_NAME == "main") {
               deployGradleTasks = "--refresh-dependencies clean test " + deployGradleTasks + "publish -Puser=${env.mavencentral_username} -Ppassword=${env.mavencentral_password} -Psigning.keyId=${env.signingKeyId} -Psigning.password=${env.signingPassword} -Psigning.secretKeyRingFile=${env.mavenCentralKeyFile}"
 
               gradle("${deployGradleTasks}")
-
             }
-
           }
-
-
         } catch (Exception e) {
           // set build result to failure
           currentBuild.result = 'FAILURE'
@@ -252,13 +240,9 @@ if (env.BRANCH_NAME == "main") {
           Date date = new Date()
           println("[ERROR] [${date.format("dd/MM/yyyy")} - ${date.format("HH:mm:ss")}]" + e)
         }
-
       }
-
     }
-
   }
-
 } else {
 
   // setup
@@ -279,7 +263,6 @@ if (env.BRANCH_NAME == "main") {
 
       featureBranchName = jsonObj.head.ref
       repoName = jsonObj.head.repo.full_name
-
     }
 
 
@@ -299,7 +282,6 @@ if (env.BRANCH_NAME == "main") {
             // our target repo failed during checkout
             sh 'exit 1' // failure due to not found forcedPR branch
           }
-
         }
 
         // test the project
@@ -314,7 +296,7 @@ if (env.BRANCH_NAME == "main") {
           withSonarQubeEnv() {
             // Will pick the global server connection from jenkins for sonarqube
 
-            String gradleCommand = "sonarqube -Dsonar.projectKey=$sonarqubeProjectKey"
+            String gradleCommand = "sonar -Dsonar.projectKey=$sonarqubeProjectKey"
 
             if (env.CHANGE_ID != null) {
               gradleCommand = gradleCommand + " -Dsonar.pullrequest.branch=${featureBranchName} -Dsonar.pullrequest.key=${env.CHANGE_ID} -Dsonar.pullrequest.base=main -Dsonar.pullrequest.github.repository=${orgNames.get(0)}/${projects.get(0)} -Dsonar.pullrequest.provider=Github"
@@ -354,7 +336,6 @@ if (env.BRANCH_NAME == "main") {
         Date date = new Date()
         println("[ERROR] [${date.format("dd/MM/yyyy")} - ${date.format("HH:mm:ss")}]" + e)
       }
-
     }
   }
 }
@@ -368,7 +349,6 @@ def getFeatureBranchProps() {
           issueCommentTrigger('.*!test.*')
         ])
       ])
-
 }
 
 

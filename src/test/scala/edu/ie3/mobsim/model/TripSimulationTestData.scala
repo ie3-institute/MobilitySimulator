@@ -97,14 +97,14 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     bbpgPoi,
     culturePoi,
     medicinalPoi,
-    other_shopPoi,
+    otherShopPoi,
     religiousPoi,
     restaurantPoi,
     servicePoi,
     sportsPoi,
     supermarketPoi,
-    charging_hub_townPoi,
-    charging_hub_highwayPoi
+    chargingHubTownPoi,
+    chargingHubHighwayPoi
   )
 
   protected val plannedDestinationPoi: PointOfInterest = poiData(11)

@@ -163,7 +163,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "finding suitable charging stations for categorical location types" should {
       val suitableChargingStations =
-        PrivateMethod[Set[ChargingStation]](Symbol("suitableChargingStations"))
+        PrivateMethod[Seq[ChargingStation]](Symbol("suitableChargingStations"))
 
       "find the right charging stations for categorical location 'home'" in {
         PointOfInterest invokePrivate suitableChargingStations(
@@ -201,14 +201,11 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         )
         val expected = Map(
           cs0 -> Quantities
-            .getQuantity(0.013113941716235453974464, Units.METRE)
-            .to(PowerSystemUnits.KILOMETRE),
+            .getQuantity(0.013113941716235453974464, Units.METRE),
           cs1 -> Quantities
-            .getQuantity(1.10382753815854878670116, Units.METRE)
-            .to(PowerSystemUnits.KILOMETRE),
+            .getQuantity(1.10382753815854878670116, Units.METRE),
           cs2 -> Quantities
             .getQuantity(111.545809977148284216795, Units.METRE)
-            .to(PowerSystemUnits.KILOMETRE)
         )
 
         actual.toMap.keys should contain allElementsOf Seq(cs0, cs1, cs2)

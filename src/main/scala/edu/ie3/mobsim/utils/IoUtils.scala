@@ -25,8 +25,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR_PER_KILOMETRE
 }
 
-import java.io.{File, IOException}
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.jdk.CollectionConverters._
@@ -37,7 +36,8 @@ final case class IoUtils private (
     evcsWriter: BufferedCsvWriter,
     evPosWriter: BufferedCsvWriter,
     poiWriter: BufferedCsvWriter,
-    csvSep: String
+    csvSep: String,
+    writeMovements: Boolean
 ) {
 
   /** Define relevant data for EV and call IO function to write it to csv.
@@ -67,7 +67,7 @@ final case class IoUtils private (
         .doubleValue()
         .toString,
       "destination_poi" -> ev.destinationPoi.id,
-      "destination_poi_type" -> ev.getDestinationPoiType.toString,
+      "destination_poi_type" -> ev.destinationPoiType.toString,
       "categorical_location" -> ev.destinationPoi.categoricalLocation.toString,
       "destination_arrival" -> ev.parkingTimeStart.toString,
       "destination_departure" -> ev.departureTime.toString,
@@ -83,7 +83,7 @@ final case class IoUtils private (
     *   Collection of electric vehicles
     */
   def writeEvs(
-      electricVehicles: Set[ElectricVehicle]
+      electricVehicles: Iterable[ElectricVehicle]
   ): Unit = electricVehicles.foreach { ev =>
     val fieldData = Map(
       "uuid" -> ev.getUuid.toString,
@@ -123,7 +123,7 @@ final case class IoUtils private (
     */
   def writeEvcs(
       cs: ChargingStation,
-      chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]],
+      chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]],
       currentTime: ZonedDateTime,
       uuid: UUID = UUID.randomUUID()
   ): Unit = {
@@ -133,7 +133,7 @@ final case class IoUtils private (
       "evcs" -> cs.uuid.toString,
       "charging_points" -> cs.chargingPoints.toString,
       "charging_evs" -> chargingStationOccupancy
-        .getOrElse(cs.uuid, Set.empty)
+        .getOrElse(cs.uuid, Seq.empty)
         .map(_.uuid)
         .mkString("[", "|", "]")
     ).asJava
@@ -210,13 +210,14 @@ object IoUtils {
       evcsFileName: String,
       evPosFileName: String,
       poiFileName: String,
+      writeMovements: Boolean,
       csvSep: String = ";"
   ): IoUtils = {
     Files.createDirectories(Paths.get(outputPath))
 
     /* Create writer for ev movements and write headline */
     val movementWriter = {
-      val filePath = Seq(outputPath, movementFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, movementFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -239,7 +240,7 @@ object IoUtils {
 
     /* Create writer for evs and write headline */
     val evWriter = {
-      val filePath = Seq(outputPath, evFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -262,7 +263,7 @@ object IoUtils {
 
     /* Create writer for evcs and write headline */
     val evcsWriter = {
-      val filePath = Seq(outputPath, evcsFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evcsFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -280,7 +281,7 @@ object IoUtils {
 
     /* Create writer for ev positions and write headline */
     val evPosWriter = {
-      val filePath = Seq(outputPath, evPosFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evPosFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -297,7 +298,7 @@ object IoUtils {
 
     /* Create writer for points of interest and write headline */
     val poiWriter = {
-      val filePath = Seq(outputPath, poiFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, poiFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -320,7 +321,8 @@ object IoUtils {
       evcsWriter,
       evPosWriter,
       poiWriter,
-      csvSep
+      csvSep,
+      writeMovements
     )
   }
 

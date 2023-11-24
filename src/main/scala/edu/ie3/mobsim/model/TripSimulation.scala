@@ -75,7 +75,8 @@ object TripSimulation extends LazyLogging {
   ): ElectricVehicle = {
 
     /* Save EV movement to csv before trip */
-    ioUtils.writeMovement(ev, currentTime, "departure")
+    if (ioUtils.writeMovements)
+      ioUtils.writeMovement(ev, currentTime, "departure")
 
     val socAtStartOfTrip: Double = ev.getStoredEnergy
       .to(KILOWATTHOUR)
@@ -83,199 +84,147 @@ object TripSimulation extends LazyLogging {
       .getValue
       .doubleValue()
 
-    val updatedEv: ElectricVehicle =
-      /* Check if SoC is < 70% and EV parks at a charging hub -> if yes, let EV charge longer, do not depart */
-      if (
-        socAtStartOfTrip < SOC_OF_70_PERCENT &&
-        (ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_TOWN || ev.getDestinationPoiType == PoiEnums.PoiTypeDictionary.CHARGING_HUB_HIGHWAY)
-      ) {
-        // logger.info(
-        s"${ev.getId} has SoC < 70% at planned departure at charging hub, so it stays a bit longer..."
-        // )
-        doNotDepartAndStayLongerAtDestination(
-          ev,
-          currentTime,
-          chargingStations,
-          tripProbabilities.firstDepartureOfDay,
-          tripProbabilities.lastTripOfDay,
-          tripProbabilities.parkingTime
-        )
-      }
+    val categoricalLocationToPdf = poisWithSizes.map {
+      case (categoricalLocation, pdf) =>
+        categoricalLocation -> pdf
+    }
+    /* Get planned POI information and distance for the trip */
+    val (
+      plannedDestinationPoiType,
+      plannedDestinationPoi,
+      plannedDrivingDistance,
+      changedEv
+    ) = getTargetProperties(
+      ev,
+      currentTime,
+      categoricalLocationToPdf,
+      tripProbabilities.categoricalLocation,
+      tripProbabilities.poiTransition,
+      tripProbabilities.tripDistance
+    ) match {
+      case TargetProperties(
+            poiType,
+            poi,
+            distance,
+            alteredEv
+          ) =>
+        (poiType, poi, distance, alteredEv)
+    }
 
-      /* Check if SoC is < 10% at start of trip -> if yes, and EV could charge at its destination, do not depart */
-      else if (
-        socAtStartOfTrip < SOC_OF_10_PERCENT
-        && ev.destinationPoi.nearestChargingStations.nonEmpty
-      ) {
-        // logger.info(
-        s"${ev.getId} has SoC < 10% at planned departure, but EV could charged here. It stays until it can charge..."
-        // )
-        doNotDepartAndStayLongerAtDestination(
-          ev,
-          currentTime,
-          chargingStations,
-          tripProbabilities.firstDepartureOfDay,
-          tripProbabilities.lastTripOfDay,
-          tripProbabilities.parkingTime
-        )
-      }
+    /* Simulate the planned trip */
+    val (
+      plannedStoredEnergyEndOfTrip,
+      plannedParkingTimeStart,
+      plannedDepartureTime
+    ) = simulatePlannedTrip(
+      changedEv,
+      currentTime,
+      plannedDrivingDistance,
+      plannedDestinationPoiType,
+      tripProbabilities.drivingSpeed,
+      tripProbabilities.firstDepartureOfDay,
+      tripProbabilities.lastTripOfDay,
+      tripProbabilities.parkingTime
+    )
 
-      /* SoC is not critical (< 10%) or couldn't charge at destination -> depart and simulate a trip */
-      else {
+    /* Decide whether EV makes a stop at a charging hub to recharge during the trip */
+    val (evWantsToChargeAtChargingHub, maybeSocAtArrival) =
+      doesEvWantToChargeAtChargingHub(
+        changedEv,
+        plannedStoredEnergyEndOfTrip,
+        plannedDestinationPoi.categoricalLocation,
+        plannedParkingTimeStart,
+        plannedDepartureTime
+      )
 
-        if (socAtStartOfTrip < SOC_OF_10_PERCENT) {
-          // logger.info(
-          s"${ev.getId} departs with battery SoC < 10% because it can't charge here. It might need to teleport to its next destination..."
-          // )
-        }
-
-        val categoricalLocationToPdf = poisWithSizes.map {
-          case (categoricalLocation, pdf) =>
-            categoricalLocation -> pdf
-        }
-        /* Get planned POI information and distance for the trip */
-        val (
-          plannedDestinationPoi,
-          plannedDrivingDistance,
-          changedEv
-        ) = getTargetProperties(
-          ev,
-          currentTime,
-          categoricalLocationToPdf,
-          tripProbabilities.categoricalLocation,
-          tripProbabilities.poiTransition,
-          tripProbabilities.tripDistance
+    maybeSocAtArrival match {
+      case Some(socAtArrival) if evWantsToChargeAtChargingHub =>
+        (
+          plannedDrivingDistance.isLessThanOrEqualTo(
+            thresholdChargingHubDistance
+          ),
+          chargingHubTownIsPresent,
+          chargingHubHighwayIsPresent
         ) match {
-          case TargetProperties(
-                poi,
-                distance,
-                alteredEv
-              ) =>
-            (poi, distance, alteredEv)
-        }
-
-        /* Simulate the planned trip */
-        val (
-          plannedStoredEnergyEndOfTrip,
-          plannedParkingTimeStart,
-          plannedDepartureTime
-        ) = simulatePlannedTrip(
-          changedEv,
-          currentTime,
-          plannedDrivingDistance,
-          plannedDestinationPoi.getPoiType,
-          tripProbabilities.drivingSpeed,
-          tripProbabilities.firstDepartureOfDay,
-          tripProbabilities.lastTripOfDay,
-          tripProbabilities.parkingTime
-        )
-
-        /* Decide whether EV makes a stop at a charging hub to recharge during the trip */
-        val (evWantsToChargeAtChargingHub, maybeSocAtArrival) =
-          doesEvWantToChargeAtChargingHub(
-            changedEv,
-            plannedStoredEnergyEndOfTrip,
-            plannedDestinationPoi.categoricalLocation,
-            plannedParkingTimeStart,
-            plannedDepartureTime
-          )
-
-        maybeSocAtArrival match {
-          case Some(socAtArrival) if evWantsToChargeAtChargingHub =>
-            (
-              plannedDrivingDistance.isLessThanOrEqualTo(
-                thresholdChargingHubDistance
-              ),
-              chargingHubTownIsPresent,
-              chargingHubHighwayIsPresent
-            ) match {
-              case (true, true, _) =>
-                // logger.info(
-                s"${ev.getId} drives to a charging hub of type chargingHubTown."
-                // )
-                makeTripToChargingHub(
-                  PoiTypeDictionary.CHARGING_HUB_TOWN,
-                  changedEv,
-                  currentTime,
-                  poisWithSizes,
-                  socAtStartOfTrip,
-                  socAtArrival,
-                  plannedDrivingDistance,
-                  plannedDestinationPoi,
-                  chargingStations,
-                  tripProbabilities.drivingSpeed
-                )
-              case (true, false, _) =>
-                // logger.info(
-                s"${ev.getId} wants to charge at charging hub on a <50km trip, but keeps its original trip because there are no chargingHubTown."
-                // )
-                keepOriginalTrip(
-                  changedEv,
-                  plannedStoredEnergyEndOfTrip,
-                  plannedDestinationPoi,
-                  plannedParkingTimeStart,
-                  plannedDepartureTime
-                )
-              case (false, _, true) =>
-                // logger.info(
-                s"${ev.getId} drives to a charging hub of type chargingHubHighway."
-                // )
-                makeTripToChargingHub(
-                  PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
-                  changedEv,
-                  currentTime,
-                  poisWithSizes,
-                  socAtStartOfTrip,
-                  socAtArrival,
-                  plannedDrivingDistance,
-                  plannedDestinationPoi,
-                  chargingStations,
-                  tripProbabilities.drivingSpeed
-                )
-              case (false, true, false) =>
-                // logger.info(
-                s"${ev.getId} drives to a charging hub of type chargingHubTown. " +
-                  s"This is a modified trip, because there are no highway charging hubs."
-                // )
-                makeModifiedTripToChargingHub(
-                  PoiTypeDictionary.CHARGING_HUB_TOWN,
-                  changedEv,
-                  currentTime,
-                  poisWithSizes,
-                  socAtArrival,
-                  plannedDrivingDistance,
-                  plannedDestinationPoi,
-                  chargingStations,
-                  tripProbabilities.drivingSpeed
-                )
-              case (false, false, false) =>
-                // logger.info(
-                s"${ev.getId} wants to charge at charging hub on a >50km trip, but keeps its original trip because there are no chargingHubs at all."
-                // )
-                keepOriginalTrip(
-                  changedEv,
-                  plannedStoredEnergyEndOfTrip,
-                  plannedDestinationPoi,
-                  plannedParkingTimeStart,
-                  plannedDepartureTime
-                )
-            }
-          case _ =>
-            /* Do not change the planned trip */
-            // logger.info(
-            s"${ev.getId} makes its planned trip."
-            // )
+          case (true, true, _) =>
+            makeTripToChargingHub(
+              PoiTypeDictionary.CHARGING_HUB_TOWN,
+              changedEv,
+              currentTime,
+              poisWithSizes,
+              socAtStartOfTrip,
+              socAtArrival,
+              plannedDrivingDistance,
+              plannedDestinationPoi,
+              plannedDestinationPoiType,
+              chargingStations,
+              tripProbabilities.drivingSpeed
+            )
+          case (true, false, _) =>
+            logger.debug(
+              s"${ev.getId} wants to charge at charging hub on a <50km trip, but keeps its original trip because there are no chargingHubTown."
+            )
             keepOriginalTrip(
               changedEv,
               plannedStoredEnergyEndOfTrip,
               plannedDestinationPoi,
+              plannedDestinationPoiType,
+              plannedParkingTimeStart,
+              plannedDepartureTime
+            )
+          case (false, _, true) =>
+            makeTripToChargingHub(
+              PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
+              changedEv,
+              currentTime,
+              poisWithSizes,
+              socAtStartOfTrip,
+              socAtArrival,
+              plannedDrivingDistance,
+              plannedDestinationPoi,
+              plannedDestinationPoiType,
+              chargingStations,
+              tripProbabilities.drivingSpeed
+            )
+          case (false, true, false) =>
+            makeModifiedTripToChargingHub(
+              PoiTypeDictionary.CHARGING_HUB_TOWN,
+              changedEv,
+              currentTime,
+              poisWithSizes,
+              socAtArrival,
+              plannedDrivingDistance,
+              plannedDestinationPoi,
+              plannedDestinationPoiType,
+              chargingStations,
+              tripProbabilities.drivingSpeed
+            )
+          case (false, false, false) =>
+            logger.debug(
+              s"${ev.getId} wants to charge at charging hub on a >50km trip, but keeps its original trip because there are no chargingHubs at all."
+            )
+            keepOriginalTrip(
+              changedEv,
+              plannedStoredEnergyEndOfTrip,
+              plannedDestinationPoi,
+              plannedDestinationPoiType,
               plannedParkingTimeStart,
               plannedDepartureTime
             )
         }
-      }
+      case _ =>
+        /* Do not change the planned trip */
 
-    updatedEv
+        keepOriginalTrip(
+          changedEv,
+          plannedStoredEnergyEndOfTrip,
+          plannedDestinationPoi,
+          plannedDestinationPoiType,
+          plannedParkingTimeStart,
+          plannedDepartureTime
+        )
+    }
+
   }
 
   /** Get planned POI information and distance for the next trip. If the
@@ -309,7 +258,7 @@ object TripSimulation extends LazyLogging {
       poiTransition: PoiTransition,
       tripDistance: TripDistance
   ): TargetProperties = {
-    val currentPoiType = ev.getDestinationPoiType
+    val currentPoiType = ev.destinationPoiType
     if (
       currentPoiType == PoiTypeDictionary.CHARGING_HUB_TOWN || currentPoiType == PoiTypeDictionary.CHARGING_HUB_HIGHWAY
     ) {
@@ -329,7 +278,8 @@ object TripSimulation extends LazyLogging {
   }
 
   /** Properties of a target for a trip
-    *
+    * @param poiType
+    *   Type of the point of interest
     * @param poi
     *   Actual target POI
     * @param distance
@@ -339,6 +289,7 @@ object TripSimulation extends LazyLogging {
     *   to return updates of the vehicle.
     */
   private final case class TargetProperties(
+      poiType: PoiTypeDictionary.Value,
       poi: PointOfInterest,
       distance: ComparableQuantity[Length],
       ev: ElectricVehicle
@@ -359,30 +310,37 @@ object TripSimulation extends LazyLogging {
   ): TargetProperties =
     (
       ev.finalDestinationPoi,
+      ev.finalDestinationPoiType,
       ev.remainingDistanceAfterChargingHub
     ) match {
       case (
             Some(destinationPoi),
+            Some(destinationPoiType),
             Some(remainingDistance)
           ) =>
         /* Reset saved values */
         val updatedEv: ElectricVehicle = ev
-          .setFinalDestinationPoi(None)
+          .resetFinalDestination()
           .setRemainingDistanceAfterChargingHub(None)
 
         /* Return the determined values */
         TargetProperties(
+          destinationPoiType,
           destinationPoi,
           remainingDistance,
           updatedEv
         )
-      case (None, _) =>
+      case (None, _, _) =>
         throw TripException(
           "Cannot resume trip, as the previous destination POI is unknown."
         )
-      case (Some(_), None) =>
+      case (Some(_), Some(_), None) =>
         throw TripException(
           "Cannot resume trip, as the remaining distance is unknown."
+        )
+      case (_, None, _) =>
+        throw TripException(
+          "Cannot resume trip, as the final destination poi type is unknown-"
         )
     }
 
@@ -417,7 +375,7 @@ object TripSimulation extends LazyLogging {
       tripDistance: TripDistance
   ): TargetProperties = {
     /* Save previous POI type (is required for later calculations) */
-    val previousPoiType = ev.getDestinationPoiType
+    val previousPoiType = ev.destinationPoiType
 
     /* Sample next destination POI type */
     val destinationPoiType =
@@ -441,6 +399,7 @@ object TripSimulation extends LazyLogging {
             destinationPoiType
           )
         TargetProperties(
+          destinationPoiType,
           poi,
           drivingDistance,
           ev
@@ -533,7 +492,8 @@ object TripSimulation extends LazyLogging {
     val nextCategoricalLocation =
       categoricalLocation.sample(time, destinationPoiType)
     categoricalLocationToPdf.get(nextCategoricalLocation) match {
-      case Some(pdf) => pdf.sample()
+      case Some(pdf) =>
+        pdf.sample()
       case None =>
         if (depth > maxDepth) {
           throw TripException(
@@ -648,6 +608,8 @@ object TripSimulation extends LazyLogging {
     *   planned trip distance
     * @param plannedDestinationPoi
     *   planned destination POI
+    * @param plannedDestinationPoiType
+    *   planned destination POI type
     * @param drivingSpeed
     *   Meta-information to determine the next driving speed
     * @return
@@ -665,6 +627,7 @@ object TripSimulation extends LazyLogging {
       socAtChargingHubArrival: Double,
       plannedDrivingDistance: ComparableQuantity[Length],
       plannedDestinationPoi: PointOfInterest,
+      plannedDestinationPoiType: PoiTypeDictionary.Value,
       chargingStations: Seq[ChargingStation],
       drivingSpeed: DrivingSpeed
   ): ElectricVehicle = {
@@ -732,12 +695,13 @@ object TripSimulation extends LazyLogging {
       .setRemainingDistanceAfterChargingHub(
         Some(plannedDrivingDistance.subtract(newDrivingDistance))
       )
-      .setFinalDestinationPoi(Some(plannedDestinationPoi))
+      .setFinalDestination(plannedDestinationPoi, plannedDestinationPoiType)
 
     /* Create updated EV */
     updatedEv.copyWith(
       newStoredEnergyEndOfTrip,
       newDestinationPoi,
+      chargingHubPoiType,
       newParkingTimeStart,
       newDepartureTime
     )
@@ -778,6 +742,7 @@ object TripSimulation extends LazyLogging {
       socAtChargingHubArrival: Double,
       plannedDrivingDistance: ComparableQuantity[Length],
       plannedDestinationPoi: PointOfInterest,
+      plannedDestinationPoiType: PoiTypeDictionary.Value,
       chargingStations: Seq[ChargingStation],
       drivingSpeed: DrivingSpeed
   ): ElectricVehicle = {
@@ -841,12 +806,13 @@ object TripSimulation extends LazyLogging {
       .setRemainingDistanceAfterChargingHub(
         Some(plannedDrivingDistance.subtract(newDrivingDistance))
       )
-      .setFinalDestinationPoi(Some(plannedDestinationPoi))
+      .setFinalDestination(plannedDestinationPoi, plannedDestinationPoiType)
 
     /* Create updated EV */
     updatedEv.copyWith(
       newStoredEnergyEndOfTrip,
       newDestinationPoi,
+      chargingHubPoiType,
       newParkingTimeStart,
       newDepartureTime
     )
@@ -946,13 +912,14 @@ object TripSimulation extends LazyLogging {
       ev: ElectricVehicle,
       plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy],
       plannedDestinationPoi: PointOfInterest,
+      plannedDestinationPoiType: PoiTypeDictionary.Value,
       plannedParkingTimeStart: ZonedDateTime,
       plannedDepartureTime: ZonedDateTime
   ): ElectricVehicle = {
 
     /* Because there is no stop at a charging hub, no trip values need to be saved */
     val updatedEv: ElectricVehicle = ev
-      .setFinalDestinationPoi(None)
+      .resetFinalDestination()
       .setRemainingDistanceAfterChargingHub(None)
 
     if (
@@ -971,68 +938,9 @@ object TripSimulation extends LazyLogging {
     updatedEv.copyWith(
       plannedStoredEnergyEndOfTrip,
       plannedDestinationPoi,
+      plannedDestinationPoiType,
       plannedParkingTimeStart,
       plannedDepartureTime
-    )
-  }
-
-  /** Create updated EV for the case that the EV does not depart because its SoC
-    * is too low and it has the possibility to charge at its current POI.
-    *
-    * @param ev
-    *   The EV which shall be updated
-    * @param currentTime
-    *   current time
-    * @param chargingStations
-    *   Collection of available charging stations
-    * @param firstDepartureOfDay
-    *   Meta-information to determine the first departure of the day
-    * @param lastTripOfDay
-    *   Meta-information to determine if that trip is the last trip of the day
-    * @param parkingTime
-    *   Meta-information to determine the parking time
-    * @return
-    *   The updated EV with only updated parking and departure times
-    */
-  private def doNotDepartAndStayLongerAtDestination(
-      ev: ElectricVehicle,
-      currentTime: ZonedDateTime,
-      chargingStations: Seq[ChargingStation],
-      firstDepartureOfDay: FirstDepartureOfDay,
-      lastTripOfDay: LastTripOfDay,
-      parkingTime: ParkingTime
-  ): ElectricVehicle = {
-
-    val parkingTimeStart: ZonedDateTime = currentTime.plusMinutes(1)
-    val departureTime: ZonedDateTime =
-      if (
-        ev.getDestinationPoiType == PoiTypeDictionary.CHARGING_HUB_TOWN
-        || ev.getDestinationPoiType == PoiTypeDictionary.CHARGING_HUB_HIGHWAY
-      ) {
-        parkingTimeStart.plusMinutes(
-          calculateChargingTimeAtChargingHub(
-            ev,
-            ev.destinationPoi,
-            ev.getStoredEnergy,
-            chargingStations
-          )
-        )
-      } else {
-        calculateDepartureTime(
-          ev.getDestinationPoiType,
-          parkingTimeStart,
-          firstDepartureOfDay,
-          lastTripOfDay,
-          parkingTime
-        )
-      }
-
-    /* Create updated EV */
-    ev.copyWith(
-      ev.getStoredEnergy,
-      ev.destinationPoi,
-      parkingTimeStart,
-      departureTime
     )
   }
 
@@ -1094,7 +1002,6 @@ object TripSimulation extends LazyLogging {
     def sampleDepartureTime(): ZonedDateTime = {
       /* Sample parking time */
       val pt = parkingTime.sample(parkingTimeStart, destinationPoiType)
-      // logger.info(s"Parking time: $parkingTime")
 
       /* Calculate and return departure time of EV using the sampled parking time */
       parkingTimeStart.plusMinutes(pt)
