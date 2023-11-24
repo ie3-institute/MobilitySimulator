@@ -50,6 +50,7 @@ object MobSimConfig {
   )
   object Mobsim {
     final case class Input(
+        evInputSource: scala.Option[MobSimConfig.CsvParams],
         grid: MobSimConfig.Mobsim.Input.Grid,
         mobility: MobSimConfig.Mobsim.Input.Mobility
     )
@@ -118,6 +119,16 @@ object MobSimConfig {
           $tsCfgValidator: $TsCfgValidator
       ): MobSimConfig.Mobsim.Input = {
         MobSimConfig.Mobsim.Input(
+          evInputSource =
+            if (c.hasPathOrNull("evInputSource"))
+              scala.Some(
+                MobSimConfig.CsvParams(
+                  c.getConfig("evInputSource"),
+                  parentPath + "evInputSource.",
+                  $tsCfgValidator
+                )
+              )
+            else None,
           grid = MobSimConfig.Mobsim.Input.Grid(
             if (c.hasPathOrNull("grid")) c.getConfig("grid")
             else com.typesafe.config.ConfigFactory.parseString("grid{}"),

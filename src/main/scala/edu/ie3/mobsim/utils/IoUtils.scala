@@ -7,6 +7,11 @@
 package edu.ie3.mobsim.utils
 
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
+import edu.ie3.datamodel.io.naming.FileNamingStrategy
+import edu.ie3.datamodel.io.source._
+import edu.ie3.datamodel.io.source.csv._
+import edu.ie3.datamodel.models.input.system.EvInput
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
@@ -16,6 +21,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR_PER_KILOMETRE
 }
 
+import java.io.IOException
 import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -315,5 +321,39 @@ object IoUtils {
       csvSep,
       writeMovements
     )
+  }
+
+  def readEvInputs(csvParams: CsvParams): Seq[EvInput] = {
+    val namingStrategy = new FileNamingStrategy()
+
+    val csvDataSource = new CsvDataSource(
+      csvParams.colSep,
+      Path.of(csvParams.path),
+      namingStrategy
+    )
+
+    val typeSource: TypeSource = new TypeSource(csvDataSource)
+
+    val thermalSource: ThermalSource = new ThermalSource(
+      typeSource,
+      csvDataSource
+    )
+
+    val rawGridSource =
+      new RawGridSource(
+        typeSource,
+        csvDataSource
+      )
+    val systemParticipantSource = new SystemParticipantSource(
+      typeSource,
+      thermalSource,
+      rawGridSource,
+      csvDataSource
+    )
+    val evs = systemParticipantSource.getEvs
+    if (evs.isEmpty) {
+      throw new IOException(s"No evs parsed at ${csvParams.path}!")
+    }
+    evs.asScala.toSeq
   }
 }

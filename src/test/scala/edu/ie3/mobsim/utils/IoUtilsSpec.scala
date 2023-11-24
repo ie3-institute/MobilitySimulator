@@ -6,9 +6,9 @@
 
 package edu.ie3.mobsim.utils
 
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
-import edu.ie3.mobsim.utils
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.{
@@ -18,6 +18,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
 }
 
 import java.io.{BufferedReader, File, FileReader}
+import java.nio.file.Path
 import java.util
 
 class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
@@ -195,6 +196,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           str shouldBe compareString
         }
       }
+    }
+
+    "read ev inputs successfully" in {
+      val path = Path.of(getClass.getResource("ev_input_data").toURI)
+      val csvParams = CsvParams(
+        ",",
+        path.toString
+      )
+      val evInputs = IoUtils.readEvInputs(csvParams)
+      evInputs should have size 1
     }
   }
 }

@@ -12,7 +12,7 @@ import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationTyp
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
+
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
