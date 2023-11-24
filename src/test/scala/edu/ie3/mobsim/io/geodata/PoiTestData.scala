@@ -6,17 +6,17 @@
 
 package edu.ie3.mobsim.io.geodata
 
-import edu.ie3.datamodel.models.{ElectricCurrentType, StandardUnits}
+import edu.ie3.datamodel.models.ElectricCurrentType
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.quantities.PowerSystemUnits
+
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
-import tech.units.indriya.unit.Units.{METRE, PERCENT}
+import tech.units.indriya.unit.Units.METRE
 
 import java.util.UUID
 import javax.measure.quantity.Length
@@ -98,7 +98,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
-    Map(cs1 -> Quantities.getQuantity(0, Units.METRE))
+    Map(cs1 -> Quantities.getQuantity(0, METRE))
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
@@ -107,7 +107,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.41154872, 51.4833271),
     1549.4886151800551,
-    Map(cs3 -> Quantities.getQuantity(0, Units.METRE))
+    Map(cs3 -> Quantities.getQuantity(0, METRE))
   )
 
   protected val bbpgPoi: PointOfInterest = PointOfInterest(
@@ -137,7 +137,7 @@ trait PoiTestData {
     Map.empty[ChargingStation, ComparableQuantity[Length]]
   )
 
-  protected val other_shopPoi: PointOfInterest = PointOfInterest(
+  protected val otherShopPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("dda899fb-e085-479d-b3a9-cba594770a2b"),
     "other_shop_251193227",
     CategoricalLocationDictionary.OTHER_SHOP,
@@ -203,7 +203,7 @@ trait PoiTestData {
     )
   )
 
-  protected val charging_hub_townPoi: PointOfInterest = PointOfInterest(
+  protected val chargingHubTownPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("4df0614d-0c01-4b31-af94-804e299f2686"),
     "charging_hub_town_261344967",
     CategoricalLocationDictionary.CHARGING_HUB_TOWN,
@@ -211,7 +211,7 @@ trait PoiTestData {
     129.211731553507,
     Map(cs4 -> Quantities.getQuantity(0, METRE))
   )
-  protected val charging_hub_highwayPoi: PointOfInterest = PointOfInterest(
+  protected val chargingHubHighwayPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("3ddc93c7-77fc-4187-be68-833b3db39809"),
     "charging_hub_highway_261347306",
     CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY,
@@ -226,7 +226,7 @@ trait PoiTestData {
     bbpgPoi,
     culturePoi,
     medicinalPoi,
-    other_shopPoi,
+    otherShopPoi,
     religiousPoi,
     restaurantPoi,
     servicePoi,

@@ -22,7 +22,6 @@ import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.geo.GeoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
@@ -30,7 +29,7 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length, Power}
 import scala.collection.immutable
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
 /** Class to denote electric vehicle and its current trip.
@@ -63,6 +62,8 @@ import scala.util.{Failure, Success, Try}
   *   whether the car will charge at SIMONA
   * @param finalDestinationPoi
   *   stores final destination if making a trip to charging hub
+  * @param finalDestinationPoiType
+  *   stores the final destination poi type if making a trip to charging hub
   * @param remainingDistanceAfterChargingHub
   *   distance remaining when departing from charging hub
   * @param chargingPricesMemory
@@ -77,12 +78,14 @@ final case class ElectricVehicle(
     workPoi: PointOfInterest,
     storedEnergy: ComparableQuantity[Energy],
     destinationPoi: PointOfInterest,
+    destinationPoiType: PoiTypeDictionary.Value,
     parkingTimeStart: ZonedDateTime,
     departureTime: ZonedDateTime,
     chargingAtHomePossible: Boolean,
     chosenChargingStation: Option[UUID],
     chargingAtSimona: Boolean,
     finalDestinationPoi: Option[PointOfInterest],
+    finalDestinationPoiType: Option[PoiTypeDictionary.Value],
     remainingDistanceAfterChargingHub: Option[
       ComparableQuantity[Length]
     ],
@@ -102,11 +105,6 @@ final case class ElectricVehicle(
 
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
-  def getDestinationPoiType: PoiTypeDictionary.Value = destinationPoi.getPoiType
-
-  def getFinalDestinationPoiType: Option[PoiTypeDictionary.Value] =
-    finalDestinationPoi.map(_.getPoiType)
-
   def getDepartureTick: java.lang.Long = toTick(simulationStart, departureTime)
 
   /** @param storedEnergy
@@ -125,12 +123,14 @@ final case class ElectricVehicle(
   def copyWith(
       storedEnergy: ComparableQuantity[Energy],
       destinationPoi: PointOfInterest,
+      destinationPoiType: PoiTypeDictionary.Value,
       parkingTimeStart: ZonedDateTime,
       departureTime: ZonedDateTime
   ): ElectricVehicle =
     copy(
       storedEnergy = storedEnergy,
       destinationPoi = destinationPoi,
+      destinationPoiType = destinationPoiType,
       parkingTimeStart = parkingTimeStart,
       departureTime = departureTime
     )
@@ -149,10 +149,18 @@ final case class ElectricVehicle(
     copy(chargingAtSimona = false)
   }
 
-  def setFinalDestinationPoi(
-      destinationPoi: Option[PointOfInterest]
+  def resetFinalDestination(): ElectricVehicle = {
+    copy(finalDestinationPoi = None, finalDestinationPoiType = None)
+  }
+
+  def setFinalDestination(
+      destinationPoi: PointOfInterest,
+      destinationPoiType: PoiTypeDictionary.Value
   ): ElectricVehicle = {
-    copy(finalDestinationPoi = destinationPoi)
+    copy(
+      finalDestinationPoi = Some(destinationPoi),
+      finalDestinationPoiType = Some(destinationPoiType)
+    )
   }
 
   def setRemainingDistanceAfterChargingHub(
@@ -337,6 +345,7 @@ case object ElectricVehicle extends LazyLogging {
       homePoi = homePoi,
       workPoi = workPoi,
       storedEnergy = evType.capacity,
+      destinationPoiType = PoiTypeDictionary.HOME,
       destinationPoi = homePoi, // is updated when trip is sampled
       parkingTimeStart = simulationStart, // EV starts parking at first tick
       departureTime =
@@ -347,6 +356,7 @@ case object ElectricVehicle extends LazyLogging {
       chosenChargingStation = None,
       chargingAtSimona = false,
       finalDestinationPoi = None,
+      finalDestinationPoiType = None,
       remainingDistanceAfterChargingHub = None,
       chargingPricesMemory = Queue[Double]()
     )
