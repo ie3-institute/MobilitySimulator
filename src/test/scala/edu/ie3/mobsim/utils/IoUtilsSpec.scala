@@ -18,6 +18,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
 }
 
 import java.io.{BufferedReader, File, FileReader}
+import java.nio.file.Path
 import java.util
 
 class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
@@ -198,10 +199,10 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "read ev inputs successfully" in {
-      val path = getClass.getResource("ev_input_data").getPath
+      val path = Path.of(getClass.getResource("ev_input_data").toURI)
       val csvParams = CsvParams(
         ",",
-        path
+        path.toString
       )
       val evInputs = IoUtils.readEvInputs(csvParams)
       evInputs should have size 1
