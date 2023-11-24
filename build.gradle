@@ -41,7 +41,6 @@ dependencies {
   implementation('com.github.ie3-institute:PowerSystemUtils:2.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
-    exclude group: 'org.apache.logging.log4j'
     exclude group: 'com.github.ie3-institute'
     exclude group: 'com.github.johanneshiry', module: 'OSMonaut'
   }
