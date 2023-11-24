@@ -12,11 +12,7 @@ import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationTyp
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.io.probabilities.{
-  FirstDepartureOfDay,
-  ProbabilityDensityFunction
-}
-import edu.ie3.mobsim.model
+import edu.ie3.mobsim.io.probabilities.{FirstDepartureOfDay, ProbabilityDensityFunction}
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
@@ -195,7 +191,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
       firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
+  ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
 
@@ -228,7 +224,7 @@ case object ElectricVehicle extends LazyLogging {
       initialHomeChargingCars.size + additionalCars.size == electricVehicles.size
     )
 
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
+    val evs = initialHomeChargingCars.toSeq ++ additionalCars
     logger.info(s"Created ${evs.size} EVs from EvInputs during setup.")
     evs
   }
