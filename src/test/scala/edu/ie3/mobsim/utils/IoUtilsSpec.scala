@@ -6,8 +6,9 @@
 
 package edu.ie3.mobsim.utils
 
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
+import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
-import edu.ie3.mobsim.utils
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.{
