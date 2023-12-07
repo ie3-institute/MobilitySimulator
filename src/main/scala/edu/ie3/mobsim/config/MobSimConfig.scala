@@ -50,11 +50,42 @@ object MobSimConfig {
   )
   object Mobsim {
     final case class Input(
-        evInputSource: scala.Option[MobSimConfig.CsvParams],
+        evInputSource: scala.Option[MobSimConfig.Mobsim.Input.EvInputSource],
         grid: MobSimConfig.Mobsim.Input.Grid,
         mobility: MobSimConfig.Mobsim.Input.Mobility
     )
     object Input {
+      final case class EvInputSource(
+          homePoiMapping: scala.Option[MobSimConfig.CsvParams],
+          source: MobSimConfig.CsvParams
+      )
+      object EvInputSource {
+        def apply(
+            c: com.typesafe.config.Config,
+            parentPath: java.lang.String,
+            $tsCfgValidator: $TsCfgValidator
+        ): MobSimConfig.Mobsim.Input.EvInputSource = {
+          MobSimConfig.Mobsim.Input.EvInputSource(
+            homePoiMapping =
+              if (c.hasPathOrNull("homePoiMapping"))
+                scala.Some(
+                  MobSimConfig.CsvParams(
+                    c.getConfig("homePoiMapping"),
+                    parentPath + "homePoiMapping.",
+                    $tsCfgValidator
+                  )
+                )
+              else None,
+            source = MobSimConfig.CsvParams(
+              if (c.hasPathOrNull("source")) c.getConfig("source")
+              else com.typesafe.config.ConfigFactory.parseString("source{}"),
+              parentPath + "source.",
+              $tsCfgValidator
+            )
+          )
+        }
+      }
+
       final case class Grid(
           name: java.lang.String,
           source: MobSimConfig.CsvParams
@@ -122,7 +153,7 @@ object MobSimConfig {
           evInputSource =
             if (c.hasPathOrNull("evInputSource"))
               scala.Some(
-                MobSimConfig.CsvParams(
+                MobSimConfig.Mobsim.Input.EvInputSource(
                   c.getConfig("evInputSource"),
                   parentPath + "evInputSource.",
                   $tsCfgValidator
