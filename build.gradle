@@ -3,7 +3,7 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '6.22.0'//code format
+  id 'com.diffplug.spotless' version '6.23.3'//code format
   id "de.undercouch.download" version "5.5.0" // downloads plugin
   id "org.sonarqube" version "4.4.1.3373" // sonarqube
   id "org.scoverage" version "8.0.3" // scala code coverage scoverage
@@ -16,7 +16,7 @@ ext {
   javaVersion = JavaVersion.VERSION_17
 
   scalaVersion = '2.13'
-  pekkoVersion = '1.0.1'
+  pekkoVersion = '1.0.2'
   scalaBinaryVersion = '2.13.12'
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
@@ -55,7 +55,7 @@ dependencies {
 
   implementation 'tech.units:indriya:2.2' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.15.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.15.1' // I/O functionalities
   implementation 'com.nrinaudo:kantan.csv-generic_2.13:0.7.0' // csv parsing
 
   /* CORE Scala */
@@ -66,7 +66,7 @@ dependencies {
   testImplementation "org.apache.pekko:pekko-actor_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.4.11'
+  implementation 'ch.qos.logback:logback-classic:1.4.14'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
