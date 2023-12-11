@@ -176,7 +176,12 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-# End of https://www.toptal.com/developers/gitignore/api/intellij+all,java,scala,gradle# Ignore Gradle project-specific cache directory
+### Metals ###
+.metals/
+.bloop/
+project/**/metals.sbt
+
+# End of https://www.toptal.com/developers/gitignore/api/intellij+all,java,scala,gradle,metals
 
 # Ignore Gradle build output directory
 build

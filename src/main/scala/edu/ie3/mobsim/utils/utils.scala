@@ -23,6 +23,16 @@ object utils {
     simulationStart.until(time, ChronoUnit.SECONDS)
   }
 
+  /** Used to round driving time and parking time. We round to the closest
+    * quarter hour. If the result is 0, we round to 15 minutes as driving and
+    * parking time should never be 0.
+    *
+    * @param minutes
+    *   minutes to be rounded
+    *
+    * @return
+    *   rounded minutes (e.g. 15, 30, 45, 60, ..)
+    */
   def roundToQuarterHourInMinutes(minutes: Int): Int = {
     val intervals15 = (minutes / 15) + math.round((minutes.toDouble % 15) / 15)
     math.max(15, intervals15 * 15).toInt
