@@ -6,10 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added 
+- Allow parsing of PSDM `EvInputs` [#112](https://github.com/ie3-institute/MobilitySimulator/issues/112)
+
 ### Changed
 - Changed sets of evs from sorted to unsorted [#113](https://github.com/ie3-institute/MobilitySimulator/issues/113)
 - Changed sets of evs to sequences for speed improvement [#135](https://github.com/ie3-institute/MobilitySimulator/issues/135)
-  
+- Cleaning up `build.gradle`, updating gradle to 8.2.1 [#164](https://github.com/ie3-institute/MobilitySimulator/issues/164)
+- Removed the possibility of stochastic charging so evs are always sent to the co-simulation, which should be in charge of charging the cars [#118](https://github.com/ie3-institute/MobilitySimulator/issues/118)
+
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
 - We now track destination poi types explicitly [#85](https://github.com/ie3-institute/MobilitySimulator/issues/85)

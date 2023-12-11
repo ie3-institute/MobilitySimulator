@@ -21,6 +21,7 @@ class PathsAndSourcesSpec extends UnitSpec {
     "using relative paths" in {
 
       val inputConfigRelative = Input(
+        None,
         Grid("myGrid", CsvParams(",", "relativePath/grid")),
         Mobility(CsvParams(",", "relativePath/mobility"))
       )
@@ -45,6 +46,7 @@ class PathsAndSourcesSpec extends UnitSpec {
       val absPath = basePath.resolve("absolutePath")
 
       val inputConfigAbsolute = Input(
+        None,
         Grid("myGrid", CsvParams(",", absPath.resolve("grid").toString)),
         Mobility(CsvParams(",", absPath.resolve("mobility").toString))
       )

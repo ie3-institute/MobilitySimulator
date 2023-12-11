@@ -3,26 +3,25 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '6.11.0'//code format
-  id "de.undercouch.download" version "5.3.0" // downloads plugin
-  id "org.sonarqube" version "3.5.0.2730" // sonarqube
-  id "org.scoverage" version "7.0.1" // scala code coverage scoverage
+  id 'com.diffplug.spotless' version '6.23.3'//code format
+  id "de.undercouch.download" version "5.5.0" // downloads plugin
+  id "org.sonarqube" version "4.4.1.3373" // sonarqube
+  id "org.scoverage" version "8.0.3" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.32" // run scalatest without specific spec task
-  id "com.jfrog.artifactory" version "4.29.3"
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
-  id "com.github.johnrengelman.shadow" version "7.1.2"
+  id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 ext {
   javaVersion = JavaVersion.VERSION_17
 
   scalaVersion = '2.13'
-  akkaVersion = '2.6.20'
-  scalaBinaryVersion = '2.13.8'
+  pekkoVersion = '1.0.2'
+  scalaBinaryVersion = '2.13.12'
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.0.2'
-  scapegoatVersion = '1.4.17'
+  scapegoatVersion = '2.1.3'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -35,40 +34,40 @@ apply from: scriptsLocation + 'scoverage.gradle' // scoverage scala code coverag
 
 repositories {
   mavenCentral() // searches in Sonatype's central repository
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // sonatype snapshot repo
-  maven { url 'https://www.jitpack.io' } // allows github repos as dependencies
+  maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' } // sonatype snapshot repo
 }
 
 dependencies {
-  implementation('com.github.ie3-institute:PowerSystemUtils:1.6') {
+  implementation('com.github.ie3-institute:PowerSystemUtils:2.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
-  implementation('com.github.ie3-institute:PowerSystemDataModel:3.0-SNAPSHOT') {
+  implementation('com.github.ie3-institute:PowerSystemDataModel:4.1.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.1-SNAPSHOT'
+  implementation 'com.github.ie3-institute:simonaAPI:0.4.0'
 
-  implementation 'tech.units:indriya:2.1.3' // Physical units
+  implementation 'tech.units:indriya:2.2' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.11.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.15.1' // I/O functionalities
+  implementation 'com.nrinaudo:kantan.csv-generic_2.13:0.7.0' // csv parsing
 
   /* CORE Scala */
   implementation "org.scala-lang:scala-library:${scalaBinaryVersion}"
   implementation 'org.scala-lang.modules:scala-parallel-collections_2.13:1.0.4'
 
-  /* CORE Akka */
-  testImplementation "com.typesafe.akka:akka-actor_${scalaVersion}:${akkaVersion}"
+  /* CORE pekko */
+  testImplementation "org.apache.pekko:pekko-actor_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.4.4'
-  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
+  implementation 'ch.qos.logback:logback-classic:1.4.14'
+  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
   implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
@@ -77,13 +76,13 @@ dependencies {
       )
 
   /* config */
-  implementation 'com.typesafe:config:1.4.2'
+  implementation 'com.typesafe:config:1.4.3'
   implementation "com.github.carueda:tscfg_2.13:$tscfgVersion"
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 
   /* Testing */
-  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.14"
-  testRuntimeClasspath 'com.vladsch.flexmark:flexmark-all:0.64.0'
+  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.17"
+  testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.8' // scalatest html output
 }
 
 group = 'edu.ie3'

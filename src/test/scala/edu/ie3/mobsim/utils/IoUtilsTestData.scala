@@ -8,14 +8,14 @@ package edu.ie3.mobsim.utils
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.model.{ChargingBehaviorTestData, ElectricVehicle}
+import edu.ie3.mobsim.model.{ChargingStationTestData, ElectricVehicle}
 
 import java.io.File
 import java.nio.file.Files
 import java.time.ZonedDateTime
 import java.util.UUID
 
-trait IoUtilsTestData extends ChargingBehaviorTestData {
+trait IoUtilsTestData extends ChargingStationTestData {
   protected val outputFileDir: File =
     Files.createTempDirectory("io-utils-test").toFile
 
@@ -25,7 +25,8 @@ trait IoUtilsTestData extends ChargingBehaviorTestData {
     "evs.csv",
     "evcs.csv",
     "positions.csv",
-    "pois.csv"
+    "pois.csv",
+    writeMovements = true
   )
 
   protected val currentTime: ZonedDateTime = ZonedDateTime.now()
@@ -38,7 +39,7 @@ trait IoUtilsTestData extends ChargingBehaviorTestData {
 
   protected val poiMap
       : Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
-    val poiSet: Set[PointOfInterest] = Set(charging_hub_townPoi)
+    val poiSet: Set[PointOfInterest] = Set(chargingHubTownPoi)
 
     poiSet.groupBy(_.categoricalLocation).map { case (catLoc, poi) =>
       catLoc -> Set.from(poi)
