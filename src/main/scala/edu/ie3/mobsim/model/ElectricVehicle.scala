@@ -18,14 +18,13 @@ import edu.ie3.mobsim.io.probabilities.{
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
 import javax.measure.quantity.{Energy, Length, Power}
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
 /** Class to denote electric vehicle and its current trip.
@@ -186,53 +185,6 @@ final case class ElectricVehicle(
 
 case object ElectricVehicle extends LazyLogging {
 
-  /** Initially create all EV objects for the simulation. The EV objects are
-    * saved in a mutable list. For the parametrization of the EVs, the loaded
-    * probabilities are used.
-    */
-  def createEvs(
-      numberOfEvsInArea: Int,
-      homePOIsWithSizes: Map[PointOfInterest, Double],
-      workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      chargingStations: Seq[ChargingStation],
-      startTime: ZonedDateTime,
-      targetSharePrivateCharging: Double,
-      evModelPdf: ProbabilityDensityFunction[EvType],
-      firstDepartureOfDay: FirstDepartureOfDay
-  ): Set[ElectricVehicle] = {
-    val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
-      determineHomePoiPdf(homePOIsWithSizes, chargingStations)
-
-    /* Assign one car per home POI with home charging option */
-    val amountOfHomeChargingCars =
-      math.round(targetSharePrivateCharging * numberOfEvsInArea).intValue
-    val initialHomeChargingCars = assignInitialHomeChargingCars(
-      amountOfHomeChargingCars,
-      homePoiPdfWithHomeCharging,
-      workPoiPdf,
-      evModelPdf,
-      firstDepartureOfDay,
-      startTime
-    )
-
-    /* Build the remaining cars */
-    val additionalCars = assignRemainingCars(
-      numberOfEvsInArea,
-      amountOfHomeChargingCars,
-      initialHomeChargingCars.size,
-      homePoiPdfWithHomeCharging,
-      homePoiPdfWithoutHomeCharging,
-      workPoiPdf,
-      evModelPdf,
-      firstDepartureOfDay,
-      startTime
-    )
-
-    val evs = initialHomeChargingCars.toSet ++ additionalCars
-    logger.debug(s"Created ${evs.size} EVs during setup.")
-    evs
-  }
-
   /** Determine probability density functions for home POI separated by the
     * possible to charge at home or not
     *
@@ -242,7 +194,7 @@ case object ElectricVehicle extends LazyLogging {
     *   Collection of available charging stations
     * @return
     */
-  private def determineHomePoiPdf(
+  def determineHomePoiPdf(
       homePoisWithSizes: Map[PointOfInterest, Double],
       chargingStations: Seq[ChargingStation]
   ): (
@@ -313,82 +265,16 @@ case object ElectricVehicle extends LazyLogging {
     )
   }
 
-  /** Assign the first electric vehicles to home charging stations with home
-    * charging possibility. The amount of cars, that are created here, is
-    * limited by either the amount of available charging stations with home
-    * charging option or the targeted amount of cars, that charge at home -
-    * which of both applies earlier.
-    *
-    * @param amountOfHomeChargingCars
-    *   Targeted amount of cars charging at home
-    * @param homePoiPdfWithHomeCharging
-    *   Probability density function for home POIs with home charging option
-    * @param workPoiPdf
-    *   Probability density function for work POI
-    * @param evModelPdf
-    *   Probability density function for ev model
-    * @param firstDepartureOfDay
-    *   Meta-information to determine the first departure of the day
-    * @param simulationStart
-    *   Wall clock time of the simulation start
-    * @return
-    *   A collection of electric vehicles assigned to home chargers
-    */
-  private def assignInitialHomeChargingCars(
-      amountOfHomeChargingCars: Int,
-      homePoiPdfWithHomeCharging: ProbabilityDensityFunction[PointOfInterest],
-      workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      evModelPdf: ProbabilityDensityFunction[EvType],
-      firstDepartureOfDay: FirstDepartureOfDay,
-      simulationStart: ZonedDateTime
-  ): Iterable[ElectricVehicle] =
-    homePoiPdfWithHomeCharging.pdf.keys.zipWithIndex
-      .filter(
-        _._2 < amountOfHomeChargingCars
-      ) // Limit to the amount of home charging cars, if needed
-      .map { case (homePoi, idx) =>
-        buildEvWithRandomAttributes(
-          s"EV_$idx",
-          evModelPdf,
-          workPoiPdf,
-          firstDepartureOfDay,
-          simulationStart,
-          homePoi,
-          isHomeChargingPossible = true
-        )
-      }
-
-  /** Build electric vehicle model with the following random attributes: Model,
-    * work POI and first departure of day
-    *
-    * @param id
-    *   Human-readable identifier
-    * @param evModelPdf
-    *   Probability density function for the model
-    * @param workPoiPdf
-    *   Probability density function for the work POI
-    * @param firstDepartureOfDay
-    *   Meta-information to determine the first departure of the day
-    * @param startTime
-    *   Wall clock time of the simulation start
-    * @param homePoi
-    *   Known home POI of the car
-    * @param isHomeChargingPossible
-    *   Whether or not charging at home is possible
-    * @return
-    *   An electric vehicle model
-    */
-  private def buildEvWithRandomAttributes(
+  def buildEvWithType(
       id: String,
-      evModelPdf: ProbabilityDensityFunction[EvType],
+      uuid: UUID,
+      evType: EvType,
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       firstDepartureOfDay: FirstDepartureOfDay,
       startTime: ZonedDateTime,
       homePoi: PointOfInterest,
       isHomeChargingPossible: Boolean
   ): ElectricVehicle = {
-    /* Sample the ev model */
-    val evType = evModelPdf.sample()
     /* Sample work POI based on sizes */
     val workPoi = workPoiPdf.sample()
     /* Like this, the EV will have its first departure on first day */
@@ -403,7 +289,8 @@ case object ElectricVehicle extends LazyLogging {
       workPoi,
       startTime,
       firstDeparture,
-      isHomeChargingPossible
+      isHomeChargingPossible,
+      uuid
     )
   }
 
@@ -433,11 +320,12 @@ case object ElectricVehicle extends LazyLogging {
       workPoi: PointOfInterest,
       simulationStart: ZonedDateTime,
       firstDeparture: ZonedDateTime,
-      isChargingAtHomePossible: Boolean
+      isChargingAtHomePossible: Boolean,
+      uuid: UUID = UUID.randomUUID()
   ): ElectricVehicle = {
     ElectricVehicle(
       simulationStart = simulationStart,
-      uuid = UUID.randomUUID(),
+      uuid = uuid,
       id = id,
       // todo: check if this is neccessary
       evType = evType.copy(
@@ -469,94 +357,4 @@ case object ElectricVehicle extends LazyLogging {
     )
   }
 
-  /** Create and assign the remaining amount of cars. As long as the targeted
-    * amount of home-charging cars is not meat, randomly assign cars to home POI
-    * with home charging option (where already one cars is assigned). If all
-    * home charging cars are assigned, randomly assign cars to the home POI,
-    * where no home charging is possible.
-    *
-    * @param amountOfEvsInArea
-    *   Targeted amount of evs in area
-    * @param amountOfHomeChargingCars
-    *   Targeted amount of home charging evs
-    * @param amountOfAssignedCars
-    *   Amount of already assigned evs with home charging option
-    * @param homePoiPdfWithHomeCharging
-    *   Probability density function for home POI with home charging option
-    * @param homePoiPdfWithoutHomeCharging
-    *   Probability density function for home POI without home charging option
-    * @param workPoiPdf
-    *   Probability density function for work POI
-    * @param evModelPdf
-    *   Probability density function for ev models
-    * @param firstDepartureOfDay
-    *   Meta-information to determine the first departure of the day
-    * @param simulationStart
-    *   Wall clock time of the simulation start
-    * @return
-    *   A collection of evs with and without home charging
-    */
-  private def assignRemainingCars(
-      amountOfEvsInArea: Int,
-      amountOfHomeChargingCars: Int,
-      amountOfAssignedCars: Int,
-      homePoiPdfWithHomeCharging: ProbabilityDensityFunction[PointOfInterest],
-      homePoiPdfWithoutHomeCharging: ProbabilityDensityFunction[
-        PointOfInterest
-      ],
-      workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
-      evModelPdf: ProbabilityDensityFunction[EvType],
-      firstDepartureOfDay: FirstDepartureOfDay,
-      simulationStart: ZonedDateTime
-  ): Seq[ElectricVehicle] = {
-    val (amountOfUnassignedHomeChargingCars, amountOfUnassignedCars) =
-      determineUnassignedCars(
-        amountOfEvsInArea,
-        amountOfHomeChargingCars,
-        amountOfAssignedCars
-      )
-    Range(0, amountOfUnassignedCars).map { cnt =>
-      /* As long as there are still cars unassigned with home charging option, do that, otherwise assign the rest to the
-       * other home POIs */
-      val (homePoi, isHomeChargingPossible) =
-        if (cnt < amountOfUnassignedHomeChargingCars)
-          (homePoiPdfWithHomeCharging.sample(), true)
-        else
-          (homePoiPdfWithoutHomeCharging.sample(), false)
-      val idx = cnt + amountOfAssignedCars
-
-      buildEvWithRandomAttributes(
-        s"EV_$idx",
-        evModelPdf,
-        workPoiPdf,
-        firstDepartureOfDay,
-        simulationStart,
-        homePoi,
-        isHomeChargingPossible
-      )
-    }
-  }
-
-  /** Determine the overall amount of unassigned cars as well as the amount of
-    * unassigned cars, that are meant to charge at home
-    *
-    * @param amountOfEvsInArea
-    *   Targeted amount of evs
-    * @param amountOfHomeChargingCars
-    *   Targeted amount of evs, that charge at home
-    * @param amountOfAssignedCars
-    *   Amount of already assigned cars, that charge at home
-    * @return
-    *   The amount of unassigned cars, that charge at home and the overall
-    *   amount
-    */
-  private def determineUnassignedCars(
-      amountOfEvsInArea: Int,
-      amountOfHomeChargingCars: Int,
-      amountOfAssignedCars: Int
-  ): (Int, Int) =
-    (
-      math.max(amountOfHomeChargingCars - amountOfAssignedCars, 0),
-      math.max(amountOfEvsInArea - amountOfAssignedCars, 0)
-    )
 }

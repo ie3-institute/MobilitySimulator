@@ -11,7 +11,6 @@ import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.PowerSystemUnits
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
@@ -163,7 +162,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
     "finding suitable charging stations for categorical location types" should {
       val suitableChargingStations =
-        PrivateMethod[Set[ChargingStation]](Symbol("suitableChargingStations"))
+        PrivateMethod[Seq[ChargingStation]](Symbol("suitableChargingStations"))
 
       "find the right charging stations for categorical location 'home'" in {
         PointOfInterest invokePrivate suitableChargingStations(
@@ -201,14 +200,11 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         )
         val expected = Map(
           cs0 -> Quantities
-            .getQuantity(0.013113941716235453974464, Units.METRE)
-            .to(PowerSystemUnits.KILOMETRE),
+            .getQuantity(0.013113941716235453974464, Units.METRE),
           cs1 -> Quantities
-            .getQuantity(1.10382753815854878670116, Units.METRE)
-            .to(PowerSystemUnits.KILOMETRE),
+            .getQuantity(1.10382753815854878670116, Units.METRE),
           cs2 -> Quantities
             .getQuantity(111.545809977148284216795, Units.METRE)
-            .to(PowerSystemUnits.KILOMETRE)
         )
 
         actual.toMap.keys should contain allElementsOf Seq(cs0, cs1, cs2)
@@ -241,7 +237,8 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         ",",
         Seq(cs1, cs3),
         Quantities.getQuantity(50d, Units.METRE),
-        Quantities.getQuantity(30d, Units.METRE)
+        Quantities.getQuantity(30d, Units.METRE),
+        assignHomeNearestChargingStations = true
       ) match {
         case Failure(exception) =>
           fail("Getting points of interest from file did fail.", exception)

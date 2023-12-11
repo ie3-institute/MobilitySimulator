@@ -6,6 +6,7 @@
 
 package edu.ie3.mobsim.utils
 
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
@@ -17,6 +18,7 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
 }
 
 import java.io.{BufferedReader, File, FileReader}
+import java.nio.file.Path
 import java.util
 
 class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
@@ -64,7 +66,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write evs correctly" in {
-      ioUtils.writeEvs(evSet)
+      ioUtils.writeEvs(evs)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "evs.csv"))
@@ -115,7 +117,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       val chargingPoints: Int = cs6.chargingPoints
       val chargingEvs: String =
         chargingStationOccupancy
-          .getOrElse(cs6.uuid, Set.empty)
+          .getOrElse(cs6.uuid, Seq.empty)
           .map(_.uuid)
           .mkString("[", "|", "]")
 
@@ -147,9 +149,9 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val compareString: String = s"${charging_hub_townPoi.id};" +
+      val compareString: String = s"${chargingHubTownPoi.id};" +
         s"${PoiTypeDictionary.CHARGING_HUB_TOWN};" +
-        s"${charging_hub_townPoi.size};" +
+        s"${chargingHubTownPoi.size};" +
         s"$cs4;" +
         s"${0.0}"
 
@@ -194,6 +196,16 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
           str shouldBe compareString
         }
       }
+    }
+
+    "read ev inputs successfully" in {
+      val path = Path.of(getClass.getResource("ev_input_data").toURI)
+      val csvParams = CsvParams(
+        ",",
+        path.toString
+      )
+      val evInputs = IoUtils.readEvInputs(csvParams)
+      evInputs should have size 1
     }
   }
 }

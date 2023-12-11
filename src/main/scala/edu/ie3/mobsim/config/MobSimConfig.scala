@@ -45,15 +45,47 @@ object MobSimConfig {
 
   final case class Mobsim(
       input: MobSimConfig.Mobsim.Input,
-      outputDir: scala.Option[java.lang.String],
+      output: MobSimConfig.Mobsim.Output,
       simulation: MobSimConfig.Mobsim.Simulation
   )
   object Mobsim {
     final case class Input(
+        evInputSource: scala.Option[MobSimConfig.Mobsim.Input.EvInputSource],
         grid: MobSimConfig.Mobsim.Input.Grid,
         mobility: MobSimConfig.Mobsim.Input.Mobility
     )
     object Input {
+      final case class EvInputSource(
+          homePoiMapping: scala.Option[MobSimConfig.CsvParams],
+          source: MobSimConfig.CsvParams
+      )
+      object EvInputSource {
+        def apply(
+            c: com.typesafe.config.Config,
+            parentPath: java.lang.String,
+            $tsCfgValidator: $TsCfgValidator
+        ): MobSimConfig.Mobsim.Input.EvInputSource = {
+          MobSimConfig.Mobsim.Input.EvInputSource(
+            homePoiMapping =
+              if (c.hasPathOrNull("homePoiMapping"))
+                scala.Some(
+                  MobSimConfig.CsvParams(
+                    c.getConfig("homePoiMapping"),
+                    parentPath + "homePoiMapping.",
+                    $tsCfgValidator
+                  )
+                )
+              else None,
+            source = MobSimConfig.CsvParams(
+              if (c.hasPathOrNull("source")) c.getConfig("source")
+              else com.typesafe.config.ConfigFactory.parseString("source{}"),
+              parentPath + "source.",
+              $tsCfgValidator
+            )
+          )
+        }
+      }
+
       final case class Grid(
           name: java.lang.String,
           source: MobSimConfig.CsvParams
@@ -118,6 +150,16 @@ object MobSimConfig {
           $tsCfgValidator: $TsCfgValidator
       ): MobSimConfig.Mobsim.Input = {
         MobSimConfig.Mobsim.Input(
+          evInputSource =
+            if (c.hasPathOrNull("evInputSource"))
+              scala.Some(
+                MobSimConfig.Mobsim.Input.EvInputSource(
+                  c.getConfig("evInputSource"),
+                  parentPath + "evInputSource.",
+                  $tsCfgValidator
+                )
+              )
+            else None,
           grid = MobSimConfig.Mobsim.Input.Grid(
             if (c.hasPathOrNull("grid")) c.getConfig("grid")
             else com.typesafe.config.ConfigFactory.parseString("grid{}"),
@@ -130,6 +172,26 @@ object MobSimConfig {
             parentPath + "mobility.",
             $tsCfgValidator
           )
+        )
+      }
+    }
+
+    final case class Output(
+        outputDir: scala.Option[java.lang.String],
+        writeMovements: scala.Boolean
+    )
+    object Output {
+      def apply(
+          c: com.typesafe.config.Config,
+          parentPath: java.lang.String,
+          $tsCfgValidator: $TsCfgValidator
+      ): MobSimConfig.Mobsim.Output = {
+        MobSimConfig.Mobsim.Output(
+          outputDir =
+            if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
+            else None,
+          writeMovements =
+            !c.hasPathOrNull("writeMovements") || c.getBoolean("writeMovements")
         )
       }
     }
@@ -253,9 +315,12 @@ object MobSimConfig {
           parentPath + "input.",
           $tsCfgValidator
         ),
-        outputDir =
-          if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
-          else None,
+        output = MobSimConfig.Mobsim.Output(
+          if (c.hasPathOrNull("output")) c.getConfig("output")
+          else com.typesafe.config.ConfigFactory.parseString("output{}"),
+          parentPath + "output.",
+          $tsCfgValidator
+        ),
         simulation = MobSimConfig.Mobsim.Simulation(
           if (c.hasPathOrNull("simulation")) c.getConfig("simulation")
           else com.typesafe.config.ConfigFactory.parseString("simulation{}"),

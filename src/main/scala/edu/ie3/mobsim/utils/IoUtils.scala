@@ -7,6 +7,11 @@
 package edu.ie3.mobsim.utils
 
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
+import edu.ie3.datamodel.io.naming.FileNamingStrategy
+import edu.ie3.datamodel.io.source._
+import edu.ie3.datamodel.io.source.csv._
+import edu.ie3.datamodel.models.input.system.EvInput
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
@@ -15,9 +20,11 @@ import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATTHOUR,
   KILOWATTHOUR_PER_KILOMETRE
 }
+import kantan.csv.{RowDecoder, _}
+import kantan.csv.ops.toCsvInputOps
 
-import java.io.File
-import java.nio.file.{Files, Paths}
+import java.io.IOException
+import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.jdk.CollectionConverters._
@@ -28,7 +35,8 @@ final case class IoUtils private (
     evcsWriter: BufferedCsvWriter,
     evPosWriter: BufferedCsvWriter,
     poiWriter: BufferedCsvWriter,
-    csvSep: String
+    csvSep: String,
+    writeMovements: Boolean
 ) {
 
   /** Define relevant data for EV and call IO function to write it to csv.
@@ -74,7 +82,7 @@ final case class IoUtils private (
     *   Collection of electric vehicles
     */
   def writeEvs(
-      electricVehicles: Set[ElectricVehicle]
+      electricVehicles: Iterable[ElectricVehicle]
   ): Unit = electricVehicles.foreach { ev =>
     val fieldData = Map(
       "uuid" -> ev.getUuid.toString,
@@ -114,7 +122,7 @@ final case class IoUtils private (
     */
   def writeEvcs(
       cs: ChargingStation,
-      chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]],
+      chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]],
       currentTime: ZonedDateTime,
       uuid: UUID = UUID.randomUUID()
   ): Unit = {
@@ -124,7 +132,7 @@ final case class IoUtils private (
       "evcs" -> cs.uuid.toString,
       "charging_points" -> cs.chargingPoints.toString,
       "charging_evs" -> chargingStationOccupancy
-        .getOrElse(cs.uuid, Set.empty)
+        .getOrElse(cs.uuid, Seq.empty)
         .map(_.uuid)
         .mkString("[", "|", "]")
     ).asJava
@@ -201,13 +209,14 @@ object IoUtils {
       evcsFileName: String,
       evPosFileName: String,
       poiFileName: String,
+      writeMovements: Boolean,
       csvSep: String = ";"
   ): IoUtils = {
     Files.createDirectories(Paths.get(outputPath))
 
     /* Create writer for ev movements and write headline */
     val movementWriter = {
-      val filePath = Seq(outputPath, movementFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, movementFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -230,7 +239,7 @@ object IoUtils {
 
     /* Create writer for evs and write headline */
     val evWriter = {
-      val filePath = Seq(outputPath, evFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -253,7 +262,7 @@ object IoUtils {
 
     /* Create writer for evcs and write headline */
     val evcsWriter = {
-      val filePath = Seq(outputPath, evcsFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evcsFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -271,7 +280,7 @@ object IoUtils {
 
     /* Create writer for ev positions and write headline */
     val evPosWriter = {
-      val filePath = Seq(outputPath, evPosFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, evPosFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -288,7 +297,7 @@ object IoUtils {
 
     /* Create writer for points of interest and write headline */
     val poiWriter = {
-      val filePath = Seq(outputPath, poiFileName).mkString(File.separator)
+      val filePath = Path.of(outputPath, poiFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -311,7 +320,67 @@ object IoUtils {
       evcsWriter,
       evPosWriter,
       poiWriter,
-      csvSep
+      csvSep,
+      writeMovements
     )
   }
+
+  def readEvInputs(csvParams: CsvParams): Seq[EvInput] = {
+    val namingStrategy = new FileNamingStrategy()
+
+    val csvDataSource = new CsvDataSource(
+      csvParams.colSep,
+      Path.of(csvParams.path),
+      namingStrategy
+    )
+
+    val typeSource: TypeSource = new TypeSource(csvDataSource)
+
+    val thermalSource: ThermalSource = new ThermalSource(
+      typeSource,
+      csvDataSource
+    )
+
+    val rawGridSource =
+      new RawGridSource(
+        typeSource,
+        csvDataSource
+      )
+    val systemParticipantSource = new SystemParticipantSource(
+      typeSource,
+      thermalSource,
+      rawGridSource,
+      csvDataSource
+    )
+    val evs = systemParticipantSource.getEvs
+    if (evs.isEmpty) {
+      throw new IOException(s"No evs parsed at ${csvParams.path}!")
+    }
+    evs.asScala.toSeq
+  }
+
+  def getProjectRootDir: String = {
+    System.getProperty("user.dir")
+  }
+
+  def getAbsolutePath(folderPath: String): Path = {
+    val path = Paths.get(folderPath)
+    if (!path.isAbsolute) Paths.get(getProjectRootDir, path.toString)
+    else path
+  }
+
+  def readCaseClassSeq[T](implicit
+      decoder: RowDecoder[T],
+      folderPath: String,
+      csvSep: Char
+  ): Seq[T] = {
+    val absolutePath = getAbsolutePath(folderPath).toUri
+    ReadResult.sequence(
+      absolutePath.readCsv[List, T](rfc.withHeader.withCellSeparator(csvSep))
+    ) match {
+      case Left(readError) => throw readError
+      case Right(values)   => values
+    }
+  }
+
 }

@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 import java.util.UUID
 import scala.util.Random
 
-trait ChargingBehaviorTestData extends TripSimulationTestData {
+trait ChargingStationTestData extends TripSimulationTestData {
 
   protected val evLowSoC: ElectricVehicle = ev1.copyWith(
     zero,
@@ -24,7 +24,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
 
   protected val evAtChargingHub: ElectricVehicle = ev2.copyWith(
     half,
-    destinationPoi = charging_hub_townPoi,
+    destinationPoi = chargingHubTownPoi,
     destinationPoiType = PoiTypeDictionary.CHARGING_HUB_TOWN,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
@@ -32,7 +32,7 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
 
   protected val evNextTrip: ElectricVehicle = ev3.copyWith(
     ev3.getEStorage,
-    destinationPoi = other_shopPoi,
+    destinationPoi = otherShopPoi,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
     departureTime = ZonedDateTime.now().plusHours(1)
@@ -63,8 +63,8 @@ trait ChargingBehaviorTestData extends TripSimulationTestData {
       .updated(cs7.uuid, 10.0)
   }
 
-  protected val chargingStationOccupancy: Map[UUID, Set[ElectricVehicle]] = {
-    Set(ev1, ev2, ev3, ev4, ev5)
+  protected val chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]] = {
+    Seq(ev1, ev2, ev3, ev4, ev5)
       .flatMap { ev =>
         ev.chosenChargingStation.map(ev -> _)
       }

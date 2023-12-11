@@ -7,8 +7,17 @@
 package edu.ie3.mobsim.model
 
 import edu.ie3.datamodel.models.ElectricCurrentType
+import edu.ie3.datamodel.models.input.NodeInput
+import edu.ie3.datamodel.models.input.system.EvInput
+import edu.ie3.datamodel.models.input.system.`type`.EvTypeInput
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
+import edu.ie3.datamodel.models.input.system.characteristic.ReactivePowerCharacteristic
+import edu.ie3.datamodel.models.voltagelevels.{
+  CommonVoltageLevel,
+  GermanVoltageLevelUtils,
+  VoltageLevel
+}
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
@@ -16,6 +25,7 @@ import edu.ie3.mobsim.io.probabilities.{
   ProbabilityDensityFunction
 }
 import edu.ie3.util.quantities.PowerSystemUnits
+import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
 import org.locationtech.jts.geom.Coordinate
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
@@ -99,4 +109,33 @@ trait ElectricVehicleTestData {
   protected val evWithoutHomeCharging: ElectricVehicle = {
     evWithHomeCharging.copy(chargingAtHomePossible = false)
   }
+
+  val node = new NodeInput(
+    UUID.randomUUID(),
+    "test-node",
+    1d.asPu,
+    false,
+    NodeInput.DEFAULT_GEO_POSITION,
+    GermanVoltageLevelUtils.LV,
+    1
+  )
+
+  protected val evInputType = new EvTypeInput(
+    UUID.randomUUID(),
+    "test-type",
+    1d.asEuro,
+    1d.asEuroPerKiloWattHour,
+    50d.asKiloWattHour,
+    5d.asKiloWattHourPerKiloMetre,
+    11d.asKiloVoltAmpere,
+    0.9
+  )
+
+  protected val evInput = new EvInput(
+    UUID.randomUUID(),
+    "test-ev-input",
+    node,
+    ReactivePowerCharacteristic.parse("cosPhiFixed:{(0.0, 0.95)}"),
+    evInputType
+  )
 }
