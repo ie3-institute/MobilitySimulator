@@ -15,9 +15,12 @@ class UtilsSpec extends UnitSpec {
     val cases = Table(
       ("time", "roundedTime"),
       (4, 15),
+      (15, 15),
       (16, 15),
       (22, 15),
-      (23, 30)
+      (23, 30),
+      (30, 30),
+      (74, 75),
     )
 
     forAll(cases) { (time, roundedTime) =>
