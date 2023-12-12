@@ -63,7 +63,8 @@ final class MobilitySimulator(
     ioUtils: IoUtils,
     tripProbabilities: TripProbabilities,
     maxDistanceFromPoi: ComparableQuantity[Length],
-    thresholdChargingHubDistance: ComparableQuantity[Length]
+    thresholdChargingHubDistance: ComparableQuantity[Length],
+    round15: Boolean
 ) extends LazyLogging {
   def doActivity(tick: Long): Optional[java.lang.Long] = {
     /* Update current time */
@@ -105,7 +106,8 @@ final class MobilitySimulator(
       currentTime,
       departedEvsFromSimona,
       tripProbabilities,
-      thresholdChargingHubDistance
+      thresholdChargingHubDistance,
+      round15
     )
 
     /* Get time until next event for one of the EVs and return corresponding tick to SIMONA */
@@ -461,7 +463,8 @@ final class MobilitySimulator(
       currentTime: ZonedDateTime,
       departedEvsFromSimona: Seq[ElectricVehicle],
       tripProbabilities: TripProbabilities,
-      thresholdChargingHubDistance: ComparableQuantity[Length]
+      thresholdChargingHubDistance: ComparableQuantity[Length],
+      round15: Boolean
   ): Unit = {
 
     // here a set is useful for fast containment checking
@@ -493,7 +496,8 @@ final class MobilitySimulator(
           chargingStations,
           ioUtils,
           tripProbabilities,
-          thresholdChargingHubDistance
+          thresholdChargingHubDistance,
+          round15
         )
       } else ev
     })
@@ -710,7 +714,8 @@ object MobilitySimulator
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
       config.mobsim.input.mobility.source.colSep,
-      config.mobsim.simulation.averageCarUsage
+      config.mobsim.simulation.averageCarUsage,
+      config.mobsim.simulation.round15
     )
 
     val homePOIsWithSizes = poisWithSizes
@@ -831,7 +836,8 @@ object MobilitySimulator
       ioUtils,
       tripProbabilities,
       maxDistanceFromPoi,
-      thresholdChargingHubDistance
+      thresholdChargingHubDistance,
+      config.mobsim.simulation.round15
     )
     simulator = Some(mobSim)
 

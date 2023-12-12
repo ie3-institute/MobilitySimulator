@@ -13,9 +13,10 @@ import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
 import org.scalatest.OptionValues._
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.METRE
+import tech.units.indriya.unit.Units.{METRE, SECOND}
 
-import java.time.ZonedDateTime
+import java.time.temporal.TemporalUnit
+import java.time.{LocalDateTime, ZonedDateTime}
 import javax.measure.quantity.Energy
 import scala.collection.mutable
 
@@ -80,7 +81,6 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
-    // testing makeModifiedTripToChargingHub
     "makeModifiedTripToChargingHub correctly" in {
       TripSimulation.makeModifiedTripToChargingHub(
         PoiTypeDictionary.CHARGING_HUB_TOWN,

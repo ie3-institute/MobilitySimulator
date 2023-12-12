@@ -69,7 +69,8 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
                 weekdayProbability,
                 saturdayProbability,
                 sundayProbability,
-                averageCarUsage
+                averageCarUsage,
+                round15 = false
               )
             )
           case None =>

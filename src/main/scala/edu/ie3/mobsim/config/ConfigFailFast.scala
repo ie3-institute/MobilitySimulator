@@ -41,6 +41,7 @@ object ConfigFailFast {
             _,
             numberOfEv,
             _,
+            _,
             targetHomeChargingShare
           ) =>
         if (averageCarUsage > 1 | averageCarUsage < 0)

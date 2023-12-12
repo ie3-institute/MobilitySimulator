@@ -6,6 +6,8 @@
 
 package edu.ie3.mobsim.io.probabilities
 
+import edu.ie3.mobsim.utils.utils
+
 import edu.ie3.mobsim.io.probabilities.FirstDepartureOfDay.random
 
 import java.time.{DayOfWeek, ZoneId, ZonedDateTime}
@@ -16,7 +18,8 @@ final case class FirstDepartureOfDay(
     probabilityWeekday: ProbabilityDensityFunction[Int],
     probabilitySaturday: ProbabilityDensityFunction[Int],
     probabilitySunday: ProbabilityDensityFunction[Int],
-    averageCarUsage: Double
+    averageCarUsage: Double,
+    round15: Boolean
 ) {
 
   /** Sample the first departure time on a day dependent on day type. Using data
@@ -40,11 +43,16 @@ final case class FirstDepartureOfDay(
     val nextDayWithNewTrip = sampleNextDayWithNewTrip(time)
 
     /* Sample time of first departure as Int */
-    val departureTimeAsInt: Int = nextDayWithNewTrip.getDayOfWeek match {
+    val rawDepartureTimeAsInt: Int = nextDayWithNewTrip.getDayOfWeek match {
       case DayOfWeek.SATURDAY => probabilitySaturday.sample()
       case DayOfWeek.SUNDAY   => probabilitySunday.sample()
       case _                  => probabilityWeekday.sample()
     }
+
+    val departureTimeAsInt = if (round15) {
+      utils.roundToQuarterHourInMinutes(rawDepartureTimeAsInt)
+    } else
+      rawDepartureTimeAsInt
 
     val firstDeparture = ZonedDateTime.of(
       nextDayWithNewTrip.getYear,

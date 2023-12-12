@@ -53,7 +53,8 @@ object TripProbabilities extends LazyLogging {
   def read(
       pathsAndSources: PathsAndSources,
       colSep: String,
-      averageCarUsage: Double
+      averageCarUsage: Double,
+      round15: Boolean
   ): TripProbabilities = {
 
     val firstDepartureOfDay =
@@ -66,7 +67,7 @@ object TripProbabilities extends LazyLogging {
             "Unable to get probabilities for first departure of day from path.",
             exception
           )
-        case Success(value) => value
+        case Success(value) => value.copy(round15 = round15)
       }
 
     val categoricalLocation = CategoricalLocationFactory.getFromFile(
@@ -117,7 +118,7 @@ object TripProbabilities extends LazyLogging {
           "Unable to get probabilities for parking time from path.",
           exception
         )
-      case Success(value) => value
+      case Success(value: ParkingTime) => value.copy(round15 = round15)
     }
     logger.debug("Done loading probabilities for parking time")
 

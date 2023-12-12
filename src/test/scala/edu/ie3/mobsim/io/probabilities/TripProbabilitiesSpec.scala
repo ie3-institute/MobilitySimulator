@@ -26,7 +26,12 @@ class TripProbabilitiesSpec extends UnitSpec {
     val pathsAndSources =
       PathsAndSources("testSim", Input(None, gridConf, mobilityConf), None)
     val tripProbabilities =
-      TripProbabilities.read(pathsAndSources, ",", averageCarUsage)
+      TripProbabilities.read(
+        pathsAndSources,
+        ",",
+        averageCarUsage,
+        round15 = true
+      )
 
     tripProbabilities.categoricalLocation.probabilitiesWeekday.size shouldBe 42
     tripProbabilities.categoricalLocation.probabilitiesSaturday.size shouldBe 42
@@ -47,6 +52,7 @@ class TripProbabilitiesSpec extends UnitSpec {
     tripProbabilities.parkingTime.probabilitiesWeekday.size shouldBe 672
     tripProbabilities.parkingTime.probabilitiesSaturday.size shouldBe 672
     tripProbabilities.parkingTime.probabilitiesSunday.size shouldBe 672
+    tripProbabilities.parkingTime.round15 shouldBe true
 
     tripProbabilities.poiTransition.probabilitiesWeekday.size shouldBe 672
     tripProbabilities.poiTransition.probabilitiesSaturday.size shouldBe 672
