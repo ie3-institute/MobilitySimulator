@@ -12,11 +12,13 @@ import edu.ie3.test.common.UnitSpec
 import scala.util.{Failure, Success}
 
 class FirstDepartureFactorySpec extends UnitSpec {
+  protected val averageCarUsage = 1.0
+
   "Getting first departure probabilities from file" when {
     "having a proper file" should {
       val properFilePath = this.getClass.getResource("departure.csv").getFile
       "pass" in {
-        FirstDepartureFactory.getFromFile(properFilePath, ",") match {
+        FirstDepartureFactory(1.0).getFromFile(properFilePath, ",") match {
           case Failure(exception) =>
             fail("Failed with exception, but was meant to pass.", exception)
           case Success(
@@ -24,7 +26,7 @@ class FirstDepartureFactorySpec extends UnitSpec {
                   probabilityWeekday,
                   probabilitySaturday,
                   probabilitySunday,
-                  _
+                  _,
                 )
               ) =>
             probabilityWeekday.pdf should have size 1
@@ -39,7 +41,7 @@ class FirstDepartureFactorySpec extends UnitSpec {
         val path =
           this.getClass.getResource("departure_headline_malformed.csv").getFile
 
-        FirstDepartureFactory.getFromFile(path, ",") match {
+        FirstDepartureFactory(averageCarUsage).getFromFile(path, ",") match {
           case Failure(exception) =>
             exception.getMessage shouldBe "Unable to read from content from file. Available headline elements: 'uuid,day_type,minute_of_day,something_weird', required fields: 'uuid,day_type,minute_of_day,probability'"
           case Success(value) =>
@@ -51,7 +53,7 @@ class FirstDepartureFactorySpec extends UnitSpec {
         val path =
           this.getClass.getResource("departure_unknown_day_type.csv").getFile
 
-        FirstDepartureFactory.getFromFile(path, ",") match {
+        FirstDepartureFactory(averageCarUsage).getFromFile(path, ",") match {
           case Failure(exception) =>
             exception.getMessage shouldBe "Unable to build first departure probabilities. First failure in stack trace."
             exception.getCause.getMessage shouldBe "Unable to parse day type from unknown token 'friyay'. Permissible values: saturday, sunday, weekday"

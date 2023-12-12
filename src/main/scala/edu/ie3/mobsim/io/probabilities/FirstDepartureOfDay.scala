@@ -8,13 +8,18 @@ package edu.ie3.mobsim.io.probabilities
 
 import edu.ie3.mobsim.utils.utils
 
+import edu.ie3.mobsim.io.probabilities.FirstDepartureOfDay.random
+
 import java.time.{DayOfWeek, ZoneId, ZonedDateTime}
+import scala.annotation.tailrec
+import scala.util.Random
 
 final case class FirstDepartureOfDay(
     probabilityWeekday: ProbabilityDensityFunction[Int],
     probabilitySaturday: ProbabilityDensityFunction[Int],
     probabilitySunday: ProbabilityDensityFunction[Int],
-    round15: Boolean
+    averageCarUsage: Double,
+    round15: Boolean,
 ) {
 
   /** Sample the first departure time on a day dependent on day type. Using data
@@ -27,12 +32,18 @@ final case class FirstDepartureOfDay(
     */
   def sample(time: ZonedDateTime): ZonedDateTime = {
 
+    @tailrec
+    def sampleNextDayWithNewTrip(time: ZonedDateTime): ZonedDateTime = {
+      if (random.nextDouble() <= averageCarUsage) time.plusDays(1)
+      else sampleNextDayWithNewTrip(time.plusDays(1))
+    }
+
     /* We can say that the departure will be on the next day ( = today + 1 day) to get year, month and day.
      * Hour and minute can be determined using departureTimeAsInt. */
-    val nextDay = time.plusDays(1)
+    val nextDayWithNewTrip = sampleNextDayWithNewTrip(time)
 
     /* Sample time of first departure as Int */
-    val rawDepartureTimeAsInt: Int = nextDay.getDayOfWeek match {
+    val rawDepartureTimeAsInt: Int = nextDayWithNewTrip.getDayOfWeek match {
       case DayOfWeek.SATURDAY => probabilitySaturday.sample()
       case DayOfWeek.SUNDAY   => probabilitySunday.sample()
       case _                  => probabilityWeekday.sample()
@@ -44,9 +55,9 @@ final case class FirstDepartureOfDay(
       rawDepartureTimeAsInt
 
     val firstDeparture = ZonedDateTime.of(
-      nextDay.getYear,
-      nextDay.getMonthValue,
-      nextDay.getDayOfMonth,
+      nextDayWithNewTrip.getYear,
+      nextDayWithNewTrip.getMonthValue,
+      nextDayWithNewTrip.getDayOfMonth,
       departureTimeAsInt / 60,
       departureTimeAsInt % 60,
       0,
@@ -58,4 +69,8 @@ final case class FirstDepartureOfDay(
     if (firstDeparture == time) firstDeparture.plusMinutes(1)
     else firstDeparture
   }
+}
+
+object FirstDepartureOfDay {
+  val random: Random = new Random()
 }

@@ -15,7 +15,7 @@ import edu.ie3.test.common.UnitSpec
 import java.nio.file.Paths
 
 class TripProbabilitiesSpec extends UnitSpec {
-
+  protected val averageCarUsage = 1.0
   "reads trip probabilities from files correctly" in {
 
     val gridConf = Grid("grid", CsvParams("/some/Path", ","))
@@ -26,7 +26,7 @@ class TripProbabilitiesSpec extends UnitSpec {
     val pathsAndSources =
       PathsAndSources("testSim", Input(None, gridConf, mobilityConf), None)
     val tripProbabilities =
-      TripProbabilities.read(pathsAndSources, ",", round15 = true)
+      TripProbabilities.read(pathsAndSources, ",", averageCarUsage, round15 = true)
 
     tripProbabilities.categoricalLocation.probabilitiesWeekday.size shouldBe 42
     tripProbabilities.categoricalLocation.probabilitiesSaturday.size shouldBe 42
