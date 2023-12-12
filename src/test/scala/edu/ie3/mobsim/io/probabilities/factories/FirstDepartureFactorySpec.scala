@@ -27,6 +27,7 @@ class FirstDepartureFactorySpec extends UnitSpec {
                   probabilitySaturday,
                   probabilitySunday,
                   _,
+                  _
                 )
               ) =>
             probabilityWeekday.pdf should have size 1

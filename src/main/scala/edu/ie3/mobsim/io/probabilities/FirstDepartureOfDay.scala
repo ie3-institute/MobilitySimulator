@@ -19,7 +19,7 @@ final case class FirstDepartureOfDay(
     probabilitySaturday: ProbabilityDensityFunction[Int],
     probabilitySunday: ProbabilityDensityFunction[Int],
     averageCarUsage: Double,
-    round15: Boolean,
+    round15: Boolean
 ) {
 
   /** Sample the first departure time on a day dependent on day type. Using data
