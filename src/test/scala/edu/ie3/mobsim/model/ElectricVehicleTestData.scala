@@ -13,11 +13,7 @@ import edu.ie3.datamodel.models.input.system.`type`.EvTypeInput
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.datamodel.models.input.system.characteristic.ReactivePowerCharacteristic
-import edu.ie3.datamodel.models.voltagelevels.{
-  CommonVoltageLevel,
-  GermanVoltageLevelUtils,
-  VoltageLevel
-}
+import edu.ie3.datamodel.models.voltagelevels.GermanVoltageLevelUtils
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
@@ -35,6 +31,7 @@ import java.util.UUID
 import javax.measure.quantity.Length
 
 trait ElectricVehicleTestData {
+  protected val averageCarUsage = 1.0
   protected val givenModel: EvType = EvType(
     "cool_model",
     "cool_producer",
@@ -80,7 +77,8 @@ trait ElectricVehicleTestData {
     FirstDepartureOfDay(
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability),
-      ProbabilityDensityFunction(departureProbability)
+      ProbabilityDensityFunction(departureProbability),
+      averageCarUsage
     )
 
   protected val givenChargingStation: ChargingStation = ChargingStation(

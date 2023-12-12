@@ -197,6 +197,7 @@ object MobSimConfig {
     }
 
     final case class Simulation(
+        averageCarUsage: scala.Double,
         location: MobSimConfig.Mobsim.Simulation.Location,
         name: java.lang.String,
         numberOfEv: scala.Int,
@@ -238,6 +239,10 @@ object MobSimConfig {
           $tsCfgValidator: $TsCfgValidator
       ): MobSimConfig.Mobsim.Simulation = {
         MobSimConfig.Mobsim.Simulation(
+          averageCarUsage =
+            if (c.hasPathOrNull("averageCarUsage"))
+              c.getDouble("averageCarUsage")
+            else 0.6,
           location = MobSimConfig.Mobsim.Simulation.Location(
             if (c.hasPathOrNull("location")) c.getConfig("location")
             else com.typesafe.config.ConfigFactory.parseString("location{}"),

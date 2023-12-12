@@ -709,7 +709,8 @@ object MobilitySimulator
 
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
-      config.mobsim.input.mobility.source.colSep
+      config.mobsim.input.mobility.source.colSep,
+      config.mobsim.simulation.averageCarUsage
     )
 
     val homePOIsWithSizes = poisWithSizes
