@@ -9,12 +9,7 @@ package edu.ie3.mobsim.utils
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.io.naming.FileNamingStrategy
 import edu.ie3.datamodel.io.source.csv.CsvDataSource
-import edu.ie3.datamodel.io.source.{
-  RawGridSource,
-  SystemParticipantSource,
-  ThermalSource,
-  TypeSource
-}
+import edu.ie3.datamodel.io.source.{EnergyManagementSource, RawGridSource, SystemParticipantSource, ThermalSource, TypeSource}
 import edu.ie3.mobsim.config.MobSimConfig
 import org.apache.commons.io.FilenameUtils
 
@@ -120,11 +115,15 @@ object PathsAndSources extends LazyLogging {
     val csvRawGridSource: RawGridSource =
       new RawGridSource(csvTypeSource, csvDataSource)
 
+    val csvEnergyManagementSource: EnergyManagementSource =
+      new EnergyManagementSource(csvTypeSource, csvDataSource)
+
     val csvSystemParticipantSource: SystemParticipantSource =
       new SystemParticipantSource(
         csvTypeSource,
         csvThermalSource,
         csvRawGridSource,
+        csvEnergyManagementSource,
         csvDataSource
       )
 

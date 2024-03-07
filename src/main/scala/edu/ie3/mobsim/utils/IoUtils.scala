@@ -346,10 +346,17 @@ object IoUtils {
         typeSource,
         csvDataSource
       )
+
+    val energyManagementSource: EnergyManagementSource = new EnergyManagementSource(
+      typeSource,
+      csvDataSource
+    )
+
     val systemParticipantSource = new SystemParticipantSource(
       typeSource,
       thermalSource,
       rawGridSource,
+      energyManagementSource,
       csvDataSource
     )
     val evs = systemParticipantSource.getEvs
