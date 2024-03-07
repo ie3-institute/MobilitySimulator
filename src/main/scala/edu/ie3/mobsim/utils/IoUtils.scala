@@ -347,10 +347,11 @@ object IoUtils {
         csvDataSource
       )
 
-    val energyManagementSource: EnergyManagementSource = new EnergyManagementSource(
-      typeSource,
-      csvDataSource
-    )
+    val energyManagementSource: EnergyManagementSource =
+      new EnergyManagementSource(
+        typeSource,
+        csvDataSource
+      )
 
     val systemParticipantSource = new SystemParticipantSource(
       typeSource,

@@ -127,7 +127,7 @@ trait ElectricVehicleTestData {
     5d.asKiloWattHourPerKiloMetre,
     11d.asKiloVoltAmpere,
     0.9,
-    11d.asKiloWatt,
+    11d.asKiloWatt
   )
 
   protected val evInput = new EvInput(
