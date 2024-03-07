@@ -53,10 +53,7 @@ object ChargingStation extends LazyLogging {
       participantSource: SystemParticipantSource
   ): Seq[ChargingStation] = {
 
-    val chargingStations = participantSource
-      .getEvCS()
-      .asScala
-      .toSeq
+    val chargingStations = participantSource.getEvcs.asScala.toSeq
       .map { evcs =>
         ChargingStation(
           evcs.getUuid,

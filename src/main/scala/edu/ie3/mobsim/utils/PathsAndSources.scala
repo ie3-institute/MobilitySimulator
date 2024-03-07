@@ -10,6 +10,7 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.io.naming.FileNamingStrategy
 import edu.ie3.datamodel.io.source.csv.CsvDataSource
 import edu.ie3.datamodel.io.source.{
+  EnergyManagementSource,
   RawGridSource,
   SystemParticipantSource,
   ThermalSource,
@@ -120,11 +121,15 @@ object PathsAndSources extends LazyLogging {
     val csvRawGridSource: RawGridSource =
       new RawGridSource(csvTypeSource, csvDataSource)
 
+    val csvEnergyManagementSource: EnergyManagementSource =
+      new EnergyManagementSource(csvTypeSource, csvDataSource)
+
     val csvSystemParticipantSource: SystemParticipantSource =
       new SystemParticipantSource(
         csvTypeSource,
         csvThermalSource,
         csvRawGridSource,
+        csvEnergyManagementSource,
         csvDataSource
       )
 

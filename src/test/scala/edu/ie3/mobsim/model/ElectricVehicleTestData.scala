@@ -126,7 +126,8 @@ trait ElectricVehicleTestData {
     50d.asKiloWattHour,
     5d.asKiloWattHourPerKiloMetre,
     11d.asKiloVoltAmpere,
-    0.9
+    0.9,
+    11d.asKiloWatt
   )
 
   protected val evInput = new EvInput(
@@ -134,6 +135,7 @@ trait ElectricVehicleTestData {
     "test-ev-input",
     node,
     ReactivePowerCharacteristic.parse("cosPhiFixed:{(0.0, 0.95)}"),
+    null,
     evInputType
   )
 }
