@@ -34,7 +34,15 @@ object utils {
     *   rounded minutes (e.g. 15, 30, 45, 60, ..)
     */
   def roundToQuarterHourInMinutes(minutes: Int): Int = {
+    if (minutes > 1440)
+      throw new IllegalArgumentException(
+        s"Value ($minutes) of Minutes exceed 1440 (= 1 Day). This should not happen."
+      )
+
     val intervals15 = (minutes / 15) + math.round((minutes.toDouble % 15) / 15)
-    math.max(15, intervals15 * 15).toInt
+    intervals15 match {
+      case 96 if (intervals15 == 96) => 95 * 15
+      case _                         => math.max(15, intervals15 * 15).toInt
+    }
   }
 }

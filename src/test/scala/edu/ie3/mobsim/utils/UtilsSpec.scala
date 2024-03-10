@@ -20,7 +20,8 @@ class UtilsSpec extends UnitSpec {
       (22, 15),
       (23, 30),
       (30, 30),
-      (74, 75)
+      (74, 75),
+      (1440, 1425)
     )
 
     forAll(cases) { (time, roundedTime) =>
@@ -28,6 +29,15 @@ class UtilsSpec extends UnitSpec {
         utils.roundToQuarterHourInMinutes(time) shouldBe roundedTime
       }
     }
+  }
+  "throw IllegalArgumentException if minutes exceed 1440 (= 1 Day)" in {
+
+    val minutes = 1441
+    val exception = intercept[IllegalArgumentException] {
+      utils.roundToQuarterHourInMinutes(minutes)
+    }
+
+    exception.getMessage shouldBe s"Value ($minutes) of Minutes exceed 1440 (= 1 Day). This should not happen."
   }
 
 }
