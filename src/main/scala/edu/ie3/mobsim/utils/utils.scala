@@ -41,8 +41,8 @@ object utils {
 
     val intervals15 = (minutes / 15) + math.round((minutes.toDouble % 15) / 15)
     intervals15 match {
-      case 96 if (intervals15 == 96) => 95 * 15
-      case _                         => math.max(15, intervals15 * 15).toInt
+      case 96 => 95 * 15
+      case _  => math.max(15, intervals15 * 15).toInt
     }
   }
 }
