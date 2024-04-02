@@ -55,7 +55,7 @@ dependencies {
 
   implementation 'tech.units:indriya:2.2' // Physical units
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.15.1' // I/O functionalities
+  implementation 'commons-io:commons-io:2.16.0' // I/O functionalities
   implementation 'com.nrinaudo:kantan.csv-generic_2.13:0.7.0' // csv parsing
 
   /* CORE Scala */
