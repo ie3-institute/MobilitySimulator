@@ -216,9 +216,9 @@ object IoUtilsSpec {
       s"${ev.id};" +
       s"${ev.evType.model};" +
       s"${ev.storedEnergy.to(KILOWATTHOUR).getValue.doubleValue()};" +
-      s"${ev.evType.acPower.to(KILOWATT).getValue.doubleValue()};" +
-      s"${ev.evType.dcPower.to(KILOWATT).getValue.doubleValue()};" +
-      s"${ev.evType.consumption.to(KILOWATTHOUR_PER_KILOMETRE).getValue.doubleValue()};" +
+      s"${ev.evType.acPower.toKilowatts};" +
+      s"${ev.evType.dcPower.toKilowatts};" +
+      s"${ev.evType.consumption.toKilowattHoursPerKilometer};" +
       s"${ev.homePoi.id};" +
       s"${ev.workPoi.id};" +
       s"${ev.chargingAtHomePossible}"

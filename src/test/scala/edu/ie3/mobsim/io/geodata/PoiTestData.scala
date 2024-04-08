@@ -12,14 +12,11 @@ import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationTyp
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.quantities.PowerSystemUnits
-
 import org.locationtech.jts.geom.Coordinate
-import tech.units.indriya.ComparableQuantity
+import squants.{Length, Meters}
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.METRE
 
 import java.util.UUID
-import javax.measure.quantity.Length
 
 trait PoiTestData {
   private val csType = new ChargingPointType(
@@ -98,7 +95,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
-    Map(cs1 -> Quantities.getQuantity(0, METRE))
+    Map(cs1 -> Meters(0))
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
@@ -107,7 +104,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.41154872, 51.4833271),
     1549.4886151800551,
-    Map(cs3 -> Quantities.getQuantity(0, METRE))
+    Map(cs3 -> Meters(0))
   )
 
   protected val bbpgPoi: PointOfInterest = PointOfInterest(
@@ -116,7 +113,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.BBPG,
     new Coordinate(7.4622403, 51.5491056),
     2783.9202769435374,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val culturePoi: PointOfInterest = PointOfInterest(
@@ -125,7 +122,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.CULTURE,
     new Coordinate(7.3339823, 51.5184387),
     6721.140094154159,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val medicinalPoi: PointOfInterest = PointOfInterest(
@@ -134,7 +131,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.MEDICINAL,
     new Coordinate(7.5112704, 51.5178795),
     4695.499976294351,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val otherShopPoi: PointOfInterest = PointOfInterest(
@@ -143,7 +140,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.OTHER_SHOP,
     new Coordinate(7.3682537, 51.4935477),
     1710.1059114060527,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val religiousPoi: PointOfInterest = PointOfInterest(
@@ -152,7 +149,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.RELIGIOUS,
     new Coordinate(7.5366142, 51.4726591),
     16984.79771274887,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val restaurantPoi: PointOfInterest = PointOfInterest(
@@ -161,7 +158,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.RESTAURANT,
     new Coordinate(7.4411392, 51.5097096),
     303.9431026,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val servicePoi: PointOfInterest = PointOfInterest(
@@ -170,7 +167,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.SERVICES,
     new Coordinate(7.5862309, 51.5012326),
     548.2907601097887,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val sportsPoi: PointOfInterest = PointOfInterest(
@@ -179,7 +176,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.SPORTS,
     new Coordinate(7.416975, 51.5009765),
     12103.459075742423,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val supermarketPoi: PointOfInterest = PointOfInterest(
@@ -188,7 +185,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.SUPERMARKET,
     new Coordinate(7.370586, 51.5234725),
     1498.211731553507,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
 
   protected val supermarket: PointOfInterest = PointOfInterest(
@@ -198,8 +195,8 @@ trait PoiTestData {
     new Coordinate(7.4115482, 51.4833281),
     10424.542,
     Map(
-      cs2 -> Quantities.getQuantity(0, METRE),
-      cs7 -> Quantities.getQuantity(0, METRE)
+      cs2 -> Meters(0),
+      cs7 -> Meters(0)
     )
   )
 
@@ -209,7 +206,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.CHARGING_HUB_TOWN,
     new Coordinate(7.41153872, 51.4834271),
     129.211731553507,
-    Map(cs4 -> Quantities.getQuantity(0, METRE))
+    Map(cs4 -> Meters(0))
   )
   protected val chargingHubHighwayPoi: PointOfInterest = PointOfInterest(
     UUID.fromString("3ddc93c7-77fc-4187-be68-833b3db39809"),
@@ -217,7 +214,7 @@ trait PoiTestData {
     CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY,
     new Coordinate(7.41153842, 51.4834251),
     178.211731553507,
-    Map(cs6 -> Quantities.getQuantity(0, METRE))
+    Map(cs6 -> Meters(0))
   )
 
   protected val itData: Seq[PointOfInterest] = Seq(

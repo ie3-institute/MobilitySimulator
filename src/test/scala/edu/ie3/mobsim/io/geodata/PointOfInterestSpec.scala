@@ -12,12 +12,10 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.test.common.UnitSpec
 import org.locationtech.jts.geom.Coordinate
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
+import squants.Length
+import squants.space.Meters
 
 import java.util.UUID
-import javax.measure.quantity.Length
 import scala.util.{Failure, Success}
 
 class PointOfInterestSpec extends UnitSpec with PoiTestData {
@@ -187,8 +185,9 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
     }
 
     "determining the nearest charging stations" should {
+      implicit val tolerance: Length = Meters(1e-10)
       val nearbyChargingStations =
-        PrivateMethod[Seq[(ChargingStation, ComparableQuantity[Length])]](
+        PrivateMethod[Seq[(ChargingStation, Length)]](
           Symbol("nearbyChargingStations")
         )
 
@@ -196,22 +195,19 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
           Seq(cs0, cs1, cs2),
           coordinate,
-          Quantities.getQuantity(1000d, Units.METRE)
+          Meters(1000d)
         )
         val expected = Map(
-          cs0 -> Quantities
-            .getQuantity(0.013113941716235453974464, Units.METRE),
-          cs1 -> Quantities
-            .getQuantity(1.10382753815854878670116, Units.METRE),
-          cs2 -> Quantities
-            .getQuantity(111.545809977148284216795, Units.METRE)
+          cs0 -> Meters(0.013113941716235453974464),
+          cs1 -> Meters(1.10382753815854878670116),
+          cs2 -> Meters(111.545809977148284216795)
         )
 
         actual.toMap.keys should contain allElementsOf Seq(cs0, cs1, cs2)
         Seq(cs0, cs1, cs2).foreach { cs =>
           actual.toMap.get(cs).zip(expected.get(cs)) match {
             case Some((actual, expected)) =>
-              actual should equalWithTolerance(expected)
+              actual =~ expected
             case None => fail("Unable to determine the expected distance")
           }
         }
@@ -221,7 +217,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
           Seq(cs0, cs1, cs2),
           coordinate,
-          Quantities.getQuantity(100d, Units.METRE)
+          Meters(100d)
         )
 
         actual.toMap.keys should contain allElementsOf Seq(cs0, cs1)
@@ -236,8 +232,8 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         testFileName,
         ",",
         Seq(cs1, cs3),
-        Quantities.getQuantity(50d, Units.METRE),
-        Quantities.getQuantity(30d, Units.METRE),
+        Meters(50d),
+        Meters(30d),
         assignHomeNearestChargingStations = true
       ) match {
         case Failure(exception) =>

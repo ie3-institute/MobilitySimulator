@@ -8,8 +8,7 @@ package edu.ie3.mobsim.model.builder
 
 import edu.ie3.mobsim.model.TripSimulationTestData
 import edu.ie3.test.common.UnitSpec
-import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
+import squants.space.Meters
 
 import java.util.UUID
 
@@ -23,7 +22,7 @@ class EvBuilderFromEvInputSpec extends UnitSpec with TripSimulationTestData {
         givenHomePoi.copy(
           id = s"home_poi_$cnt",
           nearestChargingStations = Map(
-            givenChargingStation -> Quantities.getQuantity(1.0, Units.METRE)
+            givenChargingStation -> Meters(1.0)
           )
         )
       } ++ Range(100, 200).map { cnt =>

@@ -7,7 +7,6 @@
 package edu.ie3.mobsim.model
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
-
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.util.Random

@@ -8,12 +8,10 @@ package edu.ie3.mobsim.io.probabilities
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.TripDistance.TripDistanceKey
-import edu.ie3.util.quantities.PowerSystemUnits.KILOMETRE
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities.getQuantity
+import squants.Length
+import squants.space.Kilometers
 
 import java.time.{DayOfWeek, ZonedDateTime}
-import javax.measure.quantity.Length
 
 final case class TripDistance(
     probabilitiesWeekday: Map[TripDistanceKey, ProbabilityDensityFunction[
@@ -42,7 +40,7 @@ final case class TripDistance(
       time: ZonedDateTime,
       fromPoiType: PoiTypeDictionary.Value,
       toPoiType: PoiTypeDictionary.Value
-  ): ComparableQuantity[Length] = {
+  ): Length = {
 
     /* Get current time on 15min basis */
     val timeQuarter = time.getHour * 4 + time.getMinute / 15
@@ -68,7 +66,7 @@ final case class TripDistance(
       case _         => throw new RuntimeException("No pdf found")
     }
 
-    getQuantity(distance, KILOMETRE)
+    Kilometers(distance)
   }
 }
 

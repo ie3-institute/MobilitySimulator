@@ -8,18 +8,15 @@ package edu.ie3.mobsim.io.geodata
 
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.exceptions.InitializationException
-import edu.ie3.mobsim.io.geodata.PoiEnums.{
-  CategoricalLocationDictionary,
-  PoiTypeDictionary
-}
+import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.util.geo.GeoUtils
+import edu.ie3.util.quantities.PowerSystemUnits
 import org.locationtech.jts.geom.Coordinate
-import tech.units.indriya.ComparableQuantity
+import squants.Length
+import squants.space.Kilometers
 
 import java.util.UUID
-import javax.measure.Quantity
-import javax.measure.quantity.Length
 import scala.collection.parallel.CollectionConverters.seqIsParallelizable
 import scala.collection.parallel.ParSeq
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,7 +47,7 @@ final case class PointOfInterest(
     categoricalLocation: CategoricalLocationDictionary.Value,
     geoPosition: Coordinate,
     size: Double,
-    nearestChargingStations: Map[ChargingStation, ComparableQuantity[Length]]
+    nearestChargingStations: Map[ChargingStation, Length]
 ) extends Ordered[PointOfInterest] {
   def compare(that: PointOfInterest): Int = {
     if (this.id == that.id) 0
@@ -74,8 +71,8 @@ case object PointOfInterest {
       filePath: String,
       csvSep: String,
       evcs: Seq[ChargingStation],
-      maxDistanceFromPoi: ComparableQuantity[Length],
-      maxDistanceFromHomePoi: ComparableQuantity[Length],
+      maxDistanceFromPoi: Length,
+      maxDistanceFromHomePoi: Length,
       assignHomeNearestChargingStations: Boolean
   ): Try[Seq[PointOfInterest]] =
     Using(Source.fromFile(filePath).bufferedReader()) { reader =>
@@ -203,7 +200,7 @@ case object PointOfInterest {
       entries: ParSeq[Array[String]],
       colToIndex: Map[String, Int],
       chargingStations: Seq[ChargingStation],
-      maxDistance: ComparableQuantity[Length],
+      maxDistance: Length,
       assignNearestChargingStation: Boolean
   ): Future[Seq[PointOfInterest]] =
     Future {
@@ -218,7 +215,7 @@ case object PointOfInterest {
           catLoc,
           coordinate,
           sze,
-          Map.empty[ChargingStation, ComparableQuantity[Length]]
+          Map.empty[ChargingStation, Length]
         )
         val nearestCs =
           if (assignNearestChargingStation)
@@ -247,7 +244,7 @@ case object PointOfInterest {
       poiWithNearbyChargingStations: Seq[
         (
             PointOfInterest,
-            Seq[(ChargingStation, ComparableQuantity[Length])]
+            Seq[(ChargingStation, Length)]
         )
       ]
   ): Seq[PointOfInterest] =
@@ -295,7 +292,7 @@ case object PointOfInterest {
       entries: Array[String],
       colToIndex: Map[String, Int],
       locationToChargingStations: Map[EvcsLocationType, Seq[ChargingStation]],
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: Length
   ): PointOfInterest = {
     val (uuid, identifier, sze, coordinate, catLoc) = parse(entries, colToIndex)
 
@@ -431,17 +428,23 @@ case object PointOfInterest {
   private def nearbyChargingStations(
       allowedChargingStations: Seq[ChargingStation],
       poiCoordinate: Coordinate,
-      maxDistance: Quantity[Length]
-  ): Seq[(ChargingStation, ComparableQuantity[Length])] =
+      maxDistance: Length
+  ): Seq[(ChargingStation, Length)] =
     allowedChargingStations
       .map { evcs =>
-        evcs -> GeoUtils.calcHaversine(
-          poiCoordinate.y,
-          poiCoordinate.x,
-          evcs.geoPosition.y,
-          evcs.geoPosition.x
+        evcs -> Kilometers(
+          GeoUtils
+            .calcHaversine(
+              poiCoordinate.y,
+              poiCoordinate.x,
+              evcs.geoPosition.y,
+              evcs.geoPosition.x
+            )
+            .to(PowerSystemUnits.KILOMETRE)
+            .getValue
+            .doubleValue()
         )
       }
-      .filter(_._2.isLessThan(maxDistance))
+      .filter(_._2 < maxDistance)
 
 }

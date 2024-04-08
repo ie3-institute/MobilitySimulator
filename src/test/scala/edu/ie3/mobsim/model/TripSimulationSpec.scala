@@ -9,15 +9,13 @@ package edu.ie3.mobsim.model
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
-import org.scalatest.OptionValues._
-import tech.units.indriya.ComparableQuantity
+import edu.ie3.util.quantities.PowerSystemUnits
+import squants.Energy
+import squants.energy.{KilowattHours, WattHours}
+import squants.space.Meters
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.{METRE, SECOND}
 
-import java.time.temporal.TemporalUnit
-import java.time.{LocalDateTime, ZonedDateTime}
-import javax.measure.quantity.Energy
+import java.time.ZonedDateTime
 import scala.collection.mutable
 
 class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
@@ -32,7 +30,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         poisWithSizes,
         0.5,
         0.2,
-        Quantities.getQuantity(1000, METRE),
+        Meters(1000),
         plannedDestinationPoi,
         plannedDestinationPoiType,
         chargingStations,
@@ -74,8 +72,8 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           chosenChargingStation shouldBe None
           finalDestinationPoi shouldBe Some(plannedDestinationPoi)
           finalDestinationPoiType shouldBe Some(plannedDestinationPoiType)
-          remainingDistanceAfterChargingHub.value should equalWithTolerance(
-            (-7000d).asMetre
+          remainingDistanceAfterChargingHub shouldBe Some(
+            Quantities.getQuantity(-7d, PowerSystemUnits.KILOMETRE)
           )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
@@ -88,7 +86,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         givenSimulationStart,
         poisWithSizes,
         0.2,
-        Quantities.getQuantity(1000, METRE),
+        Meters(1000),
         supermarketPoi,
         PoiTypeDictionary.SHOPPING,
         chargingStations,
@@ -130,7 +128,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           chosenChargingStation shouldBe None
           finalDestinationPoi shouldBe Some(supermarketPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
-            Quantities.getQuantity(10000, METRE)
+            Quantities.getQuantity((10), PowerSystemUnits.KILOMETRE)
           )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }
@@ -171,7 +169,10 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           evType shouldBe givenModel
           homePoi shouldBe givenHomePoi
           workPoi shouldBe givenWorkPoi
-          storedEnergy shouldBe plannedStoredEnergyEndOfTrip
+          storedEnergy shouldBe Quantities.getQuantity(
+            plannedStoredEnergyEndOfTrip.toKilowattHours,
+            PowerSystemUnits.KILOWATTHOUR
+          )
           chargingAtSimona shouldBe false
           destinationPoi shouldBe plannedDestinationPoi
           destinationPoiType shouldBe plannedDestinationPoiType
@@ -187,14 +188,20 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "calculate stored energy at the end of trip" in {
-      val energy: ComparableQuantity[Energy] =
+      implicit val tolerance: Energy = WattHours(1e-10)
+      val energy: Energy =
         TripSimulation.calculateStoredEnergyAtEndOfTrip(
           ev4.evType.consumption,
-          ev4.getEStorage,
-          drivingDistance = Quantities.getQuantity(4000, METRE)
+          KilowattHours(
+            ev4.getEStorage
+              .to(PowerSystemUnits.KILOWATTHOUR)
+              .getValue
+              .doubleValue()
+          ),
+          drivingDistance = Meters(4000)
         )
 
-      energy should equalWithTolerance(60d.asKiloWattHour)
+      energy =~ KilowattHours(60d)
     }
 
     "calculate departure time" in {

@@ -35,15 +35,12 @@ import edu.ie3.simona.api.data.ExtDataSimulation
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
-import edu.ie3.util.quantities.PowerSystemUnits
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
+import squants.Length
+import squants.space.{Kilometers, Meters}
 
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util.{Optional, UUID}
-import javax.measure.quantity.Length
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.jdk.OptionConverters._
@@ -62,8 +59,8 @@ final class MobilitySimulator(
     chargingHubHighwayIsPresent: Boolean,
     ioUtils: IoUtils,
     tripProbabilities: TripProbabilities,
-    maxDistanceFromPoi: ComparableQuantity[Length],
-    thresholdChargingHubDistance: ComparableQuantity[Length],
+    maxDistanceFromPoi: Length,
+    thresholdChargingHubDistance: Length,
     round15: Boolean
 ) extends LazyLogging {
   def doActivity(tick: Long): Optional[java.lang.Long] = {
@@ -147,7 +144,7 @@ final class MobilitySimulator(
       currentTime: ZonedDateTime,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: Length
   ): (Seq[ElectricVehicle], Map[UUID, Seq[ElectricVehicle]]) = {
 
     /* Determine parking and departing evs in this tick */
@@ -349,7 +346,7 @@ final class MobilitySimulator(
       evs: Seq[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: Length
   ): Seq[EvMovement] =
     evs.foldLeft((availableChargingPoints, Seq.empty[EvMovement])) {
       case ((updatedAvailableChargingPoints, movements), ev) =>
@@ -396,7 +393,7 @@ final class MobilitySimulator(
       ev: ElectricVehicle,
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: Length
   ): Option[EvMovement] = {
     val minParkingTimeForCharging = 15
     val staysLongEnough = ev.parkingTimeStart
@@ -463,7 +460,7 @@ final class MobilitySimulator(
       currentTime: ZonedDateTime,
       departedEvsFromSimona: Seq[ElectricVehicle],
       tripProbabilities: TripProbabilities,
-      thresholdChargingHubDistance: ComparableQuantity[Length],
+      thresholdChargingHubDistance: Length,
       round15: Boolean
   ): Unit = {
 
@@ -653,17 +650,14 @@ object MobilitySimulator
     )
 
     /* Load all POIs in the area */
-    val maxDistanceFromPoi = Quantities.getQuantity(
-      config.mobsim.simulation.location.maxDistanceToChargingStation,
-      Units.METRE
+    val maxDistanceFromPoi = Meters(
+      config.mobsim.simulation.location.maxDistanceToChargingStation
     )
-    val maxDistanceFromHomePoi = Quantities.getQuantity(
-      config.mobsim.simulation.location.maxDistanceToHomeChargingStation,
-      Units.METRE
+    val maxDistanceFromHomePoi = Meters(
+      config.mobsim.simulation.location.maxDistanceToHomeChargingStation
     )
-    val thresholdChargingHubDistance = Quantities.getQuantity(
-      config.mobsim.simulation.location.chargingHubThresholdDistance,
-      PowerSystemUnits.KILOMETRE
+    val thresholdChargingHubDistance = Kilometers(
+      config.mobsim.simulation.location.chargingHubThresholdDistance
     )
 
     /* in case we defined an explicit home poi to evcs mapping we don't need to assign
