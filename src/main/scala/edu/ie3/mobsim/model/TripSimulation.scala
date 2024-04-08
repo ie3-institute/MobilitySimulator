@@ -11,14 +11,21 @@ import edu.ie3.datamodel.models.ElectricCurrentType
 import edu.ie3.mobsim.MobilitySimulator.seed
 import edu.ie3.mobsim.exceptions.TripException
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary.{HOME, WORK}
-import edu.ie3.mobsim.io.geodata.PoiEnums.{CategoricalLocationDictionary, PoiTypeDictionary}
+import edu.ie3.mobsim.io.geodata.PoiEnums.{
+  CategoricalLocationDictionary,
+  PoiTypeDictionary
+}
 import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.utils.DefaultQuantities._
 import edu.ie3.mobsim.utils.sq.SpecificEnergyDistance
 import edu.ie3.mobsim.utils.{IoUtils, utils}
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.PowerSystemUnits.{KILOMETRE, KILOWATT, KILOWATTHOUR}
+import edu.ie3.util.quantities.PowerSystemUnits.{
+  KILOMETRE,
+  KILOWATT,
+  KILOWATTHOUR
+}
 import squants.{Energy, Length, Time}
 import squants.energy.{KilowattHours, WattHours}
 import squants.motion.Velocity
