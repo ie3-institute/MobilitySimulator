@@ -56,7 +56,7 @@ dependencies {
   implementation 'tech.units:indriya:2.2' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
   implementation 'org.locationtech.jts.io:jts-io-common:1.19.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.16.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.16.1' // I/O functionalities
   implementation 'com.nrinaudo:kantan.csv-generic_2.13:0.7.0' // csv parsing
 
   /* CORE Scala */
@@ -67,7 +67,7 @@ dependencies {
   testImplementation "org.apache.pekko:pekko-actor_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.5.3'
+  implementation 'ch.qos.logback:logback-classic:1.5.4'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
