@@ -7,12 +7,16 @@
 package edu.ie3.mobsim.utils.sq
 
 import squants._
+import squants.energy.KilowattHours
+import squants.space.Kilometers
 
 import scala.util.Try
 
 /** Represents a specific energy consumption per kilometer.
   *
   * In kWh / km
+  *
+  * Based on [[squants.thermal.ThermalCapacity]] by garyKeorkunian
   */
 final class SpecificEnergyDistance private (
     val value: Double,
@@ -20,6 +24,14 @@ final class SpecificEnergyDistance private (
 ) extends Quantity[SpecificEnergyDistance] {
 
   def dimension: SpecificEnergyDistance.type = SpecificEnergyDistance
+
+  def *(that: Length): Energy = KilowattHours(
+    this.toKilowattHoursPerKilometer * that.toKilometers
+  )
+
+  def /(that: Energy): Length = Kilometers(
+    that.toKilowattHours / this.toKilowattHoursPerKilometer
+  )
 
   def toKilowattHoursPerKilometer: Double = to(
     KilowattHoursPerKilometer

@@ -19,6 +19,7 @@ import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.utils.DefaultQuantities._
 import edu.ie3.mobsim.utils.sq.SpecificEnergyDistance
+import edu.ie3.mobsim.utils.sq.SquantsUtils.{RichDistance, RichEnergy}
 import edu.ie3.mobsim.utils.{IoUtils, utils}
 import edu.ie3.util.quantities.PowerSystemUnits
 import edu.ie3.util.quantities.PowerSystemUnits.{
@@ -565,14 +566,8 @@ object TripSimulation extends LazyLogging {
       .sample(currentTime, plannedDrivingDistance)
 
     /* Calculate driving time based on planned values */
-    // TODO DF refactor this
-    val rawDrivingTime: Time = Hours(
-      math.max(
-        math rint (plannedDrivingDistance.toKilometers / plannedDrivingSpeed.toKilometersPerHour)
-          .doubleValue(),
-        1
-      )
-    )
+    val rawDrivingTime: Time =
+      (plannedDrivingDistance / plannedDrivingSpeed).max(Hours(1))
 
     val plannedDrivingTime: Time =
       if (round15)
@@ -655,9 +650,8 @@ object TripSimulation extends LazyLogging {
     ) - newStoredEnergyEndOfTrip
 
     /* Reduced driving distance to the charging hub */
-    val newDrivingDistance: Length = Kilometers(
-      usedEnergyForThisTrip.toKilowattHours / ev.evType.consumption.toKilowattHoursPerKilometer
-    )
+    val newDrivingDistance: Length =
+      usedEnergyForThisTrip.calcDistance(ev.evType.consumption)
 
     /* Sample driving speed (based on original driving distance) */
     val newDrivingSpeed: Velocity =
@@ -978,9 +972,7 @@ object TripSimulation extends LazyLogging {
   ): Energy = {
 
     /* Calculate consumed energy during the trip */
-    val consumedEnergy: Energy = KilowattHours(
-      drivingDistance.toKilometers * consumption.toKilowattHoursPerKilometer
-    )
+    val consumedEnergy: Energy = drivingDistance.calcEnergy(consumption)
     /* Calculate storedEnergy at end of trip */
     if ((storedEnergy - consumedEnergy) < ZERO_ENERGY)
       ZERO_ENERGY
@@ -1055,12 +1047,12 @@ object TripSimulation extends LazyLogging {
       ev: ElectricVehicle
   ): Length = {
 
-    val possibleDistance: Length = Kilometers(
+    val possibleDistance: Length = KilowattHours(
       ev.getStoredEnergy
         .to(KILOWATTHOUR)
         .getValue
-        .doubleValue() / ev.evType.consumption.toKilowattHoursPerKilometer
-    )
+        .doubleValue()
+    ).calcDistance(ev.evType.consumption)
     val maxTripDistance: Length = {
       if (possibleDistance > ZERO_DISTANCE) possibleDistance
       else {
