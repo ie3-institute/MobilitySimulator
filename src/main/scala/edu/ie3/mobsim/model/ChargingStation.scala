@@ -15,7 +15,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import edu.ie3.util.quantities.QuantityUtils.RichQuantity
 import org.locationtech.jts.geom.Coordinate
-import squants.Length
+import squants.{Energy, Length, Time}
 import squants.energy.Kilowatts
 import squants.time.Minutes
 
@@ -229,11 +229,12 @@ object ChargingStation extends LazyLogging {
               .doubleValue()
           )
       }
-    val parkingTime =
+    val parkingTime: Time = Minutes(
       ev.parkingTimeStart
         .until(ev.departureTime, ChronoUnit.MINUTES)
-    val possibleChargeableEnergy =
-      availableChargingPowerForEV * Minutes(parkingTime)
+    )
+    val possibleChargeableEnergy: Energy =
+      availableChargingPowerForEV * parkingTime
     val requiredEnergy = ev.getEStorage.subtract(ev.getStoredEnergy)
     if (requiredEnergy.to(KILOWATTHOUR).getValue.doubleValue() == 0) 1
     else {

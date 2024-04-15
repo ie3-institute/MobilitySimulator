@@ -105,8 +105,7 @@ final case class ElectricVehicle(
   def getSRatedDC: ComparableQuantity[Power] = Quantities
     .getQuantity(evType.dcPower.toKilowatts, PowerSystemUnits.KILOWATT)
 
-  def getStoredEnergy: ComparableQuantity[Energy] =
-    storedEnergy
+  def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
   def getDepartureTick: java.lang.Long = toTick(simulationStart, departureTime)
 
@@ -115,9 +114,7 @@ final case class ElectricVehicle(
     * @return
     *   a copy of this ElectricVehicle with given new stored energy / soc
     */
-  def copyWith(
-      storedEnergy: ComparableQuantity[Energy]
-  ): ElectricVehicle =
+  def copyWith(storedEnergy: ComparableQuantity[Energy]): ElectricVehicle =
     copy(storedEnergy = storedEnergy)
 
   /** @param storedEnergy

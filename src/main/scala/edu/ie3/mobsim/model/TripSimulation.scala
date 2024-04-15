@@ -1121,7 +1121,7 @@ object TripSimulation extends LazyLogging {
         .doubleValue()
     )
 
-    Minutes(math.max(neededChargingTime.toMinutes, 1))
+    neededChargingTime.max(Minutes(1))
   }
 
 }
