@@ -42,7 +42,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
       case Some(firstFailure: Failure[Entry]) =>
         Failure(
           SourceException(
-            "Unable to build first departure probabilities. First failure in stack trace.",
+            "Unable to build poi transitions probabilities. First failure in stack trace.",
             firstFailure.exception
           )
         )

@@ -35,7 +35,7 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
       case Some(firstFailure: Failure[Entry]) =>
         Failure(
           SourceException(
-            "Unable to build first departure probabilities. First failure in stack trace.",
+            "Unable to build last trip probabilities. First failure in stack trace.",
             firstFailure.exception
           )
         )
