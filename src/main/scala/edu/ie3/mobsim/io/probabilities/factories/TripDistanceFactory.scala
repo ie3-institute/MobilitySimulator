@@ -14,11 +14,9 @@ import edu.ie3.mobsim.io.probabilities.{
   TripDistance
 }
 import edu.ie3.mobsim.utils.DayType
-import edu.ie3.util.quantities.PowerSystemUnits
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
+import squants.Length
+import squants.space.Kilometers
 
-import javax.measure.quantity.Length
 import scala.util.{Failure, Success, Try}
 
 object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
@@ -96,10 +94,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
       )
       .map { case (key, entries) =>
         key -> ProbabilityDensityFunction(entries.map { entry =>
-          entry.distance
-            .to(PowerSystemUnits.KILOMETRE)
-            .getValue
-            .doubleValue() -> entry.probability
+          entry.distance.toKilometers -> entry.probability
         }.toMap)
       }
 
@@ -108,7 +103,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
       dayType: DayType.Value,
       from: PoiTypeDictionary.Value,
       to: PoiTypeDictionary.Value,
-      distance: ComparableQuantity[Length],
+      distance: Length,
       probability: Double
   )
 
@@ -151,7 +146,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
             )
           )
       )
-      val distanceValue = Quantities.getQuantity(
+      val distanceValue = Kilometers(
         entityFieldData
           .getOrElse(
             distance,
@@ -159,8 +154,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
               "Unable to get distance information from entity field data"
             )
           )
-          .toDouble,
-        PowerSystemUnits.KILOMETRE
+          .toDouble
       )
       val probabilityValue = entityFieldData
         .getOrElse(

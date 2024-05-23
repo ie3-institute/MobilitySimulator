@@ -13,17 +13,17 @@ import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointT
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
+import edu.ie3.util.quantities.QuantityUtils.RichQuantity
 import org.locationtech.jts.geom.Coordinate
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities.getQuantity
+import squants.{Energy, Length, Time}
+import squants.energy.Kilowatts
+import squants.time.Minutes
 
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import javax.measure.quantity.Length
 import scala.collection.immutable.Queue
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
 import scala.jdk.CollectionConverters._
-import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
 
 final case class ChargingStation(
@@ -95,7 +95,7 @@ object ChargingStation extends LazyLogging {
       currentPricesAtChargingStations: Map[UUID, Double],
       currentlyAvailableChargingPoints: Map[UUID, Int],
       seed: Random,
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: Length
   ): (Option[UUID], Option[ElectricVehicle]) = {
     /* If there are charging stations nearby */
     if (ev.destinationPoi.nearestChargingStations.nonEmpty) {
@@ -165,7 +165,7 @@ object ChargingStation extends LazyLogging {
       ev: ElectricVehicle,
       currentPricesAtChargingStations: Map[UUID, Double],
       currentlyAvailableChargingPoints: Map[UUID, Int],
-      maxDistance: ComparableQuantity[Length]
+      maxDistance: Length
   ): Map[UUID, Double] =
     ev.destinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
@@ -197,13 +197,10 @@ object ChargingStation extends LazyLogging {
       .toMap
 
   private def distanceRating(
-      distance: ComparableQuantity[Length],
-      maxDistance: ComparableQuantity[Length]
+      distance: Length,
+      maxDistance: Length
   ): Double =
-    1 - distance
-      .divide(maxDistance)
-      .getValue
-      .doubleValue()
+    1 - distance.divide(maxDistance)
 
   private def chargeableEnergyRating(
       cs: ChargingStation,
@@ -212,27 +209,40 @@ object ChargingStation extends LazyLogging {
     val availableChargingPowerForEV =
       cs.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
-          ev.getSRatedAC.min(cs.evcsType.getsRated()).to(KILOWATT)
+          Kilowatts(
+            ev.getSRatedAC
+              .min(
+                cs.evcsType
+                  .getsRated()
+              )
+              .to(KILOWATT)
+              .getValue
+              .doubleValue()
+          )
+
         case ElectricCurrentType.DC =>
-          ev.getSRatedDC.min(cs.evcsType.getsRated()).to(KILOWATT)
+          Kilowatts(
+            ev.getSRatedDC
+              .min(cs.evcsType.getsRated())
+              .to(KILOWATT)
+              .getValue
+              .doubleValue()
+          )
       }
-    val parkingTime =
+    val parkingTime: Time = Minutes(
       ev.parkingTimeStart
         .until(ev.departureTime, ChronoUnit.MINUTES)
-    val possibleChargeableEnergy =
-      getQuantity(
-        availableChargingPowerForEV
-          .multiply(parkingTime * 60)
-          .getValue
-          .doubleValue(),
-        KILOWATTHOUR
-      )
-    val requiredEnergy =
-      ev.getEStorage.subtract(ev.getStoredEnergy).to(KILOWATTHOUR)
-    if (requiredEnergy.getValue.doubleValue() == 0) 1
+    )
+    val possibleChargeableEnergy: Energy =
+      availableChargingPowerForEV * parkingTime
+    val requiredEnergy = ev.getEStorage.subtract(ev.getStoredEnergy)
+    if (requiredEnergy.to(KILOWATTHOUR).getValue.doubleValue() == 0) 1
     else {
       math.min(
-        possibleChargeableEnergy.divide(requiredEnergy).getValue.doubleValue(),
+        possibleChargeableEnergy.toKilowattHours / requiredEnergy
+          .to(KILOWATTHOUR)
+          .getValue
+          .doubleValue(),
         1.0
       )
     }

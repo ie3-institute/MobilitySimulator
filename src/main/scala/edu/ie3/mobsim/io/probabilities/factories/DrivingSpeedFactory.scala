@@ -10,11 +10,8 @@ import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
 import edu.ie3.mobsim.utils.DayType
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units
+import squants.motion.{KilometersPerHour, Velocity}
 
-import javax.measure.quantity.Speed
 import scala.util.{Failure, Success, Try}
 
 object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
@@ -94,7 +91,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
       dayType: DayType.Value,
       a: Double,
       b: Double,
-      min: ComparableQuantity[Speed]
+      min: Velocity
   )
 
   private object Entry {
@@ -150,7 +147,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
           )
         )
         .toDouble
-      val minSpeed = Quantities.getQuantity(
+      val minSpeed = KilometersPerHour(
         entityFieldData
           .getOrElse(
             min,
@@ -158,8 +155,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
               "Unable to get minimum speed information from entity field data"
             )
           )
-          .toDouble,
-        Units.KILOMETRE_PER_HOUR
+          .toDouble
       )
 
       new Entry(

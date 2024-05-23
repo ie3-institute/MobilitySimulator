@@ -9,11 +9,11 @@ package edu.ie3.mobsim.model
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits
+import squants.energy.Kilowatts
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
-import javax.measure.quantity.Energy
 import scala.collection.immutable.Queue
 
 class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
@@ -55,7 +55,10 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
             evType shouldBe givenModel
             homePoi shouldBe givenHomePoi
             workPoi shouldBe givenWorkPoi
-            storedEnergy shouldBe givenModel.capacity
+            storedEnergy shouldBe Quantities.getQuantity(
+              givenModel.capacity.toKilowattHours,
+              PowerSystemUnits.KILOWATTHOUR
+            )
             chargingAtSimona shouldBe false
             destinationPoi shouldBe givenHomePoi
             destinationPoiType shouldBe PoiTypeDictionary.HOME
@@ -74,7 +77,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
         ElectricVehicle.buildEv(
           "test_car",
           givenModel.copy(
-            dcPower = Quantities.getQuantity(0d, PowerSystemUnits.KILOWATT)
+            dcPower = Kilowatts(0d)
           ),
           givenHomePoi,
           givenWorkPoi,
@@ -83,7 +86,10 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           isChargingAtHomePossible = true
         ) match {
           case model: ElectricVehicle =>
-            model.getSRatedDC shouldBe givenModel.acPower
+            model.getSRatedDC shouldBe Quantities.getQuantity(
+              givenModel.acPower.toKilowatts,
+              PowerSystemUnits.KILOWATT
+            )
         }
       }
 
@@ -112,9 +118,12 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
       "copy object with new stored energy" in {
         val evFull: ElectricVehicle =
           evWithHomeCharging.copyWith(evWithHomeCharging.getStoredEnergy)
-        evFull.getStoredEnergy shouldBe givenModel.capacity
+        evFull.getStoredEnergy shouldBe Quantities.getQuantity(
+          givenModel.capacity.toKilowattHours,
+          PowerSystemUnits.KILOWATTHOUR
+        )
 
-        val zero: ComparableQuantity[Energy] =
+        val zero: ComparableQuantity[javax.measure.quantity.Energy] =
           Quantities.getQuantity(0, PowerSystemUnits.KILOWATTHOUR)
         val evEmpty: ElectricVehicle = evWithHomeCharging.copyWith(zero)
         evEmpty.getStoredEnergy shouldBe zero

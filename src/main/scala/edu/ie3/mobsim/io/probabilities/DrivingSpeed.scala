@@ -8,13 +8,10 @@ package edu.ie3.mobsim.io.probabilities
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.util.quantities.PowerSystemUnits.KILOMETRE
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
+import squants.Length
+import squants.motion.{KilometersPerHour, Velocity}
 
 import java.time.{DayOfWeek, ZonedDateTime}
-import javax.measure.quantity.{Length, Speed}
 
 /** Container class for function parameters to calculate the driving speed of a
   * car
@@ -44,8 +41,8 @@ final case class DrivingSpeed(
     */
   def sample(
       time: ZonedDateTime,
-      distance: ComparableQuantity[Length]
-  ): ComparableQuantity[Speed] = {
+      distance: Length
+  ): Velocity = {
 
     /* Get current time on 15min basis */
     val timeInterval = time.getHour match {
@@ -98,7 +95,7 @@ case object DrivingSpeed extends LazyLogging {
   final case class SpeedFunction(
       a: Double,
       b: Double,
-      minimumSpeed: ComparableQuantity[Speed]
+      minimumSpeed: Velocity
   ) {
 
     /** Calculate the driving speed according to the distance
@@ -108,15 +105,14 @@ case object DrivingSpeed extends LazyLogging {
       *   Average driving speed
       */
     def calculate(
-        distance: ComparableQuantity[Length]
-    ): ComparableQuantity[Speed] = {
+        distance: Length
+    ): Velocity = {
       val safeDistance =
-        math.max(distance.to(KILOMETRE).getValue.doubleValue(), 1.0)
-      val proposedSpeed = Quantities.getQuantity(
-        a + b * math.log(safeDistance),
-        KILOMETRE_PER_HOUR
+        math.max(distance.toKilometers, 1.0)
+      val proposedSpeed = KilometersPerHour(
+        a + b * math.log(safeDistance)
       )
-      if (proposedSpeed.isLessThan(minimumSpeed))
+      if (proposedSpeed < minimumSpeed)
         minimumSpeed
       else
         proposedSpeed

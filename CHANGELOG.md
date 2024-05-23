@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaning up `build.gradle`, updating gradle to 8.2.1 [#164](https://github.com/ie3-institute/MobilitySimulator/issues/164)
 - Removed the possibility of stochastic charging so evs are always sent to the co-simulation, which should be in charge of charging the cars [#118](https://github.com/ie3-institute/MobilitySimulator/issues/118)
 - Changed to updated PowerSystemDataModel V5.0.1 [#249](https://github.com/ie3-institute/MobilitySimulator/issues/249)
+- Change from quantities to squants [#257](https://github.com/ie3-institute/MobilitySimulator/issues/257)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]

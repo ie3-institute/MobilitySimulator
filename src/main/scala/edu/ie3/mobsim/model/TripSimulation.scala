@@ -18,20 +18,24 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.{
 import edu.ie3.mobsim.io.geodata.{PoiEnums, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities._
 import edu.ie3.mobsim.utils.DefaultQuantities._
+import edu.ie3.mobsim.utils.sq.SpecificEnergyDistance
+import edu.ie3.mobsim.utils.sq.SquantsUtils.{RichDistance, RichEnergy}
 import edu.ie3.mobsim.utils.{IoUtils, utils}
+import edu.ie3.util.quantities.PowerSystemUnits
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOMETRE,
   KILOWATT,
   KILOWATTHOUR
 }
-import edu.ie3.util.quantities.QuantityUtil
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR
+import squants.{Energy, Length, Time}
+import squants.energy.{KilowattHours, WattHours}
+import squants.motion.Velocity
+import squants.space.Kilometers
+import squants.time.{Hours, Minutes}
+import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import javax.measure.quantity.{Energy, Length, Speed}
 import scala.annotation.tailrec
 import scala.math.Ordering.Implicits.infixOrderingOps
 
@@ -71,7 +75,7 @@ object TripSimulation extends LazyLogging {
       chargingStations: Seq[ChargingStation],
       ioUtils: IoUtils,
       tripProbabilities: TripProbabilities,
-      thresholdChargingHubDistance: ComparableQuantity[Length],
+      thresholdChargingHubDistance: squants.Length,
       round15: Boolean
   ): ElectricVehicle = {
 
@@ -79,11 +83,8 @@ object TripSimulation extends LazyLogging {
     if (ioUtils.writeMovements)
       ioUtils.writeMovement(ev, currentTime, "departure")
 
-    val socAtStartOfTrip: Double = ev.getStoredEnergy
-      .to(KILOWATTHOUR)
-      .divide(ev.getEStorage.to(KILOWATTHOUR))
-      .getValue
-      .doubleValue()
+    val socAtStartOfTrip: Double =
+      ev.getStoredEnergy.divide(ev.getEStorage).getValue.doubleValue()
 
     val categoricalLocationToPdf = poisWithSizes.map {
       case (categoricalLocation, pdf) =>
@@ -142,9 +143,8 @@ object TripSimulation extends LazyLogging {
     maybeSocAtArrival match {
       case Some(socAtArrival) if evWantsToChargeAtChargingHub =>
         (
-          plannedDrivingDistance.isLessThanOrEqualTo(
-            thresholdChargingHubDistance
-          ),
+          plannedDrivingDistance <=
+            thresholdChargingHubDistance,
           chargingHubTownIsPresent,
           chargingHubHighwayIsPresent
         ) match {
@@ -293,7 +293,7 @@ object TripSimulation extends LazyLogging {
   private final case class TargetProperties(
       poiType: PoiTypeDictionary.Value,
       poi: PointOfInterest,
-      distance: ComparableQuantity[Length],
+      distance: Length,
       ev: ElectricVehicle
   )
 
@@ -329,7 +329,7 @@ object TripSimulation extends LazyLogging {
         TargetProperties(
           destinationPoiType,
           destinationPoi,
-          remainingDistance,
+          Kilometers(remainingDistance.to(KILOMETRE).getValue.doubleValue()),
           updatedEv
         )
       case (None, _, _) =>
@@ -394,7 +394,7 @@ object TripSimulation extends LazyLogging {
     ) match {
       case poi =>
         /* Sample driving distance */
-        val drivingDistance: ComparableQuantity[Length] =
+        val drivingDistance: Length =
           tripDistance.sample(
             time,
             previousPoiType,
@@ -542,45 +542,43 @@ object TripSimulation extends LazyLogging {
   private def simulatePlannedTrip(
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
-      plannedDrivingDistance: ComparableQuantity[Length],
+      plannedDrivingDistance: Length,
       plannedDestinationPoiType: PoiTypeDictionary.Value,
       drivingSpeed: DrivingSpeed,
       firstDepartureOfDay: FirstDepartureOfDay,
       lastTripOfDay: LastTripOfDay,
       parkingTime: ParkingTime,
       round15: Boolean
-  ): (ComparableQuantity[Energy], ZonedDateTime, ZonedDateTime) = {
+  ): (Energy, ZonedDateTime, ZonedDateTime) = {
 
     /* Calculate stored energy at the end of the trip based on planned values */
-    val plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy] =
+    val plannedStoredEnergyEndOfTrip: Energy =
       calculateStoredEnergyAtEndOfTrip(
         ev.evType.consumption,
-        ev.getStoredEnergy,
-        plannedDrivingDistance: ComparableQuantity[Length]
+        KilowattHours(
+          ev.getStoredEnergy.to(KILOWATTHOUR).getValue.doubleValue()
+        ),
+        plannedDrivingDistance: Length
       )
 
     /* Sample driving speed based on planned values */
     val plannedDrivingSpeed = drivingSpeed
       .sample(currentTime, plannedDrivingDistance)
-      .to(KILOMETRE_PER_HOUR)
 
     /* Calculate driving time based on planned values */
-    val rawDrivingTime: Int = math.max(
-      (math rint (plannedDrivingDistance
-        .to(KILOMETRE)
-        .divide(plannedDrivingSpeed.to(KILOMETRE_PER_HOUR))
-        .getValue
-        .doubleValue() * 60)).toInt,
-      1
-    )
+    val rawDrivingTime: Time =
+      (plannedDrivingDistance / plannedDrivingSpeed).max(Hours(1))
 
-    val plannedDrivingTime =
-      if (round15) utils.roundToQuarterHourInMinutes(rawDrivingTime)
+    val plannedDrivingTime: Time =
+      if (round15)
+        Minutes(
+          utils.roundToQuarterHourInMinutes(rawDrivingTime.toMinutes.toInt)
+        )
       else rawDrivingTime
 
     /* Calculate start of parking time based on planned values */
     val plannedParkingTimeStart: ZonedDateTime =
-      currentTime.plusMinutes(plannedDrivingTime)
+      currentTime.plusMinutes(plannedDrivingTime.toMinutes.toLong)
 
     /* Calculate departure time based on planned values */
     val plannedDepartureTime: ZonedDateTime = calculateDepartureTime(
@@ -632,7 +630,7 @@ object TripSimulation extends LazyLogging {
       ],
       socAtStartOfTrip: Double,
       socAtChargingHubArrival: Double,
-      plannedDrivingDistance: ComparableQuantity[Length],
+      plannedDrivingDistance: Length,
       plannedDestinationPoi: PointOfInterest,
       plannedDestinationPoiType: PoiTypeDictionary.Value,
       chargingStations: Seq[ChargingStation],
@@ -640,35 +638,32 @@ object TripSimulation extends LazyLogging {
   ): ElectricVehicle = {
 
     /* Drive only until SoC reaches SoC of charging hub arrival */
-    val newStoredEnergyEndOfTrip: ComparableQuantity[Energy] =
-      ev.getEStorage.multiply(socAtChargingHubArrival)
-
+    val newStoredEnergyEndOfTrip: Energy = KilowattHours(
+      ev.getEStorage
+        .to(KILOWATTHOUR)
+        .getValue
+        .doubleValue() * socAtChargingHubArrival
+    )
     /* Reduced used energy for the trip until the charging hub */
-    val usedEnergyForThisTrip: ComparableQuantity[Energy] =
-      ev.getStoredEnergy.subtract(newStoredEnergyEndOfTrip)
+    val usedEnergyForThisTrip: Energy = KilowattHours(
+      ev.getStoredEnergy.to(KILOWATTHOUR).getValue.doubleValue()
+    ) - newStoredEnergyEndOfTrip
 
     /* Reduced driving distance to the charging hub */
-    val newDrivingDistance: ComparableQuantity[Length] = usedEnergyForThisTrip
-      .divide(ev.evType.consumption)
-      .asType(classOf[Length])
-      .to(KILOMETRE)
+    val newDrivingDistance: Length =
+      usedEnergyForThisTrip.calcDistance(ev.evType.consumption)
 
     /* Sample driving speed (based on original driving distance) */
-    val newDrivingSpeed: ComparableQuantity[Speed] =
+    val newDrivingSpeed: Velocity =
       drivingSpeed
         .sample(
           currentTime,
           plannedDrivingDistance
         )
-        .to(KILOMETRE_PER_HOUR)
 
     /* Calculate driving time */
     val newDrivingTime: Int = math.max(
-      (math rint (newDrivingDistance
-        .to(KILOMETRE)
-        .divide(newDrivingSpeed.to(KILOMETRE_PER_HOUR))
-        .getValue
-        .doubleValue() * 60)).toInt,
+      (math rint (newDrivingDistance / newDrivingSpeed).toMinutes).toInt,
       1
     )
 
@@ -685,7 +680,7 @@ object TripSimulation extends LazyLogging {
       ).sample()
 
     /* Calculate parking time */
-    val newParkingTime: Long =
+    val newParkingTime: Time =
       calculateChargingTimeAtChargingHub(
         ev,
         newDestinationPoi,
@@ -695,18 +690,24 @@ object TripSimulation extends LazyLogging {
 
     /* Calculate departure time */
     val newDepartureTime: ZonedDateTime =
-      newParkingTimeStart.plusMinutes(newParkingTime)
+      newParkingTimeStart.plusMinutes(newParkingTime.toMinutes.toLong)
 
     /* Save parameters of the originally planned trip for the next trip simulation after charging */
     val updatedEv: ElectricVehicle = ev
       .setRemainingDistanceAfterChargingHub(
-        Some(plannedDrivingDistance.subtract(newDrivingDistance))
+        Some(
+          Quantities.getQuantity(
+            (plannedDrivingDistance - newDrivingDistance).toKilometers,
+            PowerSystemUnits.KILOMETRE
+          )
+        )
       )
       .setFinalDestination(plannedDestinationPoi, plannedDestinationPoiType)
 
     /* Create updated EV */
     updatedEv.copyWith(
-      newStoredEnergyEndOfTrip,
+      Quantities
+        .getQuantity(newStoredEnergyEndOfTrip.toKilowattHours, KILOWATTHOUR),
       newDestinationPoi,
       chargingHubPoiType,
       newParkingTimeStart,
@@ -747,7 +748,7 @@ object TripSimulation extends LazyLogging {
         ProbabilityDensityFunction[PointOfInterest]
       ],
       socAtChargingHubArrival: Double,
-      plannedDrivingDistance: ComparableQuantity[Length],
+      plannedDrivingDistance: Length,
       plannedDestinationPoi: PointOfInterest,
       plannedDestinationPoiType: PoiTypeDictionary.Value,
       chargingStations: Seq[ChargingStation],
@@ -755,32 +756,32 @@ object TripSimulation extends LazyLogging {
   ): ElectricVehicle = {
 
     /* Set SoC at arriving at charging hub in town */
-    val newStoredEnergyEndOfTrip: ComparableQuantity[Energy] =
-      ev.getEStorage.multiply(socAtChargingHubArrival)
+    val newStoredEnergyEndOfTrip: Energy = KilowattHours(
+      ev.getEStorage
+        .to(KILOWATTHOUR)
+        .getValue
+        .doubleValue() * socAtChargingHubArrival
+    )
 
     /* Set driving distance to the charging hub to fixed value, so that only 10 km are left afterwards */
-    val newDrivingDistance: ComparableQuantity[Length] =
-      plannedDrivingDistance.subtract(
+    val newDrivingDistance: Length =
+      plannedDrivingDistance -
         REMAINING_DISTANCE_AFTER_MODIFIED_CHARGING_HUB_STOP
-      )
 
     /* Sample driving speed (based on original driving distance) */
-    val newDrivingSpeed: ComparableQuantity[Speed] =
+    val newDrivingSpeed: Velocity =
       drivingSpeed
         .sample(
           currentTime,
           plannedDrivingDistance
         )
-        .to(KILOMETRE_PER_HOUR)
 
     /* Calculate driving time */
-    val newDrivingTime: Int = math.max(
-      (math rint (newDrivingDistance
-        .to(KILOMETRE)
-        .divide(newDrivingSpeed.to(KILOMETRE_PER_HOUR))
-        .getValue
-        .doubleValue() * 60)).toInt,
-      1
+    val newDrivingTime: Time = Minutes(
+      math.max(
+        (math rint (newDrivingDistance / newDrivingSpeed).toMinutes).toInt,
+        1
+      )
     )
 
     val newDestinationCategoricalLocation: CategoricalLocationDictionary.Value =
@@ -793,10 +794,10 @@ object TripSimulation extends LazyLogging {
 
     /* Calculate start of parking time */
     val newParkingTimeStart: ZonedDateTime =
-      currentTime.plusMinutes(newDrivingTime)
+      currentTime.plusMinutes(newDrivingTime.toMinutes.toLong)
 
     /* Calculate parking time */
-    val newParkingTime: Long =
+    val newParkingTime: Time =
       calculateChargingTimeAtChargingHub(
         ev,
         newDestinationPoi,
@@ -806,18 +807,24 @@ object TripSimulation extends LazyLogging {
 
     /* Calculate departure time */
     val newDepartureTime: ZonedDateTime =
-      newParkingTimeStart.plusMinutes(newParkingTime)
+      newParkingTimeStart.plusMinutes(newParkingTime.toMinutes.toLong)
 
     /* Save parameters of the originally planned trip for the next trip simulation after charging */
     val updatedEv: ElectricVehicle = ev
       .setRemainingDistanceAfterChargingHub(
-        Some(plannedDrivingDistance.subtract(newDrivingDistance))
+        Some(
+          Quantities.getQuantity(
+            (plannedDrivingDistance - newDrivingDistance).toKilometers,
+            PowerSystemUnits.KILOMETRE
+          )
+        )
       )
       .setFinalDestination(plannedDestinationPoi, plannedDestinationPoiType)
 
     /* Create updated EV */
     updatedEv.copyWith(
-      newStoredEnergyEndOfTrip,
+      Quantities
+        .getQuantity(newStoredEnergyEndOfTrip.toKilowattHours, KILOWATTHOUR),
       newDestinationPoi,
       chargingHubPoiType,
       newParkingTimeStart,
@@ -844,23 +851,20 @@ object TripSimulation extends LazyLogging {
     */
   private def doesEvWantToChargeAtChargingHub(
       ev: ElectricVehicle,
-      plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy],
+      plannedStoredEnergyEndOfTrip: Energy,
       plannedDestinationCategoricalLocation: CategoricalLocationDictionary.Value,
       plannedParkingTimeStart: ZonedDateTime,
       plannedDepartureTime: ZonedDateTime
   ): (Boolean, Option[Double]) = {
 
-    val socAtStartOfTrip: Double = ev.getStoredEnergy
-      .to(KILOWATTHOUR)
-      .divide(ev.getEStorage.to(KILOWATTHOUR))
-      .getValue
-      .doubleValue()
+    val socAtStartOfTrip: Double =
+      ev.getStoredEnergy.divide(ev.getEStorage).getValue.doubleValue()
 
-    val socAtEndOfTrip: Double = plannedStoredEnergyEndOfTrip
-      .to(KILOWATTHOUR)
-      .divide(ev.getEStorage.to(KILOWATTHOUR))
-      .getValue
-      .doubleValue()
+    val socAtEndOfTrip: Double =
+      plannedStoredEnergyEndOfTrip.toKilowattHours / ev.getEStorage
+        .to(KILOWATTHOUR)
+        .getValue
+        .doubleValue()
 
     /* EV can be sufficiently charged if the next destination is home, home charging is possible and EV stays for at least 3 hours */
     val sufficientHomeChargingPossible: Boolean =
@@ -917,25 +921,20 @@ object TripSimulation extends LazyLogging {
     */
   def keepOriginalTrip(
       ev: ElectricVehicle,
-      plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy],
+      plannedStoredEnergyEndOfTrip: Energy,
       plannedDestinationPoi: PointOfInterest,
       plannedDestinationPoiType: PoiTypeDictionary.Value,
       plannedParkingTimeStart: ZonedDateTime,
       plannedDepartureTime: ZonedDateTime
   ): ElectricVehicle = {
+    implicit val tolerance: Energy = WattHours(1e-6)
 
     /* Because there is no stop at a charging hub, no trip values need to be saved */
     val updatedEv: ElectricVehicle = ev
       .resetFinalDestination()
       .setRemainingDistanceAfterChargingHub(None)
 
-    if (
-      QuantityUtil.isEquivalentAbs(
-        plannedStoredEnergyEndOfTrip,
-        ZERO_ENERGY,
-        1
-      )
-    ) {
+    if (plannedStoredEnergyEndOfTrip =~ ZERO_ENERGY) {
       logger.info(
         s"${ev.getId} has driven its battery to SoC = 0%."
       )
@@ -943,7 +942,10 @@ object TripSimulation extends LazyLogging {
 
     /* Create updated EV */
     updatedEv.copyWith(
-      plannedStoredEnergyEndOfTrip,
+      Quantities.getQuantity(
+        plannedStoredEnergyEndOfTrip.toKilowattHours,
+        KILOWATTHOUR
+      ),
       plannedDestinationPoi,
       plannedDestinationPoiType,
       plannedParkingTimeStart,
@@ -964,21 +966,17 @@ object TripSimulation extends LazyLogging {
     *   stored energy at the end of the trip
     */
   def calculateStoredEnergyAtEndOfTrip(
-      consumption: ComparableQuantity[SpecificEnergy],
-      storedEnergy: ComparableQuantity[Energy],
-      drivingDistance: ComparableQuantity[Length]
-  ): ComparableQuantity[Energy] = {
+      consumption: SpecificEnergyDistance,
+      storedEnergy: Energy,
+      drivingDistance: Length
+  ): Energy = {
 
     /* Calculate consumed energy during the trip */
-    val consumedEnergy: ComparableQuantity[Energy] = drivingDistance
-      .multiply(consumption)
-      .asType(classOf[Energy])
-      .to(KILOWATTHOUR)
-
+    val consumedEnergy: Energy = drivingDistance.calcEnergy(consumption)
     /* Calculate storedEnergy at end of trip */
-    if (storedEnergy.subtract(consumedEnergy).isLessThan(ZERO_ENERGY))
+    if ((storedEnergy - consumedEnergy) < ZERO_ENERGY)
       ZERO_ENERGY
-    else storedEnergy.subtract(consumedEnergy)
+    else storedEnergy - consumedEnergy
   }
 
   /** Calculate departure time for the trip. The next departure might be sampled
@@ -1045,17 +1043,18 @@ object TripSimulation extends LazyLogging {
     "Currently not used. EV is either sent to charging hub or has SoC=0% at end of trip and teleports for next trip"
   )
   def checkAndIfNecessaryAdjustDrivingDistance(
-      sampledTripDistance: ComparableQuantity[Length],
+      sampledTripDistance: Length,
       ev: ElectricVehicle
-  ): ComparableQuantity[Length] = {
+  ): Length = {
 
-    val possibleDistance: ComparableQuantity[Length] = ev.getStoredEnergy
-      .divide(ev.evType.consumption)
-      .asType(classOf[Length])
-      .to(KILOMETRE)
-
-    val maxTripDistance: ComparableQuantity[Length] = {
-      if (possibleDistance.isGreaterThan(ZERO_DISTANCE)) possibleDistance
+    val possibleDistance: Length = KilowattHours(
+      ev.getStoredEnergy
+        .to(KILOWATTHOUR)
+        .getValue
+        .doubleValue()
+    ).calcDistance(ev.evType.consumption)
+    val maxTripDistance: Length = {
+      if (possibleDistance > ZERO_DISTANCE) possibleDistance
       else {
         logger.info(
           s"${ev.getId} cannot drive anymore because its battery is empty!"
@@ -1064,7 +1063,7 @@ object TripSimulation extends LazyLogging {
       }
     }
 
-    if (sampledTripDistance.isLessThan(maxTripDistance)) sampledTripDistance
+    if (sampledTripDistance < maxTripDistance) sampledTripDistance
     else maxTripDistance
   }
 
@@ -1082,9 +1081,9 @@ object TripSimulation extends LazyLogging {
   private def calculateChargingTimeAtChargingHub(
       ev: ElectricVehicle,
       destinationPoi: PointOfInterest,
-      storedEnergyAtChargingStart: ComparableQuantity[Energy],
+      storedEnergyAtChargingStart: Energy,
       chargingStations: Seq[ChargingStation]
-  ): Long = {
+  ): Time = {
     val chargingHub = destinationPoi.nearestChargingStations.headOption
       .flatMap { case (closestChargingStation, _) =>
         chargingStations.find(_ == closestChargingStation)
@@ -1108,15 +1107,21 @@ object TripSimulation extends LazyLogging {
           ev.getSRatedDC.min(chargingPowerOfChargingHub).to(KILOWATT)
       }
 
-    val energyUntilFullCharge =
-      ev.getEStorage.subtract(storedEnergyAtChargingStart).to(KILOWATTHOUR)
+    val energyUntilFullCharge: Energy = KilowattHours(
+      ev.getEStorage
+        .to(KILOWATTHOUR)
+        .getValue
+        .doubleValue() - storedEnergyAtChargingStart.toKilowattHours
+    )
 
-    val neededChargingTimeInMinutes = (energyUntilFullCharge
-      .divide(availableChargingPowerForEV)
-      .getValue
-      .doubleValue() * 60).toLong
+    val neededChargingTime: Time = Hours(
+      energyUntilFullCharge.toKilowattHours / availableChargingPowerForEV
+        .to(KILOWATT)
+        .getValue
+        .doubleValue()
+    )
 
-    math.max(neededChargingTimeInMinutes, 1)
+    neededChargingTime.max(Minutes(1))
   }
 
 }

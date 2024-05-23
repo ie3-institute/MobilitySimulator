@@ -18,6 +18,7 @@ import edu.ie3.mobsim.io.probabilities.{
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
+import squants.energy.Kilowatts
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
 
@@ -92,11 +93,17 @@ final case class ElectricVehicle(
 
   def getId: String = id
 
-  def getEStorage: ComparableQuantity[Energy] = evType.capacity
+  def getEStorage: ComparableQuantity[Energy] =
+    Quantities.getQuantity(
+      evType.capacity.toKilowattHours,
+      PowerSystemUnits.KILOWATTHOUR
+    )
 
-  def getSRatedAC: ComparableQuantity[Power] = evType.acPower
+  def getSRatedAC: ComparableQuantity[Power] = Quantities
+    .getQuantity(evType.acPower.toKilowatts, PowerSystemUnits.KILOWATT)
 
-  def getSRatedDC: ComparableQuantity[Power] = evType.dcPower
+  def getSRatedDC: ComparableQuantity[Power] = Quantities
+    .getQuantity(evType.dcPower.toKilowatts, PowerSystemUnits.KILOWATT)
 
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
@@ -159,7 +166,9 @@ final case class ElectricVehicle(
   }
 
   def setRemainingDistanceAfterChargingHub(
-      remainingDistance: Option[ComparableQuantity[Length]]
+      remainingDistance: Option[
+        ComparableQuantity[Length]
+      ]
   ): ElectricVehicle = {
     copy(remainingDistanceAfterChargingHub = remainingDistance)
   }
@@ -254,7 +263,7 @@ case object ElectricVehicle extends LazyLogging {
     homePoi.nearestChargingStations.foldLeft(false)(
       (
           chargeAtHome: Boolean,
-          cs: (ChargingStation, ComparableQuantity[Length])
+          cs: (ChargingStation, squants.Length)
       ) => {
         val evcsIsHomeType: Boolean =
           chargingStations
@@ -330,16 +339,15 @@ case object ElectricVehicle extends LazyLogging {
       // todo: check if this is neccessary
       evType = evType.copy(
         dcPower =
-          if (
-            evType.dcPower.isLessThan(
-              Quantities.getQuantity(0.1, PowerSystemUnits.KILOWATT)
-            )
-          ) evType.acPower
+          if (evType.dcPower < Kilowatts(0.1)) evType.acPower
           else evType.dcPower
       ),
       homePoi = homePoi,
       workPoi = workPoi,
-      storedEnergy = evType.capacity,
+      storedEnergy = Quantities.getQuantity(
+        evType.capacity.toKilowattHours,
+        PowerSystemUnits.KILOWATTHOUR
+      ),
       destinationPoiType = PoiTypeDictionary.HOME,
       destinationPoi = homePoi, // is updated when trip is sampled
       parkingTimeStart = simulationStart, // EV starts parking at first tick

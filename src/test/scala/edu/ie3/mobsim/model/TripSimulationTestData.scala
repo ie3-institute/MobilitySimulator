@@ -17,17 +17,19 @@ import edu.ie3.mobsim.io.geodata.{
   PointOfInterest
 }
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
-import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.mobsim.io.probabilities._
+import edu.ie3.mobsim.io.probabilities.factories._
 import edu.ie3.util.quantities.PowerSystemUnits
+import squants.energy.KilowattHours
+import squants.motion.KilometersPerHour
+import squants.{Length, Meters}
 import tech.units.indriya.ComparableQuantity
 import tech.units.indriya.quantity.Quantities
-import tech.units.indriya.unit.Units.{KILOMETRE_PER_HOUR, METRE}
 
 import java.io.File
 import java.nio.file.Paths
 import java.time.ZonedDateTime
-import javax.measure.quantity.{Energy, Length}
+import javax.measure.quantity.Energy
 import scala.util.{Failure, Success}
 
 trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
@@ -109,7 +111,9 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
 
   protected val plannedDestinationPoi: PointOfInterest = poiData(11)
 
-  protected val plannedStoredEnergyEndOfTrip: ComparableQuantity[Energy] = half
+  protected val plannedStoredEnergyEndOfTrip: squants.Energy = KilowattHours(
+    half.to(PowerSystemUnits.KILOWATTHOUR).getValue.doubleValue()
+  )
   protected val plannedDestinationPoiType: PoiTypeDictionary.Value =
     PoiTypeDictionary.LEISURE
   protected val plannedDestinationCategoricalLocation
@@ -132,7 +136,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   )
 
   private val speedFunction: SpeedFunction =
-    SpeedFunction(50, 0, Quantities.getQuantity(50, KILOMETRE_PER_HOUR))
+    SpeedFunction(50, 0, KilometersPerHour(50))
 
   private val speedMap: Map[Int, SpeedFunction] =
     Range(0, 12).map(_ -> speedFunction).toMap
@@ -142,8 +146,8 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val storedEnergyValue: ComparableQuantity[Energy] =
     Quantities.getQuantity(20, PowerSystemUnits.KILOWATTHOUR)
 
-  protected val maxDistance: ComparableQuantity[Length] =
-    Quantities.getQuantity(5000, METRE)
+  protected val maxDistance: Length =
+    Meters(5000)
 
   private val basePath: String = Seq(
     Paths.get("").toAbsolutePath.toString,

@@ -15,11 +15,7 @@ import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
-import edu.ie3.util.quantities.PowerSystemUnits.{
-  KILOWATT,
-  KILOWATTHOUR,
-  KILOWATTHOUR_PER_KILOMETRE
-}
+import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import kantan.csv.{RowDecoder, _}
 import kantan.csv.ops.toCsvInputOps
 
@@ -95,11 +91,7 @@ final case class IoUtils private (
       "max_charging_power_dc" ->
         ev.getSRatedDC.to(KILOWATT).getValue.doubleValue().toString,
       "consumption" ->
-        ev.evType.consumption
-          .to(KILOWATTHOUR_PER_KILOMETRE)
-          .getValue
-          .doubleValue()
-          .toString,
+        ev.evType.consumption.toKilowattHoursPerKilometer.toString,
       "home_poi" -> ev.homePoi.id,
       "work_poi" -> ev.workPoi.id,
       "is_home_charging_possible" -> ev.chargingAtHomePossible.toString
@@ -157,7 +149,7 @@ final case class IoUtils private (
           "type" -> poiType.toString,
           "size" -> poi.size.toString,
           "evcs" -> evcsUuid.toString,
-          "distance" -> distance.getValue.doubleValue().toString
+          "distance" -> distance.toKilometers.toString
         ).asJava
 
         poiWriter.write(fieldData)

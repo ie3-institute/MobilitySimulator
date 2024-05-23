@@ -9,12 +9,14 @@ package edu.ie3.mobsim.model
 import edu.ie3.datamodel.models.input.system.`type`.EvTypeInput
 import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
+import edu.ie3.mobsim.utils.sq.{
+  KilowattHoursPerKilometer,
+  SpecificEnergyDistance
+}
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.interfaces.SpecificEnergy
-import tech.units.indriya.ComparableQuantity
-import tech.units.indriya.quantity.Quantities
+import squants.Energy
+import squants.energy.{KilowattHours, Kilowatts, Power}
 
-import javax.measure.quantity.{Energy, Power}
 import scala.io.Source
 import scala.util.{Failure, Success, Try, Using}
 
@@ -38,10 +40,10 @@ final case class EvType(
     model: String,
     producer: String,
     segment: String,
-    capacity: ComparableQuantity[Energy],
-    consumption: ComparableQuantity[SpecificEnergy],
-    acPower: ComparableQuantity[Power],
-    dcPower: ComparableQuantity[Power]
+    capacity: Energy,
+    consumption: SpecificEnergyDistance,
+    acPower: Power,
+    dcPower: Power
 )
 
 object EvType {
@@ -62,18 +64,14 @@ object EvType {
         val model = entries(0)
         val producer = entries(1)
         val segment = entries(2)
-        val batCap = Quantities.getQuantity(
-          entries(3).toDouble,
-          PowerSystemUnits.KILOWATTHOUR
+        val batCap = KilowattHours(
+          entries(3).toDouble
         )
-        val batCon = Quantities.getQuantity(
-          entries(4).toDouble / 100,
-          PowerSystemUnits.KILOWATTHOUR_PER_KILOMETRE
+        val batCon = KilowattHoursPerKilometer(
+          entries(4).toDouble / 100
         ) // Comes as kWh/km
-        val acPower =
-          Quantities.getQuantity(entries(5).toDouble, PowerSystemUnits.KILOWATT)
-        val dcPower =
-          Quantities.getQuantity(entries(6).toDouble, PowerSystemUnits.KILOWATT)
+        val acPower = Kilowatts(entries(5).toDouble)
+        val dcPower = Kilowatts(entries(6).toDouble)
 
         new EvType(
           model,
@@ -92,10 +90,34 @@ object EvType {
       "custom-model",
       "custom-producer",
       "custom-segment",
-      evTypeInput.geteStorage(),
-      evTypeInput.geteCons(),
-      evTypeInput.getsRated(),
-      evTypeInput.getsRated()
+      KilowattHours(
+        evTypeInput
+          .geteStorage()
+          .to(PowerSystemUnits.KILOWATTHOUR)
+          .getValue
+          .doubleValue()
+      ),
+      KilowattHoursPerKilometer(
+        evTypeInput
+          .geteCons()
+          .to(PowerSystemUnits.KILOWATTHOUR_PER_KILOMETRE)
+          .getValue
+          .doubleValue()
+      ),
+      Kilowatts(
+        evTypeInput
+          .getsRated()
+          .to(PowerSystemUnits.KILOWATT)
+          .getValue
+          .doubleValue()
+      ),
+      Kilowatts(
+        evTypeInput
+          .getsRated()
+          .to(PowerSystemUnits.KILOWATT)
+          .getValue
+          .doubleValue()
+      )
     )
   }
 

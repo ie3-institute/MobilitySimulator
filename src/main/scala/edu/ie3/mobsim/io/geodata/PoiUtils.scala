@@ -11,9 +11,8 @@ import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.mobsim.model.ChargingStation
-import tech.units.indriya.ComparableQuantity
+import squants.Length
 
-import javax.measure.quantity.Length
 import scala.collection.immutable.{SortedMap, TreeSet}
 import scala.util.{Failure, Success}
 
@@ -31,8 +30,8 @@ object PoiUtils extends LazyLogging {
   def loadPOIs(
       chargingStations: Seq[ChargingStation],
       poiPath: String,
-      maxDistanceFromPoi: ComparableQuantity[Length],
-      maxDistanceFromHomePoi: ComparableQuantity[Length],
+      maxDistanceFromPoi: Length,
+      maxDistanceFromHomePoi: Length,
       assignHomeNearestChargingStations: Boolean
   ): Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
     val start = System.currentTimeMillis()

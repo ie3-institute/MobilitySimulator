@@ -14,6 +14,8 @@ import edu.ie3.mobsim.io.probabilities.{
 }
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 import edu.ie3.util.geo.GeoUtils
+import edu.ie3.util.quantities.PowerSystemUnits
+import squants.space.Kilometers
 
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -108,11 +110,17 @@ object EvBuilderFromEvInputWithEvcsMapping {
         )
       )
       val poiCoordinate = homePoi.geoPosition
-      val distance = GeoUtils.calcHaversine(
-        poiCoordinate.y,
-        poiCoordinate.x,
-        evcs.geoPosition.y,
-        evcs.geoPosition.x
+      val distance = Kilometers(
+        GeoUtils
+          .calcHaversine(
+            poiCoordinate.y,
+            poiCoordinate.x,
+            evcs.geoPosition.y,
+            evcs.geoPosition.x
+          )
+          .to(PowerSystemUnits.KILOMETRE)
+          .getValue
+          .doubleValue()
       )
       homePoi.uuid -> homePoi.copy(nearestChargingStations =
         Map(evcs -> distance)

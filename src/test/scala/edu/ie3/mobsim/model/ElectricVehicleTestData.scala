@@ -20,15 +20,16 @@ import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
   ProbabilityDensityFunction
 }
+import edu.ie3.mobsim.utils.sq.KilowattHoursPerKilometer
 import edu.ie3.util.quantities.PowerSystemUnits
 import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
 import org.locationtech.jts.geom.Coordinate
-import tech.units.indriya.ComparableQuantity
+import squants.Length
+import squants.energy.{KilowattHours, Kilowatts}
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.measure.quantity.Length
 
 trait ElectricVehicleTestData {
   protected val averageCarUsage = 1.0
@@ -36,11 +37,10 @@ trait ElectricVehicleTestData {
     "cool_model",
     "cool_producer",
     "Van",
-    Quantities.getQuantity(100d, PowerSystemUnits.KILOWATTHOUR),
-    Quantities
-      .getQuantity(10d, PowerSystemUnits.KILOWATTHOUR_PER_KILOMETRE),
-    Quantities.getQuantity(11d, PowerSystemUnits.KILOWATT),
-    Quantities.getQuantity(50d, PowerSystemUnits.KILOWATT)
+    KilowattHours(100d),
+    KilowattHoursPerKilometer(10d),
+    Kilowatts(11d),
+    Kilowatts(50d)
   )
   protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
@@ -51,7 +51,7 @@ trait ElectricVehicleTestData {
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116482, 51.4843281),
     1.0,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
   protected val givenHomePoiPdf: ProbabilityDensityFunction[PointOfInterest] =
     ProbabilityDensityFunction(Map(givenHomePoi -> 1.0))
@@ -62,7 +62,7 @@ trait ElectricVehicleTestData {
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.4116482, 51.4843281),
     1.0,
-    Map.empty[ChargingStation, ComparableQuantity[Length]]
+    Map.empty[ChargingStation, Length]
   )
   protected val givenWorkPoiPdf: ProbabilityDensityFunction[PointOfInterest] =
     ProbabilityDensityFunction(Map(givenWorkPoi -> 1.0))
