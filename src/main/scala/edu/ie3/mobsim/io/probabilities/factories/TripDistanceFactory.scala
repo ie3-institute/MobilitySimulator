@@ -45,7 +45,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
       case Some(firstFailure: Failure[Entry]) =>
         Failure(
           SourceException(
-            "Unable to build first departure probabilities. First failure in stack trace.",
+            "Unable to build trip distance probabilities. First failure in stack trace.",
             firstFailure.exception
           )
         )
