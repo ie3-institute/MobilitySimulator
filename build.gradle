@@ -82,7 +82,7 @@ dependencies {
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 
   /* Testing */
-  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.18"
+  testImplementation "org.scalatest:scalatest_$scalaVersion:3.2.19"
   testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.8' // scalatest html output
 }
 
