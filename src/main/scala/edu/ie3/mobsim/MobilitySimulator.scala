@@ -622,7 +622,7 @@ object MobilitySimulator
     * necessary data such as probabilities, EV models, etc. and creates all
     * objects such as EVs, POIs, and charging stations.
     */
-  override protected def initialize(): Optional[java.lang.Long] = {
+  override protected def initialize(): java.lang.Long = {
 
     val availableEvData = evData.getOrElse(
       throw InitializationException(
@@ -856,6 +856,13 @@ object MobilitySimulator
 
     logger.info("Finished setup!")
 
-    mobSim.doActivity(-1L)
+    mobSim
+      .doActivity(-1L)
+      .toScala
+      .getOrElse(
+        throw InitializationException(
+          "No first tick available after initialization"
+        )
+      )
   }
 }
