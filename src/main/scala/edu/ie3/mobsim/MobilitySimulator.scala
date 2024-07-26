@@ -54,7 +54,7 @@ final class MobilitySimulator(
       ProbabilityDensityFunction[PointOfInterest]
     ],
     startTime: ZonedDateTime,
-    private var electricVehicles: Seq[ElectricVehicle],
+    var electricVehicles: Seq[ElectricVehicle],
     chargingHubTownIsPresent: Boolean,
     chargingHubHighwayIsPresent: Boolean,
     ioUtils: IoUtils,
