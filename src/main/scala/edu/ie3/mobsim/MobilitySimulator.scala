@@ -117,7 +117,9 @@ final class MobilitySimulator(
       )
     )
 
-    Some(long2Long(tick + timeUntilNextEvent)).toJava
+    timeUntilNextEvent.map { nextEvent =>
+      long2Long(tick + nextEvent)
+    }.toJava
   }
 
   /** Hand over EVs to SIMONA which arrive at their destination POI or depart
