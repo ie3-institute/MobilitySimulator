@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the possibility of stochastic charging so evs are always sent to the co-simulation, which should be in charge of charging the cars [#118](https://github.com/ie3-institute/MobilitySimulator/issues/118)
 - Changed to updated PowerSystemDataModel V5.0.1 [#249](https://github.com/ie3-institute/MobilitySimulator/issues/249)
 - Change from quantities to squants [#257](https://github.com/ie3-institute/MobilitySimulator/issues/257)
+- MobSim informs EVCS in SIMONA about estimated next arrivals [#254](https://github.com/ie3-institute/MobilitySimulator/issues/254)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
