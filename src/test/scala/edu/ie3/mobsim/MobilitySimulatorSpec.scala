@@ -374,48 +374,95 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       }
     }
 
-    "update electricVehicles correctly" in {
+    "get time until next event" in {
       val mobilitySimulator = mobSim()
 
-      val updateElectricVehicles =
-        PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+      val getTimeUntilNextArrival =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
+      val getTimeUntilNextDeparture =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextDeparture"))
+
+      val evDeparting: ElectricVehicle =
+        ev1.copy(departureTime = givenSimulationStart.plusMinutes(45))
+      val evArriving: ElectricVehicle =
+        ev1.copy(
+          departureTime = givenSimulationStart.plusHours(18),
+          parkingTimeStart = givenSimulationStart.plusHours(1)
+        )
 
       val cases = Table(
-        "updatedMovements",
-        Seq(
-          EvMovement(
-            cs0.uuid,
-            ev1.copy(
-              homePoi = chargingHubHighwayPoi,
-              chargingAtHomePossible = false
-            )
-          )
-        ),
-        Seq(
-          EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
-          EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
-        ),
-        Seq(
-          EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
-          EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
-          EvMovement(
-            cs0.uuid,
-            ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
-          )
-        )
+        ("electricVehicles", "expectedNextEvent"),
+        (Seq.empty[ElectricVehicle], None),
+        (Seq(evArriving), Some(3600L)),
+        (Seq(evDeparting), Some(2700L)),
+        (Seq(evArriving, evDeparting), Some(2700L))
       )
 
-      forAll(cases) { updatedMovements =>
-        mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
+      forAll(cases) { (electricVehicles, expectedNextEvent) =>
+        val actualNextArrival: Option[Long] =
+          mobilitySimulator invokePrivate getTimeUntilNextArrival(
+            electricVehicles,
+            givenSimulationStart
+          )
 
-        mobilitySimulator.electricVehicles.foreach { electricVehicle =>
-          updatedMovements.foreach { movement =>
-            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
-              electricVehicle shouldBe movement.ev
-            }
+        val actualNextDeparture: Option[Long] =
+          mobilitySimulator invokePrivate getTimeUntilNextDeparture(
+            electricVehicles,
+            givenSimulationStart
+          )
+
+        val timeUntilNextEvent = Seq(
+          actualNextArrival,
+          actualNextDeparture
+        ).flatten.minOption
+
+        timeUntilNextEvent shouldBe expectedNextEvent
+      }
+    }
+  }
+
+  "update electricVehicles correctly" in {
+    val mobilitySimulator = mobSim()
+
+    val updateElectricVehicles =
+      PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+
+    val cases = Table(
+      "updatedMovements",
+      Seq(
+        EvMovement(
+          cs0.uuid,
+          ev1.copy(
+            homePoi = chargingHubHighwayPoi,
+            chargingAtHomePossible = false
+          )
+        )
+      ),
+      Seq(
+        EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
+        EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+      ),
+      Seq(
+        EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
+        EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
+        EvMovement(
+          cs0.uuid,
+          ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
+        )
+      )
+    )
+
+    forAll(cases) { updatedMovements =>
+      mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
+
+      mobilitySimulator.electricVehicles.foreach { electricVehicle =>
+        updatedMovements.foreach { movement =>
+          if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+            electricVehicle shouldBe movement.ev
           }
         }
       }
     }
   }
+
 }
