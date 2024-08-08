@@ -32,6 +32,7 @@ import edu.ie3.mobsim.model.{
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
+import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -63,7 +64,7 @@ final class MobilitySimulator(
     thresholdChargingHubDistance: Length,
     round15: Boolean
 ) extends LazyLogging {
-  def doActivity(tick: Long): Optional[java.lang.Long] = {
+  private def doActivity(tick: Long): Optional[java.lang.Long] = {
     /* Update current time */
     val currentTime = startTime.plusSeconds(tick)
 
@@ -97,8 +98,8 @@ final class MobilitySimulator(
 
     /* Get time until next event for one of the EVs and return corresponding tick to SIMONA */
     val timeUntilNextEvent = Seq(
-      getTimeUntilNextArrival(electricVehicles, currentTime),
-      getTimeUntilNextDeparture(electricVehicles, currentTime)
+      MobilitySimulator.getTimeUntilNextArrival(electricVehicles, currentTime),
+      MobilitySimulator.getTimeUntilNextDeparture(electricVehicles, currentTime)
     ).flatten.minOption
 
     timeUntilNextEvent.foreach { nextEvent =>
@@ -187,7 +188,8 @@ final class MobilitySimulator(
     )
 
     // Finally, send arrivals to SIMONA
-    val nextArrival = getTimeUntilNextArrival(electricVehicles, currentTime)
+    val nextArrival =
+      MobilitySimulator.getTimeUntilNextArrival(electricVehicles, currentTime)
     evData.provideArrivingEvs(
       EvMovement.buildMovementsMap(arrivals),
       nextArrival.map(long2Long).toJava
@@ -507,66 +509,7 @@ final class MobilitySimulator(
         )
       } else ev
     })
-
   }
-
-  /** Return the time in seconds until the earliest next departure for one of
-    * the EVs.
-    *
-    * @param evs
-    *   Collection of all EVs
-    * @param currentTime
-    *   Current time to create a start value for foldLeft
-    * @return
-    *   Time until earliest next departure for one of the EVs in the set of all
-    *   EVs
-    */
-  private def getTimeUntilNextDeparture(
-      evs: Seq[ElectricVehicle],
-      currentTime: ZonedDateTime
-  ): Option[Long] =
-    evs
-      .foldLeft[Option[ZonedDateTime]](None)(
-        (earliestEvent, ev: ElectricVehicle) =>
-          if (!ev.parkingTimeStart.isAfter(currentTime))
-            Seq(earliestEvent, Some(ev.departureTime)).flatten.minOption
-          else
-            earliestEvent
-      )
-      .map { nextEvent =>
-        currentTime.until(nextEvent, ChronoUnit.SECONDS)
-      }
-
-  /** Return the time in seconds until the earliest next arrival for one of the
-    * EVs.
-    *
-    * @param evs
-    *   Collection of all EVs
-    * @param currentTime
-    *   Current time to create a start value for foldLeft
-    * @return
-    *   Time until earliest next arrival for one of the EVs in the set of all
-    *   EVs
-    */
-  private def getTimeUntilNextArrival(
-      evs: Seq[ElectricVehicle],
-      currentTime: ZonedDateTime
-  ): Option[Long] =
-    evs
-      .foldLeft[Option[ZonedDateTime]](None)(
-        (earliestEvent, ev: ElectricVehicle) =>
-          if (ev.parkingTimeStart.isAfter(currentTime)) {
-            Seq(
-              earliestEvent,
-              Some(ev.parkingTimeStart),
-              Some(ev.departureTime)
-            ).flatten.minOption
-          } else
-            earliestEvent
-      )
-      .map { nextEvent =>
-        currentTime.until(nextEvent, ChronoUnit.SECONDS)
-      }
 
   private def updateElectricVehicles(movements: Seq[EvMovement]): Unit = {
     val movementMap = movements.map { case EvMovement(_, ev) =>
@@ -623,6 +566,8 @@ object MobilitySimulator
     * objects such as EVs, POIs, and charging stations.
     */
   override protected def initialize(): java.lang.Long = {
+
+    val initTick = -1L
 
     val availableEvData = evData.getOrElse(
       throw InitializationException(
@@ -854,15 +799,81 @@ object MobilitySimulator
     )
     simulator = Some(mobSim)
 
-    logger.info("Finished setup!")
-
-    mobSim
-      .doActivity(-1L)
-      .toScala
-      .getOrElse(
+    val currentTime = startTime.plusSeconds(initTick)
+    val timeUntilFirstArrival =
+      getTimeUntilNextArrival(evs, currentTime).getOrElse(
         throw InitializationException(
-          "No first tick available after initialization"
+          "No first arrival determined!"
         )
       )
+    val firstArrivalTick = initTick + timeUntilFirstArrival
+
+    // Also provide first tick to the data service
+    availableEvData.provideArrivingEvs(
+      Map.empty[UUID, java.util.List[EvModel]].asJava,
+      Some(long2Long(firstArrivalTick)).toJava
+    )
+
+    logger.info("Finished setup!")
+
+    firstArrivalTick
   }
+
+  /** Return the time in seconds until the earliest next departure for one of
+    * the EVs.
+    *
+    * @param evs
+    *   Collection of all EVs
+    * @param currentTime
+    *   Current time to create a start value for foldLeft
+    * @return
+    *   Time until earliest next departure for one of the EVs in the set of all
+    *   EVs
+    */
+  private def getTimeUntilNextDeparture(
+      evs: Seq[ElectricVehicle],
+      currentTime: ZonedDateTime
+  ): Option[Long] =
+    evs
+      .foldLeft[Option[ZonedDateTime]](None)(
+        (earliestEvent, ev: ElectricVehicle) =>
+          if (!ev.parkingTimeStart.isAfter(currentTime))
+            Seq(earliestEvent, Some(ev.departureTime)).flatten.minOption
+          else
+            earliestEvent
+      )
+      .map { nextEvent =>
+        currentTime.until(nextEvent, ChronoUnit.SECONDS)
+      }
+
+  /** Return the time in seconds until the earliest next arrival for one of the
+    * EVs.
+    *
+    * @param evs
+    *   Collection of all EVs
+    * @param currentTime
+    *   Current time to create a start value for foldLeft
+    * @return
+    *   Time until earliest next arrival for one of the EVs in the set of all
+    *   EVs
+    */
+  private def getTimeUntilNextArrival(
+      evs: Seq[ElectricVehicle],
+      currentTime: ZonedDateTime
+  ): Option[Long] =
+    evs
+      .foldLeft[Option[ZonedDateTime]](None)(
+        (earliestEvent, ev: ElectricVehicle) =>
+          if (ev.parkingTimeStart.isAfter(currentTime)) {
+            Seq(
+              earliestEvent,
+              Some(ev.parkingTimeStart),
+              Some(ev.departureTime)
+            ).flatten.minOption
+          } else
+            earliestEvent
+      )
+      .map { nextEvent =>
+        currentTime.until(nextEvent, ChronoUnit.SECONDS)
+      }
 }

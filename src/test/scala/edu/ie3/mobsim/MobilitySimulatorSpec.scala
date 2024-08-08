@@ -309,8 +309,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "get time until next departure" in {
-      val mobilitySimulator = mobSim()
-
       val getTimeUntilNextDeparture =
         PrivateMethod[Option[Long]](Symbol("getTimeUntilNextDeparture"))
 
@@ -328,7 +326,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (evs, expectedNextDeparture) =>
         val actualNextDepartureOption =
-          mobilitySimulator invokePrivate getTimeUntilNextDeparture(
+          MobilitySimulator invokePrivate getTimeUntilNextDeparture(
             evs,
             givenSimulationStart
           )
@@ -342,8 +340,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "get time until next arrival" in {
-      val mobilitySimulator = mobSim()
-
       val getTimeUntilNextArrival =
         PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
 
@@ -361,7 +357,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (evs, expectedNextArrival) =>
         val actualNextArrivalOption =
-          mobilitySimulator invokePrivate getTimeUntilNextArrival(
+          MobilitySimulator invokePrivate getTimeUntilNextArrival(
             evs,
             givenSimulationStart
           )
@@ -375,8 +371,6 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
     }
 
     "get time until next event" in {
-      val mobilitySimulator = mobSim()
-
       val getTimeUntilNextArrival =
         PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
       val getTimeUntilNextDeparture =
@@ -400,13 +394,13 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
 
       forAll(cases) { (electricVehicles, expectedNextEvent) =>
         val actualNextArrival: Option[Long] =
-          mobilitySimulator invokePrivate getTimeUntilNextArrival(
+          MobilitySimulator invokePrivate getTimeUntilNextArrival(
             electricVehicles,
             givenSimulationStart
           )
 
         val actualNextDeparture: Option[Long] =
-          mobilitySimulator invokePrivate getTimeUntilNextDeparture(
+          MobilitySimulator invokePrivate getTimeUntilNextDeparture(
             electricVehicles,
             givenSimulationStart
           )
