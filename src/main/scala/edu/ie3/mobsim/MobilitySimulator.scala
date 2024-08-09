@@ -91,6 +91,7 @@ final class MobilitySimulator(
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
     val chargingStationOccupancy = exchangeEvMovementsWithSimona(
       currentTime,
+      tick,
       availableChargingPoints,
       currentPricesAtChargingStations,
       maxDistanceFromPoi
@@ -131,6 +132,8 @@ final class MobilitySimulator(
     *
     * @param currentTime
     *   current time of the simulation
+    * @param tick
+    *   the current tick
     * @param availableChargingPoints
     *   Map with currently available charging points at the evcs
     * @param currentPricesAtChargingStations
@@ -142,6 +145,7 @@ final class MobilitySimulator(
     */
   private def exchangeEvMovementsWithSimona(
       currentTime: ZonedDateTime,
+      tick: Long,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: Length
@@ -188,11 +192,20 @@ final class MobilitySimulator(
     )
 
     // Finally, send arrivals to SIMONA
-    val nextArrival =
-      MobilitySimulator.getTimeUntilNextArrival(electricVehicles, currentTime)
+    val timeUntilNextEvent =
+      MobilitySimulator
+        .getTimeUntilNextArrival(electricVehicles, currentTime)
+        .orElse(
+          // If all EVs are currently parked, there is no next arrival
+          // at this point in time. Because the simulation has to continue,
+          // provide the next departure tick.
+          MobilitySimulator
+            .getTimeUntilNextDeparture(electricVehicles, currentTime)
+        )
+        .map(_ + tick)
     evData.provideArrivingEvs(
       EvMovement.buildMovementsMap(arrivals),
-      nextArrival.map(long2Long).toJava
+      timeUntilNextEvent.map(long2Long).toJava
     )
 
     // compile map from evcs to their parked evs
