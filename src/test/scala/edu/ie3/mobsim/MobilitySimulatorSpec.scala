@@ -308,11 +308,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       }
     }
 
-    "get time until next event" in {
-      val mobilitySimulator = mobSim()
-
-      val getTimeUntilNextEvent =
-        PrivateMethod[Long](Symbol("getTimeUntilNextEvent"))
+    "get time until next departure" in {
+      val getTimeUntilNextDeparture =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextDeparture"))
 
       val ev2: ElectricVehicle =
         evChargingAtSimonaWithStation.copy(departureTime =
@@ -320,65 +318,145 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         )
 
       val cases = Table(
-        ("evs", "expectedNextEvent"),
-        (Seq(arrivingEv), 3600),
+        ("evs", "expectedNextDeparture"),
+        (Seq(departingEv), 3600),
         (Seq(ev2), 2700),
-        (Seq(arrivingEv, ev2), 2700)
+        (Seq(departingEv, ev2), 2700)
       )
 
-      forAll(cases) { (evs, expectedNextEvent) =>
-        val actualNextEvent =
-          mobilitySimulator invokePrivate getTimeUntilNextEvent(
+      forAll(cases) { (evs, expectedNextDeparture) =>
+        val actualNextDepartureOption =
+          MobilitySimulator invokePrivate getTimeUntilNextDeparture(
             evs,
             givenSimulationStart
           )
 
-        actualNextEvent shouldBe expectedNextEvent
+        val actualNextDeparture = actualNextDepartureOption.getOrElse(
+          fail("getTimeUntilNextDeparture returned None")
+        )
+
+        actualNextDeparture shouldBe expectedNextDeparture
       }
     }
 
-    "update electricVehicles correctly" in {
-      val mobilitySimulator = mobSim()
+    "get time until next arrival" in {
+      val getTimeUntilNextArrival =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
 
-      val updateElectricVehicles =
-        PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+      val ev2: ElectricVehicle =
+        evChargingAtSimonaWithStation.copy(
+          parkingTimeStart = givenSimulationStart.plusMinutes(15)
+        )
 
       val cases = Table(
-        "updatedMovements",
-        Seq(
-          EvMovement(
-            cs0.uuid,
-            ev1.copy(
-              homePoi = chargingHubHighwayPoi,
-              chargingAtHomePossible = false
-            )
-          )
-        ),
-        Seq(
-          EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
-          EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
-        ),
-        Seq(
-          EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
-          EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
-          EvMovement(
-            cs0.uuid,
-            ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
-          )
-        )
+        ("evs", "expectedNextArrival"),
+        (Seq(arrivingEv), 1800L),
+        (Seq(ev2), 900L),
+        (Seq(arrivingEv, ev2), 900L)
       )
 
-      forAll(cases) { updatedMovements =>
-        mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
+      forAll(cases) { (evs, expectedNextArrival) =>
+        val actualNextArrivalOption =
+          MobilitySimulator invokePrivate getTimeUntilNextArrival(
+            evs,
+            givenSimulationStart
+          )
 
-        mobilitySimulator.electricVehicles.foreach { electricVehicle =>
-          updatedMovements.foreach { movement =>
-            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
-              electricVehicle shouldBe movement.ev
-            }
+        val actualNextArrival = actualNextArrivalOption.getOrElse(
+          fail("getTimeUntilNextArrival returned None")
+        )
+
+        actualNextArrival shouldBe expectedNextArrival
+      }
+    }
+
+    "get time until next event" in {
+      val getTimeUntilNextArrival =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
+      val getTimeUntilNextDeparture =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextDeparture"))
+
+      val evDeparting: ElectricVehicle =
+        ev1.copy(departureTime = givenSimulationStart.plusMinutes(45))
+      val evArriving: ElectricVehicle =
+        ev1.copy(
+          departureTime = givenSimulationStart.plusHours(18),
+          parkingTimeStart = givenSimulationStart.plusHours(1)
+        )
+
+      val cases = Table(
+        ("electricVehicles", "expectedNextEvent"),
+        (Seq.empty[ElectricVehicle], None),
+        (Seq(evArriving), Some(3600L)),
+        (Seq(evDeparting), Some(2700L)),
+        (Seq(evArriving, evDeparting), Some(2700L))
+      )
+
+      forAll(cases) { (electricVehicles, expectedNextEvent) =>
+        val actualNextArrival: Option[Long] =
+          MobilitySimulator invokePrivate getTimeUntilNextArrival(
+            electricVehicles,
+            givenSimulationStart
+          )
+
+        val actualNextDeparture: Option[Long] =
+          MobilitySimulator invokePrivate getTimeUntilNextDeparture(
+            electricVehicles,
+            givenSimulationStart
+          )
+
+        val timeUntilNextEvent = Seq(
+          actualNextArrival,
+          actualNextDeparture
+        ).flatten.minOption
+
+        timeUntilNextEvent shouldBe expectedNextEvent
+      }
+    }
+  }
+
+  "update electricVehicles correctly" in {
+    val mobilitySimulator = mobSim()
+
+    val updateElectricVehicles =
+      PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+
+    val cases = Table(
+      "updatedMovements",
+      Seq(
+        EvMovement(
+          cs0.uuid,
+          ev1.copy(
+            homePoi = chargingHubHighwayPoi,
+            chargingAtHomePossible = false
+          )
+        )
+      ),
+      Seq(
+        EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
+        EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+      ),
+      Seq(
+        EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
+        EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
+        EvMovement(
+          cs0.uuid,
+          ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
+        )
+      )
+    )
+
+    forAll(cases) { updatedMovements =>
+      mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
+
+      mobilitySimulator.electricVehicles.foreach { electricVehicle =>
+        updatedMovements.foreach { movement =>
+          if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+            electricVehicle shouldBe movement.ev
           }
         }
       }
     }
   }
+
 }
