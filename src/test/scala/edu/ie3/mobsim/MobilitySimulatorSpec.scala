@@ -413,50 +413,49 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         timeUntilNextEvent shouldBe expectedNextEvent
       }
     }
-  }
 
-  "update electricVehicles correctly" in {
-    val mobilitySimulator = mobSim()
+    "update electricVehicles correctly" in {
+      val mobilitySimulator = mobSim()
 
-    val updateElectricVehicles =
-      PrivateMethod[Unit](Symbol("updateElectricVehicles"))
+      val updateElectricVehicles =
+        PrivateMethod[Unit](Symbol("updateElectricVehicles"))
 
-    val cases = Table(
-      "updatedMovements",
-      Seq(
-        EvMovement(
-          cs0.uuid,
-          ev1.copy(
-            homePoi = chargingHubHighwayPoi,
-            chargingAtHomePossible = false
+      val cases = Table(
+        "updatedMovements",
+        Seq(
+          EvMovement(
+            cs0.uuid,
+            ev1.copy(
+              homePoi = chargingHubHighwayPoi,
+              chargingAtHomePossible = false
+            )
+          )
+        ),
+        Seq(
+          EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
+          EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+        ),
+        Seq(
+          EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
+          EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
+          EvMovement(
+            cs0.uuid,
+            ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
           )
         )
-      ),
-      Seq(
-        EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
-        EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
-      ),
-      Seq(
-        EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
-        EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
-        EvMovement(
-          cs0.uuid,
-          ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
-        )
       )
-    )
 
-    forAll(cases) { updatedMovements =>
-      mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
+      forAll(cases) { updatedMovements =>
+        mobilitySimulator invokePrivate updateElectricVehicles(updatedMovements)
 
-      mobilitySimulator.electricVehicles.foreach { electricVehicle =>
-        updatedMovements.foreach { movement =>
-          if (movement.ev.uuid.equals(electricVehicle.uuid)) {
-            electricVehicle shouldBe movement.ev
+        mobilitySimulator.electricVehicles.foreach { electricVehicle =>
+          updatedMovements.foreach { movement =>
+            if (movement.ev.uuid.equals(electricVehicle.uuid)) {
+              electricVehicle shouldBe movement.ev
+            }
           }
         }
       }
     }
   }
-
 }
