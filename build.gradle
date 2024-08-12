@@ -92,7 +92,6 @@ description = 'MobilitySimulator'
 
 shadowJar {
   zip64 = true
-  from sourceSets.main.allSource
 }
 
 // scapegoat hook configuration
