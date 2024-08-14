@@ -379,7 +379,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val evDeparting: ElectricVehicle =
         ev1.copy(departureTime = givenSimulationStart.plusMinutes(45))
       val evArriving: ElectricVehicle =
-        ev1.copy(
+        ev2.copy(
           departureTime = givenSimulationStart.plusHours(18),
           parkingTimeStart = givenSimulationStart.plusHours(1)
         )
