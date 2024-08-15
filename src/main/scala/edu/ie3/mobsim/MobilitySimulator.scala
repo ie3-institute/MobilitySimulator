@@ -32,6 +32,7 @@ import edu.ie3.mobsim.model.{
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataSimulation
+import edu.ie3.simona.api.data.ev.model.EvModel
 import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -63,7 +64,7 @@ final class MobilitySimulator(
     thresholdChargingHubDistance: Length,
     round15: Boolean
 ) extends LazyLogging {
-  def doActivity(tick: Long): Optional[java.lang.Long] = {
+  private def doActivity(tick: Long): Optional[java.lang.Long] = {
     /* Update current time */
     val currentTime = startTime.plusSeconds(tick)
 
@@ -88,28 +89,26 @@ final class MobilitySimulator(
       .toMap
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
-    val (
-      departedEvsFromSimona,
-      chargingStationOccupancy
-    ) = exchangeEvMovementsWithSimona(
+    val chargingStationOccupancy = exchangeEvMovementsWithSimona(
       currentTime,
+      tick,
       availableChargingPoints,
       currentPricesAtChargingStations,
       maxDistanceFromPoi
     )
 
-    /* Update and simulate all EVs that were returned from SIMONA */
-    updateAndSimulateDepartedEvs(
-      currentTime,
-      departedEvsFromSimona,
-      tripProbabilities,
-      thresholdChargingHubDistance,
-      round15
-    )
-
     /* Get time until next event for one of the EVs and return corresponding tick to SIMONA */
-    val timeUntilNextEvent =
-      getTimeUntilNextEvent(electricVehicles, currentTime)
+    val timeUntilNextEvent = Seq(
+      MobilitySimulator.getTimeUntilNextArrival(electricVehicles, currentTime),
+      MobilitySimulator.getTimeUntilNextDeparture(electricVehicles, currentTime)
+    ).flatten.minOption
+
+    timeUntilNextEvent.foreach { nextEvent =>
+      logger.debug(
+        s"Next event in ${(nextEvent / 60 / 60).toInt} hours " +
+          s"and ${(nextEvent / 60) % 60} minutes."
+      )
+    }
 
     /* Save occupancy of charging stations for csv output */
     chargingStations.foreach(cs =>
@@ -120,7 +119,9 @@ final class MobilitySimulator(
       )
     )
 
-    Some(long2Long(tick + timeUntilNextEvent)).toJava
+    timeUntilNextEvent.map { nextEvent =>
+      long2Long(tick + nextEvent)
+    }.toJava
   }
 
   /** Hand over EVs to SIMONA which arrive at their destination POI or depart
@@ -131,6 +132,8 @@ final class MobilitySimulator(
     *
     * @param currentTime
     *   current time of the simulation
+    * @param tick
+    *   the current tick
     * @param availableChargingPoints
     *   Map with currently available charging points at the evcs
     * @param currentPricesAtChargingStations
@@ -138,16 +141,17 @@ final class MobilitySimulator(
     * @param maxDistance
     *   Maximum permissible distance between a POI and a charging station
     * @return
-    *   Returned EV models from SIMONA as set of Electric Vehicles
+    *   The updated charging station occupancy
     */
   private def exchangeEvMovementsWithSimona(
       currentTime: ZonedDateTime,
+      tick: Long,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: Length
-  ): (Seq[ElectricVehicle], Map[UUID, Seq[ElectricVehicle]]) = {
+  ): Map[UUID, Seq[ElectricVehicle]] = {
 
-    /* Determine parking and departing evs in this tick */
+    // Determine parking and departing evs in this tick
     val (parkingEvs, departingEvs) =
       defineMovements(electricVehicles, currentTime)
 
@@ -170,7 +174,7 @@ final class MobilitySimulator(
       }
       .toSeq
 
-    /* Add EVs that start parking to movements and assign to Evcs UUID */
+    // Add EVs that start parking now to movements and assign to Evcs UUID
     val arrivals = handleParkingEvs(
       parkingEvs,
       currentPricesAtChargingStations,
@@ -178,12 +182,34 @@ final class MobilitySimulator(
       maxDistance
     )
 
+    // Update and simulate all EVs that were returned from SIMONA
+    updateAndSimulateDepartedEvs(
+      currentTime,
+      departedEvs,
+      tripProbabilities,
+      thresholdChargingHubDistance,
+      round15
+    )
+
+    // Finally, send arrivals to SIMONA
+    val timeUntilNextEvent =
+      MobilitySimulator
+        .getTimeUntilNextArrival(electricVehicles, currentTime)
+        .orElse(
+          // If all EVs are currently parked, there is no next arrival
+          // at this point in time. Because the simulation has to continue,
+          // provide the next departure tick.
+          MobilitySimulator
+            .getTimeUntilNextDeparture(electricVehicles, currentTime)
+        )
+        .map(_ + tick)
     evData.provideArrivingEvs(
-      EvMovement.buildMovementsMap(arrivals)
+      EvMovement.buildMovementsMap(arrivals),
+      timeUntilNextEvent.map(long2Long).toJava
     )
 
     // compile map from evcs to their parked evs
-    val evcsToParkedEvs = electricVehicles
+    electricVehicles
       .flatMap { ev =>
         ev.chosenChargingStation.map(ev -> _)
       }
@@ -192,8 +218,6 @@ final class MobilitySimulator(
       } { case (ev, _) =>
         ev
       }
-
-    (departedEvs, evcsToParkedEvs)
   }
 
   /** Determine the set of cars, that start to park and that depart in this time
@@ -498,55 +522,6 @@ final class MobilitySimulator(
         )
       } else ev
     })
-
-  }
-
-  /** Return the time in seconds until the earliest next event for one of the
-    * EVs. The events are either departure or parking start.
-    *
-    * @param evs
-    *   Collection of all EVs
-    * @param currentTime
-    *   Current time to create a start value for foldLeft
-    * @return
-    *   Time until earliest next event for one of the EVs in the set of all EVs
-    */
-  private def getTimeUntilNextEvent(
-      evs: Seq[ElectricVehicle],
-      currentTime: ZonedDateTime
-  ): Long = {
-
-    val nextEvent: ZonedDateTime = evs.foldLeft(currentTime.plusYears(1))(
-      (earliestEvent: ZonedDateTime, ev: ElectricVehicle) => {
-        val earlierEvent = if (ev.parkingTimeStart.isAfter(currentTime)) {
-          Seq(
-            earliestEvent,
-            ev.parkingTimeStart,
-            ev.departureTime
-          ).minOption.getOrElse(
-            throw new IllegalArgumentException(
-              "Unable to determine the earlier time"
-            )
-          )
-        } else {
-          Seq(earliestEvent, ev.departureTime).minOption.getOrElse(
-            throw new IllegalArgumentException(
-              "Unable to determine the earlier time"
-            )
-          )
-        }
-        earlierEvent
-      }
-    )
-
-    val timeUntilNextEvent: Long =
-      currentTime.until(nextEvent, ChronoUnit.SECONDS)
-    logger.debug(
-      s"Next event in ${(timeUntilNextEvent / 60 / 60).toInt} hours " +
-        s"and ${(timeUntilNextEvent / 60) % 60} minutes."
-    )
-
-    timeUntilNextEvent
   }
 
   private def updateElectricVehicles(movements: Seq[EvMovement]): Unit = {
@@ -603,7 +578,9 @@ object MobilitySimulator
     * necessary data such as probabilities, EV models, etc. and creates all
     * objects such as EVs, POIs, and charging stations.
     */
-  override protected def initialize(): Optional[java.lang.Long] = {
+  override protected def initialize(): java.lang.Long = {
+
+    val initTick = -1L
 
     val availableEvData = evData.getOrElse(
       throw InitializationException(
@@ -835,8 +812,81 @@ object MobilitySimulator
     )
     simulator = Some(mobSim)
 
+    val currentTime = startTime.plusSeconds(initTick)
+    val timeUntilFirstArrival =
+      getTimeUntilNextArrival(evs, currentTime).getOrElse(
+        throw InitializationException(
+          "No first arrival determined!"
+        )
+      )
+    val firstArrivalTick = initTick + timeUntilFirstArrival
+
+    // Also provide first tick to the data service
+    availableEvData.provideArrivingEvs(
+      Map.empty[UUID, java.util.List[EvModel]].asJava,
+      Some(long2Long(firstArrivalTick)).toJava
+    )
+
     logger.info("Finished setup!")
 
-    mobSim.doActivity(-1L)
+    firstArrivalTick
   }
+
+  /** Return the time in seconds until the earliest next departure for one of
+    * the EVs.
+    *
+    * @param evs
+    *   Collection of all EVs
+    * @param currentTime
+    *   Current time to create a start value for foldLeft
+    * @return
+    *   Time until earliest next departure for one of the EVs in the set of all
+    *   EVs
+    */
+  private def getTimeUntilNextDeparture(
+      evs: Seq[ElectricVehicle],
+      currentTime: ZonedDateTime
+  ): Option[Long] =
+    evs
+      .foldLeft[Option[ZonedDateTime]](None)(
+        (earliestEvent, ev: ElectricVehicle) =>
+          if (!ev.parkingTimeStart.isAfter(currentTime))
+            Seq(earliestEvent, Some(ev.departureTime)).flatten.minOption
+          else
+            earliestEvent
+      )
+      .map { nextEvent =>
+        currentTime.until(nextEvent, ChronoUnit.SECONDS)
+      }
+
+  /** Return the time in seconds until the earliest next arrival for one of the
+    * EVs.
+    *
+    * @param evs
+    *   Collection of all EVs
+    * @param currentTime
+    *   Current time to create a start value for foldLeft
+    * @return
+    *   Time until earliest next arrival for one of the EVs in the set of all
+    *   EVs
+    */
+  private def getTimeUntilNextArrival(
+      evs: Seq[ElectricVehicle],
+      currentTime: ZonedDateTime
+  ): Option[Long] =
+    evs
+      .foldLeft[Option[ZonedDateTime]](None)(
+        (earliestEvent, ev: ElectricVehicle) =>
+          if (ev.parkingTimeStart.isAfter(currentTime)) {
+            Seq(
+              earliestEvent,
+              Some(ev.parkingTimeStart),
+              Some(ev.departureTime)
+            ).flatten.minOption
+          } else
+            earliestEvent
+      )
+      .map { nextEvent =>
+        currentTime.until(nextEvent, ChronoUnit.SECONDS)
+      }
 }

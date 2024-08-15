@@ -59,7 +59,15 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
   protected val arrivingEv: ElectricVehicle = {
     ev1.copy(
       destinationPoi = chargingHubHighwayPoi,
-      destinationPoiType = PoiTypeDictionary.CHARGING_HUB_HIGHWAY
+      destinationPoiType = PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
+      parkingTimeStart = givenSimulationStart.plusMinutes(30)
+    )
+  }
+
+  protected val departingEv: ElectricVehicle = {
+    ev1.copy(
+      destinationPoi = culturePoi,
+      destinationPoiType = PoiTypeDictionary.LEISURE
     )
   }
 
