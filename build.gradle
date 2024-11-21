@@ -53,7 +53,7 @@ dependencies {
 
   implementation 'com.github.ie3-institute:simonaAPI:0.5.0'
 
-  implementation 'tech.units:indriya:2.2' // Physical units
+  implementation 'tech.units:indriya:2.2.1' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
   implementation 'org.locationtech.jts.io:jts-io-common:1.20.0' // Location specific stuff
   implementation 'commons-io:commons-io:2.18.0' // I/O functionalities
