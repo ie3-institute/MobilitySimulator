@@ -28,7 +28,7 @@ class ChargingStationSpec
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
         random,
-        maxDistance
+        maxDistance,
       )
 
       uuid shouldBe Some(cs2.uuid)
@@ -43,7 +43,7 @@ class ChargingStationSpec
         currentPricesAtChargingStations.updated(cs7.uuid, 0.0),
         currentlyAvailableChargingPoints,
         random,
-        maxDistance
+        maxDistance,
       )
 
       uuid shouldBe Some(cs7.uuid)
@@ -58,7 +58,7 @@ class ChargingStationSpec
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
         random,
-        maxDistance
+        maxDistance,
       )
 
       uuid shouldBe None
@@ -71,7 +71,7 @@ class ChargingStationSpec
         currentPricesAtChargingStations,
         noAvailableChargingPoints,
         random,
-        maxDistance
+        maxDistance,
       )
 
       uuid shouldBe None
@@ -83,12 +83,12 @@ class ChargingStationSpec
         evChargingNeeded.copyWith(half),
         currentPricesAtChargingStations,
         currentlyAvailableChargingPoints,
-        maxDistance
+        maxDistance,
       )
 
       x shouldBe Map(
         UUID.fromString("7537c0b6-3137-4e30-8a95-db1c0f9d9b81") -> 5.0,
-        cs7.uuid -> 5.0
+        cs7.uuid -> 5.0,
       )
     }
 
@@ -110,14 +110,14 @@ class ChargingStationSpec
         (evWithLowPriceMemory, Map(cs6.uuid -> 0.0), 0.5),
         (evWithHighPriceMemory, Map(cs6.uuid -> 0.0), 1.0),
         (evOtherPriceMemory, Map(cs6.uuid -> 0.6), 0.25),
-        (evOtherPriceMemory, Map(cs6.uuid -> 0.4), 0.75)
+        (evOtherPriceMemory, Map(cs6.uuid -> 0.4), 0.75),
       )
 
       forAll(cases) { (ev, prices, expectedRating) =>
         val result = ChargingStation invokePrivate priceRating(
           cs6,
           ev,
-          prices
+          prices,
         )
         assert(result === expectedRating +- 1e-6)
       }

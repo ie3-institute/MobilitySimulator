@@ -19,7 +19,7 @@ final case class PoiTransition(
     probabilitiesSaturday: Map[PoiTransitionKey, ProbabilityDensityFunction[
       Int
     ]],
-    probabilitiesSunday: Map[PoiTransitionKey, ProbabilityDensityFunction[Int]]
+    probabilitiesSunday: Map[PoiTransitionKey, ProbabilityDensityFunction[Int]],
 ) {
 
   /** Sample a destination POI type dependent on day type, day time and previous
@@ -34,7 +34,7 @@ final case class PoiTransition(
     */
   def sample(
       time: ZonedDateTime,
-      fromPoiType: PoiEnums.PoiTypeDictionary.Value
+      fromPoiType: PoiEnums.PoiTypeDictionary.Value,
   ): PoiEnums.PoiTypeDictionary.Value = {
     /* Get current time on 15min basis */
     val timeQuarter = time.getHour * 4 + time.getMinute / 15

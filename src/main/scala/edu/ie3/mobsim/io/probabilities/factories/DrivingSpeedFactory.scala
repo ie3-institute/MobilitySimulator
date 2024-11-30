@@ -40,7 +40,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
         Failure(
           SourceException(
             "Unable to build driving speed information. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -68,7 +68,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
               DrivingSpeed(
                 weekdayParameters,
                 saturdayParameters,
-                sundayParameters
+                sundayParameters,
               )
             )
           case None =>
@@ -91,7 +91,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
       dayType: DayType.Value,
       a: Double,
       b: Double,
-      min: Velocity
+      min: Velocity,
   )
 
   private object Entry {
@@ -101,7 +101,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
           time,
           throw SourceException(
             "Unable to get time interval information from entity field data"
-          )
+          ),
         ) match {
         case "00:00-02:00" => 0
         case "02:00-04:00" => 1
@@ -125,7 +125,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -136,7 +136,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
           a,
           throw SourceException(
             "Unable to get 'a' parameter from entity field data"
-          )
+          ),
         )
         .toDouble
       val bValue = entityFieldData
@@ -144,7 +144,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
           b,
           throw SourceException(
             "Unable to get 'b' parameter from entity field data"
-          )
+          ),
         )
         .toDouble
       val minSpeed = KilometersPerHour(
@@ -153,7 +153,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
             min,
             throw SourceException(
               "Unable to get minimum speed information from entity field data"
-            )
+            ),
           )
           .toDouble
       )
@@ -163,7 +163,7 @@ object DrivingSpeedFactory extends ProbabilityFactory[DrivingSpeed] {
         dayTypeValue,
         aValue,
         bValue,
-        minSpeed
+        minSpeed,
       )
     }
   }

@@ -15,7 +15,7 @@ import scala.util.Random
 final case class ProbabilityDensityFunction[T] private (
     pdf: Map[T, Double],
     cdf: Map[Double, T],
-    private val seed: Random
+    private val seed: Random,
 ) {
   def sample(): T = {
     val p = seed.nextDouble()
@@ -37,7 +37,7 @@ object ProbabilityDensityFunction {
 
   def apply[T](
       pdf: Map[T, Double],
-      seed: Random
+      seed: Random,
   ): ProbabilityDensityFunction[T] = {
     if (pdf.isEmpty) {
       throw StochasticsException(

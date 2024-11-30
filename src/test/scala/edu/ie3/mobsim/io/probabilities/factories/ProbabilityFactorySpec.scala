@@ -18,7 +18,7 @@ class ProbabilityFactorySpec
       processLine("foo,Bar, baz", ",") should contain theSameElementsAs Seq(
         "foo",
         "bar",
-        "baz"
+        "baz",
       )
     }
 

@@ -16,7 +16,7 @@ final case class ParkingTime(
     probabilitiesWeekday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]],
     probabilitiesSaturday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]],
     probabilitiesSunday: Map[ParkingTimeKey, ProbabilityDensityFunction[Int]],
-    round15: Boolean
+    round15: Boolean,
 ) {
 
   /** Sample a parking time dependent on day type, day time and POI type. Using

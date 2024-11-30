@@ -45,14 +45,14 @@ class EvBuilderFromEvInputWithMappingSpec
         givenSimulationStart,
         givenFirstDepartureMetaData,
         ev2poi,
-        poi2evcs
+        poi2evcs,
       )
 
       builtEvs.map(ev => {
         if (ev.uuid != nonMappedEv.getUuid) {
           ev.homePoi.uuid shouldBe ev2poi.getOrElse(
             ev.uuid,
-            fail("Can not find UUID.")
+            fail("Can not find UUID."),
           )
           ev.chargingAtHomePossible shouldBe true
           val nearestCs = ev.homePoi.nearestChargingStations.keys

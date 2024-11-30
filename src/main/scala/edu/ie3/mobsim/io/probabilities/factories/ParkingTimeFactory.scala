@@ -40,7 +40,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
         Failure(
           SourceException(
             "Unable to build parking time probabilities. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -69,7 +69,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
                 weekdayProbability,
                 saturdayProbability,
                 sundayProbability,
-                round15 = false
+                round15 = false,
               )
             )
           case None =>
@@ -98,7 +98,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
       dayType: DayType.Value,
       poiType: PoiTypeDictionary.Value,
       duration: Int,
-      probability: Double
+      probability: Double,
   )
 
   private object Entry {
@@ -108,7 +108,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
           quarterHourOfDay,
           throw SourceException(
             "Unable to get quarter hour information from entity field data"
-          )
+          ),
         )
         .toInt
       val dayTypeValue = DayType(
@@ -116,7 +116,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -127,7 +127,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
           poiType,
           throw SourceException(
             "Unable to get poi type information from entity field data"
-          )
+          ),
         )
       )
       val durationValue = entityFieldData
@@ -135,7 +135,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
           duration,
           throw SourceException(
             "Unable to get duration information from entity field data"
-          )
+          ),
         )
         .toInt
       val probabilityValue = entityFieldData
@@ -143,7 +143,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
           probability,
           throw SourceException(
             "Unable to get probability information from entity field data"
-          )
+          ),
         )
         .toDouble
 
@@ -152,7 +152,7 @@ object ParkingTimeFactory extends ProbabilityFactory[ParkingTime] {
         dayTypeValue,
         poiTypeValue,
         durationValue,
-        probabilityValue
+        probabilityValue,
       )
     }
   }

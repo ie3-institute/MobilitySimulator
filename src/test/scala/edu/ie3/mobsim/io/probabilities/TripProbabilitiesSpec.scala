@@ -30,7 +30,7 @@ class TripProbabilitiesSpec extends UnitSpec {
         pathsAndSources,
         ",",
         averageCarUsage,
-        round15 = true
+        round15 = true,
       )
 
     tripProbabilities.categoricalLocation.probabilitiesWeekday.size shouldBe 42

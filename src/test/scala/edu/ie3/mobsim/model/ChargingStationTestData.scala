@@ -18,7 +18,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
     destinationPoi = supermarket,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
-    departureTime = ZonedDateTime.now().plusHours(5)
+    departureTime = ZonedDateTime.now().plusHours(5),
   )
 
   protected val evAtChargingHub: ElectricVehicle = ev2.copyWith(
@@ -26,7 +26,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
     destinationPoi = chargingHubTownPoi,
     destinationPoiType = PoiTypeDictionary.CHARGING_HUB_TOWN,
     parkingTimeStart = ZonedDateTime.now(),
-    departureTime = ZonedDateTime.now().plusHours(1)
+    departureTime = ZonedDateTime.now().plusHours(1),
   )
 
   protected val evNextTrip: ElectricVehicle = ev3.copyWith(
@@ -34,7 +34,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
     destinationPoi = otherShopPoi,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
-    departureTime = ZonedDateTime.now().plusHours(1)
+    departureTime = ZonedDateTime.now().plusHours(1),
   )
 
   protected val evChargingNeeded: ElectricVehicle = ev4.copyWith(
@@ -42,7 +42,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
     destinationPoi = supermarket,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
-    departureTime = ZonedDateTime.now().plusHours(5)
+    departureTime = ZonedDateTime.now().plusHours(5),
   )
 
   protected val evNoChargingStations: ElectricVehicle = ev5.copyWith(
@@ -50,7 +50,7 @@ trait ChargingStationTestData extends TripSimulationTestData {
     destinationPoi = supermarketPoi,
     destinationPoiType = PoiTypeDictionary.SHOPPING,
     parkingTimeStart = ZonedDateTime.now(),
-    departureTime = ZonedDateTime.now().plusHours(5)
+    departureTime = ZonedDateTime.now().plusHours(5),
   )
 
   protected val currentPricesAtChargingStations: Map[UUID, Double] = {

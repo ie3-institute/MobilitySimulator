@@ -12,7 +12,7 @@ import scala.util.Random
 final case class LastTripOfDay(
     probabilityWeekday: Map[Int, Double],
     probabilitySaturday: Map[Int, Double],
-    probabilitySunday: Map[Int, Double]
+    probabilitySunday: Map[Int, Double],
 ) {
 
   /** Sample if the trip was last trip of day dependent on day type and day

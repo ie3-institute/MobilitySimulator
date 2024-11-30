@@ -22,7 +22,7 @@ final case class TripDistance(
     ]],
     probabilitiesSunday: Map[TripDistanceKey, ProbabilityDensityFunction[
       Double
-    ]]
+    ]],
 ) {
 
   /** Sample a trip distance based on day type, day time and origin and
@@ -39,7 +39,7 @@ final case class TripDistance(
   def sample(
       time: ZonedDateTime,
       fromPoiType: PoiTypeDictionary.Value,
-      toPoiType: PoiTypeDictionary.Value
+      toPoiType: PoiTypeDictionary.Value,
   ): Length = {
 
     /* Get current time on 15min basis */
@@ -59,7 +59,7 @@ final case class TripDistance(
       TripDistanceKey(
         timeQuarter,
         fromPoiType,
-        toPoiType
+        toPoiType,
       )
     ) match {
       case Some(pdf) => pdf.sample()
@@ -74,6 +74,6 @@ case object TripDistance {
   final case class TripDistanceKey(
       time: Int,
       fromPoi: PoiTypeDictionary.Value,
-      toPoi: PoiTypeDictionary.Value
+      toPoi: PoiTypeDictionary.Value,
   )
 }

@@ -32,7 +32,7 @@ final case class ChargingStation(
     geoPosition: Coordinate,
     evcsType: ChargingPointType,
     evcsLocationType: EvcsLocationType,
-    chargingPoints: Int
+    chargingPoints: Int,
 )
 
 object ChargingStation extends LazyLogging {
@@ -50,7 +50,7 @@ object ChargingStation extends LazyLogging {
     */
   def loadChargingStationsWithPSDM(
       gridSource: RawGridSource,
-      participantSource: SystemParticipantSource
+      participantSource: SystemParticipantSource,
   ): Seq[ChargingStation] = {
 
     val chargingStations = participantSource.getEvcs.asScala.toSeq
@@ -61,7 +61,7 @@ object ChargingStation extends LazyLogging {
           evcs.getNode.getGeoPosition.getCoordinate,
           evcsType = evcs.getType,
           evcs.getLocationType,
-          chargingPoints = evcs.getChargingPoints
+          chargingPoints = evcs.getChargingPoints,
         )
       }
 
@@ -95,7 +95,7 @@ object ChargingStation extends LazyLogging {
       currentPricesAtChargingStations: Map[UUID, Double],
       currentlyAvailableChargingPoints: Map[UUID, Int],
       seed: Random,
-      maxDistance: Length
+      maxDistance: Length,
   ): (Option[UUID], Option[ElectricVehicle]) = {
     /* If there are charging stations nearby */
     if (ev.destinationPoi.nearestChargingStations.nonEmpty) {
@@ -110,7 +110,7 @@ object ChargingStation extends LazyLogging {
         (
           ev.destinationPoi.nearestChargingStations.keys.headOption
             .map(_.uuid),
-          None
+          None,
         )
       } else {
         /* Update charging prices memory of EV to have a reference for the prices of specific charging stations */
@@ -128,13 +128,13 @@ object ChargingStation extends LazyLogging {
           evWithUpdatedPriceMemory,
           currentPricesAtChargingStations,
           currentlyAvailableChargingPoints,
-          maxDistance
+          maxDistance,
         )
         (
           ratingMap.maxByOption { case (_, rating) => rating }.map {
             case (cs, _) => cs
           },
-          Some(evWithUpdatedPriceMemory)
+          Some(evWithUpdatedPriceMemory),
         )
       }
       /* If there are no charging stations nearby */
@@ -165,7 +165,7 @@ object ChargingStation extends LazyLogging {
       ev: ElectricVehicle,
       currentPricesAtChargingStations: Map[UUID, Double],
       currentlyAvailableChargingPoints: Map[UUID, Int],
-      maxDistance: Length
+      maxDistance: Length,
   ): Map[UUID, Double] =
     ev.destinationPoi.nearestChargingStations.par
       .map { case (cs, distance) =>
@@ -198,13 +198,13 @@ object ChargingStation extends LazyLogging {
 
   private def distanceRating(
       distance: Length,
-      maxDistance: Length
+      maxDistance: Length,
   ): Double =
     1 - distance.divide(maxDistance)
 
   private def chargeableEnergyRating(
       cs: ChargingStation,
-      ev: ElectricVehicle
+      ev: ElectricVehicle,
   ): Double = {
     val availableChargingPowerForEV =
       cs.evcsType.getElectricCurrentType match {
@@ -243,7 +243,7 @@ object ChargingStation extends LazyLogging {
           .to(KILOWATTHOUR)
           .getValue
           .doubleValue(),
-        1.0
+        1.0,
       )
     }
   }
@@ -251,7 +251,7 @@ object ChargingStation extends LazyLogging {
   private def priceRating(
       cs: ChargingStation,
       ev: ElectricVehicle,
-      currentPrices: Map[UUID, Double]
+      currentPrices: Map[UUID, Double],
   ): Double = currentPrices.get(cs.uuid) match {
     case Some(price) =>
       ev.chargingPricesMemory.maxOption.zip(

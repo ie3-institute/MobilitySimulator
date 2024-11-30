@@ -14,7 +14,7 @@ import java.nio.file.Paths
 object ArgsParser {
   final case class Arguments(
       mainArgs: Array[String],
-      config: Option[Config] = None
+      config: Option[Config] = None,
   )
 
   def prepareConfig(args: Array[String]): Option[MobSimConfig] =

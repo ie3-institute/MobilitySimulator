@@ -42,7 +42,7 @@ object ConfigFailFast {
             numberOfEv,
             _,
             _,
-            targetHomeChargingShare
+            targetHomeChargingShare,
           ) =>
         if (averageCarUsage > 1 | averageCarUsage < 0)
           throw IllegalConfigException(
@@ -64,7 +64,7 @@ object ConfigFailFast {
       case Location(
             chargingHubThresholdDistance,
             maxDistanceToChargingStation,
-            maxDistanceToHomeChargingStation
+            maxDistanceToHomeChargingStation,
           ) =>
         if (chargingHubThresholdDistance < 0.0)
           throw IllegalConfigException(

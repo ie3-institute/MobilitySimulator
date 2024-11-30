@@ -11,7 +11,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.TripDistance.TripDistanceKey
 import edu.ie3.mobsim.io.probabilities.{
   ProbabilityDensityFunction,
-  TripDistance
+  TripDistance,
 }
 import edu.ie3.mobsim.utils.DayType
 import squants.Length
@@ -46,7 +46,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
         Failure(
           SourceException(
             "Unable to build trip distance probabilities. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -74,7 +74,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
               TripDistance(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
               )
             )
           case None =>
@@ -104,7 +104,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
       from: PoiTypeDictionary.Value,
       to: PoiTypeDictionary.Value,
       distance: Length,
-      probability: Double
+      probability: Double,
   )
 
   private object Entry {
@@ -114,7 +114,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
           quarterHour,
           throw SourceException(
             "Unable to get minute information from entity field data"
-          )
+          ),
         )
         .toInt
       val dayTypeValue = DayType(
@@ -122,7 +122,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -134,7 +134,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
             fromPoi,
             throw SourceException(
               "Unable to get source poi type information from entity field data"
-            )
+            ),
           )
       )
       val toPoiValue = PoiTypeDictionary(
@@ -143,7 +143,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
             toPoi,
             throw SourceException(
               "Unable to get target poi type information from entity field data"
-            )
+            ),
           )
       )
       val distanceValue = Kilometers(
@@ -152,7 +152,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
             distance,
             throw SourceException(
               "Unable to get distance information from entity field data"
-            )
+            ),
           )
           .toDouble
       )
@@ -161,7 +161,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
           probability,
           throw SourceException(
             "Unable to get probability information from entity field data"
-          )
+          ),
         )
         .toDouble
 
@@ -171,7 +171,7 @@ object TripDistanceFactory extends ProbabilityFactory[TripDistance] {
         fromPoiValue,
         toPoiValue,
         distanceValue,
-        probabilityValue
+        probabilityValue,
       )
     }
   }

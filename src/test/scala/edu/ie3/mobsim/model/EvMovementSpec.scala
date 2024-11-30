@@ -19,7 +19,7 @@ class EvMovementSpec extends UnitSpec with TripSimulationTestData {
     val movements = Seq(
       EvMovement(csUuidA, ev1),
       EvMovement(csUuidB, ev2),
-      EvMovement(csUuidB, ev3)
+      EvMovement(csUuidB, ev3),
     )
 
     "build ev model maps correctly" in {
@@ -28,8 +28,8 @@ class EvMovementSpec extends UnitSpec with TripSimulationTestData {
         csUuidA -> Seq(ev1).asJava,
         csUuidB -> Seq(
           ev2,
-          ev3
-        ).asJava
+          ev3,
+        ).asJava,
       ).asJava
       actualMap shouldBe expectedMap
     }
@@ -40,8 +40,8 @@ class EvMovementSpec extends UnitSpec with TripSimulationTestData {
         csUuidA -> Seq(ev1.uuid).asJava,
         csUuidB -> Seq(
           ev2.uuid,
-          ev3.uuid
-        ).asJava
+          ev3.uuid,
+        ).asJava,
       ).asJava
       actualMap shouldBe expectedMap
     }

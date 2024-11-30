@@ -10,11 +10,11 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.model.ElectricVehicle.{
   buildEvWithType,
-  determineHomePoiPdf
+  determineHomePoiPdf,
 }
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 
@@ -35,7 +35,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
       evModelPdf: ProbabilityDensityFunction[EvType],
-      firstDepartureOfDay: FirstDepartureOfDay
+      firstDepartureOfDay: FirstDepartureOfDay,
   ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
@@ -49,7 +49,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       workPoiPdf,
       evModelPdf,
       firstDepartureOfDay,
-      startTime
+      startTime,
     )
 
     /* Build the remaining cars */
@@ -62,7 +62,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       workPoiPdf,
       evModelPdf,
       firstDepartureOfDay,
-      startTime
+      startTime,
     )
 
     val evs = initialHomeChargingCars.toSeq ++ additionalCars
@@ -97,7 +97,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay,
-      simulationStart: ZonedDateTime
+      simulationStart: ZonedDateTime,
   ): Iterable[ElectricVehicle] = {
     homePoiPdfWithHomeCharging.pdf.keys.zipWithIndex
       .filter(
@@ -111,7 +111,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
           firstDepartureOfDay,
           simulationStart,
           homePoi,
-          isHomeChargingPossible = true
+          isHomeChargingPossible = true,
         )
       }
   }
@@ -154,13 +154,13 @@ object EvBuilderFromRandomModel extends LazyLogging {
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       evModelPdf: ProbabilityDensityFunction[EvType],
       firstDepartureOfDay: FirstDepartureOfDay,
-      simulationStart: ZonedDateTime
+      simulationStart: ZonedDateTime,
   ): Seq[ElectricVehicle] = {
     val (amountOfUnassignedHomeChargingCars, amountOfUnassignedCars) =
       determineUnassignedCars(
         amountOfEvsInArea,
         amountOfHomeChargingCars,
-        amountOfAssignedCars
+        amountOfAssignedCars,
       )
     Range(0, amountOfUnassignedCars).map { cnt =>
       /* As long as there are still cars unassigned with home charging option, do that, otherwise assign the rest to the
@@ -179,7 +179,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
         firstDepartureOfDay,
         simulationStart,
         homePoi,
-        isHomeChargingPossible
+        isHomeChargingPossible,
       )
     }
   }
@@ -200,11 +200,11 @@ object EvBuilderFromRandomModel extends LazyLogging {
   private def determineUnassignedCars(
       amountOfEvsInArea: Int,
       amountOfHomeChargingCars: Int,
-      amountOfAssignedCars: Int
+      amountOfAssignedCars: Int,
   ): (Int, Int) =
     (
       math.max(amountOfHomeChargingCars - amountOfAssignedCars, 0),
-      math.max(amountOfEvsInArea - amountOfAssignedCars, 0)
+      math.max(amountOfEvsInArea - amountOfAssignedCars, 0),
     )
 
   /** Build electric vehicle model with the following random attributes: Model,
@@ -234,7 +234,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       firstDepartureOfDay: FirstDepartureOfDay,
       startTime: ZonedDateTime,
       homePoi: PointOfInterest,
-      isHomeChargingPossible: Boolean
+      isHomeChargingPossible: Boolean,
   ): ElectricVehicle = {
     /* Sample the ev model */
     val evType = evModelPdf.sample()
@@ -246,7 +246,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
       firstDepartureOfDay,
       startTime,
       homePoi,
-      isHomeChargingPossible
+      isHomeChargingPossible,
     )
 
   }

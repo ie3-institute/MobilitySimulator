@@ -32,7 +32,7 @@ object PoiUtils extends LazyLogging {
       poiPath: String,
       maxDistanceFromPoi: Length,
       maxDistanceFromHomePoi: Length,
-      assignHomeNearestChargingStations: Boolean
+      assignHomeNearestChargingStations: Boolean,
   ): Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]] = {
     val start = System.currentTimeMillis()
     PointOfInterest
@@ -42,7 +42,7 @@ object PoiUtils extends LazyLogging {
         chargingStations,
         maxDistanceFromPoi,
         maxDistanceFromHomePoi,
-        assignHomeNearestChargingStations
+        assignHomeNearestChargingStations,
       )
       .map { allPois =>
         allPois.groupBy(_.categoricalLocation).map { case (catLoc, pois) =>
@@ -52,7 +52,7 @@ object PoiUtils extends LazyLogging {
       case Failure(exception) =>
         throw InitializationException(
           "Unable to load points of interest.",
-          exception
+          exception,
         )
       case Success(value) =>
         val amountOfPois = value.map(_._2.size).sum
@@ -64,7 +64,7 @@ object PoiUtils extends LazyLogging {
             .map { case (k, v) =>
               s"$k -> ${v.size} (${"%.2f".format(v.size.doubleValue / amountOfPois * 100)} %)"
             }
-            .mkString("\n\t")
+            .mkString("\n\t"),
         )
         value
     }
@@ -94,7 +94,7 @@ object PoiUtils extends LazyLogging {
             .sortBy { case (poi, _) =>
               poi.id
             }
-        )
+        ),
       )
     }
   }
@@ -108,7 +108,7 @@ object PoiUtils extends LazyLogging {
         poiType,
         setOfPOIs.foldLeft(0.0)((sizeSum: Double, poi: PointOfInterest) => {
           sizeSum + poi.size
-        })
+        }),
       )
     }
   }

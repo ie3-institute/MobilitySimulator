@@ -37,7 +37,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
           "size" -> 2,
           "lon" -> 3,
           "lat" -> 4,
-          "categoricallocation" -> 5
+          "categoricallocation" -> 5,
         )
       }
 
@@ -73,7 +73,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         actual.keys should contain theSameElementsAs Seq(
           EvcsLocationType.HOME,
           EvcsLocationType.WORK,
-          EvcsLocationType.STREET
+          EvcsLocationType.STREET,
         )
         /* Check, that an already assigned home-cs is not considered */
         actual.get(EvcsLocationType.HOME) match {
@@ -91,7 +91,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
             String,
             Double,
             Coordinate,
-            PoiEnums.CategoricalLocationDictionary.Value
+            PoiEnums.CategoricalLocationDictionary.Value,
         )
       ](Symbol("parse"))
 
@@ -105,7 +105,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
             "3.4",
             "51.4843282",
             "7.4116481",
-            "home"
+            "home",
           )
         val col2idx = Map(
           "uuid" -> 0,
@@ -113,7 +113,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
           "size" -> 2,
           "lat" -> 3,
           "lon" -> 4,
-          "categoricallocation" -> 5
+          "categoricallocation" -> 5,
         )
 
         PointOfInterest invokePrivate parse(entries, col2idx) match {
@@ -136,7 +136,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
             "3.4",
             "7.4116481",
             "51.4843282",
-            "home"
+            "home",
           )
         val col2idx = Map(
           "uuid" -> 0,
@@ -144,7 +144,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
           "size" -> 2,
           "lon" -> 3,
           "lat" -> 4,
-          "categoricallocation" -> 5
+          "categoricallocation" -> 5,
         )
 
         PointOfInterest invokePrivate parse(entries, col2idx) match {
@@ -165,21 +165,21 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
       "find the right charging stations for categorical location 'home'" in {
         PointOfInterest invokePrivate suitableChargingStations(
           CategoricalLocationDictionary.HOME,
-          locationToChargingStations
+          locationToChargingStations,
         ) should contain allElementsOf Seq(cs0, cs1)
       }
 
       "find the right charging stations for categorical location 'work'" in {
         PointOfInterest invokePrivate suitableChargingStations(
           CategoricalLocationDictionary.WORK,
-          locationToChargingStations
+          locationToChargingStations,
         ) should contain allElementsOf Seq(cs3)
       }
 
       "find the right charging stations for other categorical locations" in {
         PointOfInterest invokePrivate suitableChargingStations(
           CategoricalLocationDictionary.SPORTS,
-          locationToChargingStations
+          locationToChargingStations,
         ) should contain allElementsOf Seq(cs2)
       }
     }
@@ -195,12 +195,12 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
           Seq(cs0, cs1, cs2),
           coordinate,
-          Meters(1000d)
+          Meters(1000d),
         )
         val expected = Map(
           cs0 -> Meters(0.013113941716235453974464),
           cs1 -> Meters(1.10382753815854878670116),
-          cs2 -> Meters(111.545809977148284216795)
+          cs2 -> Meters(111.545809977148284216795),
         )
 
         actual.toMap.keys should contain allElementsOf Seq(cs0, cs1, cs2)
@@ -217,7 +217,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         val actual = PointOfInterest invokePrivate nearbyChargingStations(
           Seq(cs0, cs1, cs2),
           coordinate,
-          Meters(100d)
+          Meters(100d),
         )
 
         actual.toMap.keys should contain allElementsOf Seq(cs0, cs1)
@@ -234,7 +234,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
         Seq(cs1, cs3),
         Meters(50d),
         Meters(30d),
-        assignHomeNearestChargingStations = true
+        assignHomeNearestChargingStations = true,
       ) match {
         case Failure(exception) =>
           fail("Getting points of interest from file did fail.", exception)

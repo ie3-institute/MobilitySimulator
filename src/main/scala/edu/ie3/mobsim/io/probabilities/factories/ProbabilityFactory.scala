@@ -51,7 +51,7 @@ trait ProbabilityFactory[T] {
     */
   protected def checkHeadLine(
       headLine: String,
-      csvSep: String
+      csvSep: String,
   ): Try[Array[String]] = {
     val availableElements = processLine(headLine, csvSep)
     if (availableElements.sorted.sameElements(requiredFields.sorted))
