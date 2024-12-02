@@ -11,7 +11,7 @@ import edu.ie3.mobsim.exceptions.InitializationException
 import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.mobsim.utils.sq.{
   KilowattHoursPerKilometer,
-  SpecificEnergyDistance
+  SpecificEnergyDistance,
 }
 import edu.ie3.util.quantities.PowerSystemUnits
 import squants.Energy
@@ -43,14 +43,14 @@ final case class EvType(
     capacity: Energy,
     consumption: SpecificEnergyDistance,
     acPower: Power,
-    dcPower: Power
+    dcPower: Power,
 )
 
 object EvType {
 
   private def apply(
       evString: String,
-      csvSep: String = ","
+      csvSep: String = ",",
   ): Try[EvType] = {
     val entries = evString.trim.toLowerCase.split(csvSep)
     if (entries.length != 7)
@@ -80,7 +80,7 @@ object EvType {
           batCap,
           batCon,
           acPower,
-          dcPower
+          dcPower,
         )
       }
   }
@@ -117,7 +117,7 @@ object EvType {
           .to(PowerSystemUnits.KILOWATT)
           .getValue
           .doubleValue()
-      )
+      ),
     )
   }
 
@@ -134,7 +134,7 @@ object EvType {
     */
   def getEvInputModelsWithProbabilities(
       modelFilePath: String,
-      probabilityFilePath: String
+      probabilityFilePath: String,
   ): ProbabilityDensityFunction[EvType] = {
     val models = getFromFile(modelFilePath)
     getEvInputModelsWithProbabilities(models, probabilityFilePath)
@@ -142,7 +142,7 @@ object EvType {
 
   def getFromFile(
       filePath: String,
-      dropFirstLine: Boolean = true
+      dropFirstLine: Boolean = true,
   ): Seq[EvType] =
     Using(Source.fromFile(filePath)) {
       _.getLines()
@@ -152,7 +152,7 @@ object EvType {
             case Failure(exception) =>
               throw InitializationException(
                 s"Unable to parse input string '$inputString' to ev type.",
-                exception
+                exception,
               )
             case Success(value) => value
           }
@@ -163,7 +163,7 @@ object EvType {
       case Failure(exception) =>
         throw InitializationException(
           s"Unable to obtain ev models from file '$filePath'.",
-          exception
+          exception,
         )
     }
 
@@ -180,7 +180,7 @@ object EvType {
     */
   def getEvInputModelsWithProbabilities(
       modelList: Seq[EvType],
-      probabilityFilePath: String
+      probabilityFilePath: String,
   ): ProbabilityDensityFunction[EvType] = {
     val segmentProbabilities = getEvSegmentProbabilities(probabilityFilePath)
 
@@ -213,7 +213,7 @@ object EvType {
     */
   private def getEvSegmentProbabilities(
       filePath: String,
-      csvSep: String = ","
+      csvSep: String = ",",
   ): Map[String, Double] =
     Using(Source.fromFile(filePath)) { bufferedSource =>
       val segmentProbabilities = bufferedSource
@@ -231,7 +231,7 @@ object EvType {
       case Failure(exception) =>
         throw InitializationException(
           "Unable to read ev type segment probabilities.",
-          exception
+          exception,
         )
       case Success(value) => value
     }

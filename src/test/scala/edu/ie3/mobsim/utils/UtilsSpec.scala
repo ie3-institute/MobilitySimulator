@@ -21,7 +21,7 @@ class UtilsSpec extends UnitSpec {
       (23, 30),
       (30, 30),
       (74, 75),
-      (1440, 1425)
+      (1440, 1425),
     )
 
     forAll(cases) { (time, roundedTime) =>

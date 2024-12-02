@@ -34,7 +34,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         plannedDestinationPoi,
         plannedDestinationPoiType,
         chargingStations,
-        speed
+        speed,
       ) match {
         case ElectricVehicle(
               simulationStart,
@@ -54,7 +54,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               finalDestinationPoi,
               finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
-              chargingPricesMemory
+              chargingPricesMemory,
             ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
@@ -90,7 +90,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         supermarketPoi,
         PoiTypeDictionary.SHOPPING,
         chargingStations,
-        speed
+        speed,
       ) match {
         case ElectricVehicle(
               simulationStart,
@@ -110,7 +110,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               finalDestinationPoi,
               finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
-              chargingPricesMemory
+              chargingPricesMemory,
             ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
@@ -141,7 +141,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         plannedDestinationPoi,
         plannedDestinationPoiType,
         plannedParkingTimeStart,
-        plannedDepartureTime
+        plannedDepartureTime,
       ) match {
         case ElectricVehicle(
               simulationStart,
@@ -161,7 +161,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               finalDestinationPoi,
               finalDestinationPoiType,
               remainingDistanceAfterChargingHub,
-              chargingPricesMemory
+              chargingPricesMemory,
             ) =>
           simulationStart shouldBe givenSimulationStart
           uuid shouldBe ev4.getUuid
@@ -171,7 +171,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           workPoi shouldBe givenWorkPoi
           storedEnergy shouldBe Quantities.getQuantity(
             plannedStoredEnergyEndOfTrip.toKilowattHours,
-            PowerSystemUnits.KILOWATTHOUR
+            PowerSystemUnits.KILOWATTHOUR,
           )
           chargingAtSimona shouldBe false
           destinationPoi shouldBe plannedDestinationPoi
@@ -198,7 +198,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
               .getValue
               .doubleValue()
           ),
-          drivingDistance = Meters(4000)
+          drivingDistance = Meters(4000),
         )
 
       energy =~ KilowattHours(60d)
@@ -210,7 +210,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
         plannedParkingTimeStart,
         firstDepartureOfDay,
         lastTripOfDay,
-        parkingTime
+        parkingTime,
       )
 
       time shouldBe plannedParkingTimeStart.plusHours(1)

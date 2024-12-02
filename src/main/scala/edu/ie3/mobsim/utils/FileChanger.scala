@@ -21,7 +21,7 @@ object FileChanger extends App {
       sourcePath: String,
       sourceHeader: Seq[String],
       fieldNameMapping: Map[String, String],
-      additionalDataFunction: () => Map[String, String]
+      additionalDataFunction: () => Map[String, String],
   )
 
   private val csvSep = ","
@@ -45,7 +45,7 @@ object FileChanger extends App {
       Seq(poiDir, "pcm", "poi.csv").mkString(JavaFile.separator),
       Seq("id", "size", "lat", "lon", "categoricallocation"),
       Map.empty[String, String],
-      () => Map("uuid" -> UUID.randomUUID().toString)
+      () => Map("uuid" -> UUID.randomUUID().toString),
     )
 
     val targetPath =
@@ -56,7 +56,7 @@ object FileChanger extends App {
     mergeFiles(
       Seq(sourceDefinition),
       targetPath,
-      targetHeader
+      targetHeader,
     )
   }
 
@@ -68,7 +68,7 @@ object FileChanger extends App {
         ),
         Seq("time", "probabilities"),
         Map("time" -> "minute_of_day", "probabilities" -> "probability"),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Abfahrtszeit_Samstag.csv").mkString(
@@ -77,7 +77,7 @@ object FileChanger extends App {
         Seq("time", "probabilities"),
         Map("time" -> "minute_of_day", "probabilities" -> "probability"),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Abfahrtszeit_Sonn - Feiertag.csv").mkString(
@@ -85,8 +85,8 @@ object FileChanger extends App {
         ),
         Seq("time", "probabilities"),
         Map("time" -> "minute_of_day", "probabilities" -> "probability"),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath =
@@ -108,9 +108,9 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "poi" -> "poi_type",
           "parking_time" -> "duration",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Aufenthaltsdauer_Samstag.csv").mkString(
@@ -121,10 +121,10 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "poi" -> "poi_type",
           "parking_time" -> "duration",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Aufenthaltsdauer_Sonn - Feiertag.csv").mkString(
@@ -135,10 +135,10 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "poi" -> "poi_type",
           "parking_time" -> "duration",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath =
@@ -150,7 +150,7 @@ object FileChanger extends App {
         "quarter_hour_of_day",
         "poi_type",
         "duration",
-        "probability"
+        "probability",
       )
 
     mergeFiles(sources, targetPath, targetHeader)
@@ -164,7 +164,7 @@ object FileChanger extends App {
         ),
         Seq("time_interval", "a", "b", "min"),
         Map("time_interval" -> "time"),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Geschwindigkeit_Samstag.csv").mkString(
@@ -173,7 +173,7 @@ object FileChanger extends App {
         Seq("time_interval", "a", "b", "min"),
         Map("time_interval" -> "time"),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Geschwindigkeit_Sonn - Feiertag.csv").mkString(
@@ -181,8 +181,8 @@ object FileChanger extends App {
         ),
         Seq("time_interval", "a", "b", "min"),
         Map("time_interval" -> "time"),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath =
@@ -203,9 +203,9 @@ object FileChanger extends App {
           "time_interval" -> "time",
           "poi" -> "poi_type",
           "categ_location" -> "categorical_location",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Kategorische_Aufenthaltsorte_Samstag.csv")
@@ -215,10 +215,10 @@ object FileChanger extends App {
           "time_interval" -> "time",
           "poi" -> "poi_type",
           "categ_location" -> "categorical_location",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Kategorische_Aufenthaltsorte_Sonn - Feiertag.csv")
@@ -228,10 +228,10 @@ object FileChanger extends App {
           "time_interval" -> "time",
           "poi" -> "poi_type",
           "categ_location" -> "categorical_location",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath = Path.of(probabilityDir, "categorical_location.csv")
@@ -242,7 +242,7 @@ object FileChanger extends App {
         "time",
         "poi_type",
         "categorical_location",
-        "probability"
+        "probability",
       )
 
     mergeFiles(sources, targetPath, targetHeader)
@@ -258,9 +258,9 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "from_poi" -> "from",
           "to_poi" -> "to",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Uebergangswahrscheinlichkeit_Samstag.csv")
@@ -270,10 +270,10 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "from_poi" -> "from",
           "to_poi" -> "to",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Uebergangswahrscheinlichkeit_Sonn - Feiertag.csv")
@@ -283,10 +283,10 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "from_poi" -> "from",
           "to_poi" -> "to",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath =
@@ -298,7 +298,7 @@ object FileChanger extends App {
         "quarter_hour_of_day",
         "from",
         "to",
-        "probability"
+        "probability",
       )
 
     mergeFiles(sources, targetPath, targetHeader)
@@ -315,9 +315,9 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "from_poi" -> "from",
           "to_poi" -> "to",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Wegstrecken_Samstag.csv").mkString(
@@ -328,10 +328,10 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "from_poi" -> "from",
           "to_poi" -> "to",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Wegstrecken_Sonn - Feiertag.csv").mkString(
@@ -342,10 +342,10 @@ object FileChanger extends App {
           "time_interval" -> "quarter_hour_of_day",
           "from_poi" -> "from",
           "to_poi" -> "to",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath =
@@ -358,7 +358,7 @@ object FileChanger extends App {
         "from",
         "to",
         "distance",
-        "probability"
+        "probability",
       )
 
     mergeFiles(sources, targetPath, targetHeader)
@@ -373,9 +373,9 @@ object FileChanger extends App {
         Seq("time_interval", "probabilities"),
         Map(
           "time_interval" -> "quarter_hour_of_day",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday")
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "weekday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Zwischenstopp_Samstag.csv").mkString(
@@ -384,10 +384,10 @@ object FileChanger extends App {
         Seq("time_interval", "probabilities"),
         Map(
           "time_interval" -> "quarter_hour_of_day",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
         () =>
-          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday")
+          Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "saturday"),
       ),
       SourceDefinition(
         Seq(probabilityDir, "Zwischenstopp_Sonn - Feiertag.csv").mkString(
@@ -396,10 +396,10 @@ object FileChanger extends App {
         Seq("time_interval", "probabilities"),
         Map(
           "time_interval" -> "quarter_hour_of_day",
-          "probabilities" -> "probability"
+          "probabilities" -> "probability",
         ),
-        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday")
-      )
+        () => Map("uuid" -> UUID.randomUUID().toString, "day_type" -> "sunday"),
+      ),
     )
 
     val targetPath =
@@ -422,7 +422,7 @@ object FileChanger extends App {
   private def mergeFiles(
       sources: Seq[SourceDefinition],
       targetPath: Path,
-      targetHeader: Seq[String]
+      targetHeader: Seq[String],
   ): Unit = {
     val targetFile = File(targetPath.toFile)
     if (!targetFile.exists)
@@ -439,18 +439,18 @@ object FileChanger extends App {
                 sourcePath,
                 sourceHeader,
                 fieldNameMapping,
-                additionalDataFunction
+                additionalDataFunction,
               ) =>
             transformData(
               sourcePath,
               sourceHeader,
               fieldNameMapping,
-              additionalDataFunction
+              additionalDataFunction,
             ) match {
               case Failure(exception) =>
                 throw new RuntimeException(
                   s"Unable to parse content of file '$sourcePath'.",
-                  exception
+                  exception,
                 )
               case Success(value) => value
             }
@@ -471,7 +471,7 @@ object FileChanger extends App {
     */
   private def assessHeadLineElements(
       headLine: String,
-      expectedElements: Seq[String]
+      expectedElements: Seq[String],
   ): Map[String, Int] = {
     val elements = headLine.toLowerCase.split(csvSep).map(_.trim)
     if (!elements.sameElements(expectedElements))
@@ -500,7 +500,7 @@ object FileChanger extends App {
       sourcePath: String,
       sourceHeader: Seq[String],
       fieldNameMapping: Map[String, String],
-      additionalDataFunction: () => Map[String, String]
+      additionalDataFunction: () => Map[String, String],
   ): Try[Seq[Map[String, String]]] =
     Using(Source.fromFile(sourcePath).bufferedReader()) { reader =>
       /* Prepare information from reader */
@@ -514,7 +514,7 @@ object FileChanger extends App {
             _,
             fieldToIndex,
             fieldNameMapping,
-            additionalDataFunction
+            additionalDataFunction,
           )
         }
         .toList
@@ -537,7 +537,7 @@ object FileChanger extends App {
       line: String,
       fieldToIndex: Map[String, Int],
       fieldNameMapping: Map[String, String],
-      additionalDataFunction: () => Map[String, String]
+      additionalDataFunction: () => Map[String, String],
   ): Map[String, String] = {
     /* Read the content of the line */
     val elements = line.split(csvSep).map(_.trim)

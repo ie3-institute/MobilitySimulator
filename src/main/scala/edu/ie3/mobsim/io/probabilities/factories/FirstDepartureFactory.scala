@@ -9,7 +9,7 @@ package edu.ie3.mobsim.io.probabilities.factories
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.utils.DayType
 
@@ -40,7 +40,7 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
         Failure(
           SourceException(
             "Unable to build first departure probabilities. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -70,7 +70,7 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
                 saturdayProbability,
                 sundayProbability,
                 averageCarUsage,
-                round15 = false
+                round15 = false,
               )
             )
           case None =>
@@ -91,7 +91,7 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
   private final case class Entry(
       minute: Int,
       dayType: DayType.Value,
-      probability: Double
+      probability: Double,
   )
 
   private object Entry {
@@ -101,7 +101,7 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
           minute,
           throw SourceException(
             "Unable to get minute information from entity field data"
-          )
+          ),
         )
         .toInt
       val dayTypeValue = DayType(
@@ -109,7 +109,7 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -120,14 +120,14 @@ final case class FirstDepartureFactory(averageCarUsage: Double)
           probability,
           throw SourceException(
             "Unable to get probability information from entity field data"
-          )
+          ),
         )
         .toDouble
 
       new Entry(
         minuteValue,
         dayTypeValue,
-        probabilityValue
+        probabilityValue,
       )
     }
   }

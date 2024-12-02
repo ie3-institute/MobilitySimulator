@@ -17,7 +17,7 @@ import scala.util.Try
 final case class HomePoiMapping(
     poi: UUID,
     evcs: UUID,
-    evs: Seq[UUID]
+    evs: Seq[UUID],
 )
 
 object HomePoiMapping {
@@ -38,7 +38,7 @@ object HomePoiMapping {
             "Can not convert String(s) to UUID",
             errors.headOption.getOrElse(
               throw new IllegalStateException("Expected a throwable.")
-            )
+            ),
           )
         )
     }
@@ -51,7 +51,7 @@ object HomePoiMapping {
     IoUtils.readCaseClassSeq(
       homePoiDecoder,
       csvParams.path,
-      csvParams.colSep.charAt(0)
+      csvParams.colSep.charAt(0),
     )
   }
 

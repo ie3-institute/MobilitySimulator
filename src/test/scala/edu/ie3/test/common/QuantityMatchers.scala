@@ -20,13 +20,13 @@ trait QuantityMatchers {
     override def apply(left: Quantity[Q]): MatchResult = MatchResult(
       QuantityUtil.equals(left, right, tolerance),
       QuantityMatchers.assembleRawFailureMessage(left, right, tolerance),
-      QuantityMatchers.assembleNegatedFailureMessage(left, right, tolerance)
+      QuantityMatchers.assembleNegatedFailureMessage(left, right, tolerance),
     )
   }
 
   def equalWithTolerance[Q <: Quantity[Q]](
       right: Quantity[Q],
-      tolerance: Double = 1e-10
+      tolerance: Double = 1e-10,
   ) = new QuantityMatcher(right, tolerance)
 }
 
@@ -34,11 +34,11 @@ case object QuantityMatchers extends QuantityMatchers {
   private def assembleRawFailureMessage[Q <: Quantity[Q]](
       lhs: Quantity[Q],
       rhs: Quantity[Q],
-      tolerance: Double
+      tolerance: Double,
   ) = s"The quantities $lhs and $rhs differ more than $tolerance in value"
   private def assembleNegatedFailureMessage[Q <: Quantity[Q]](
       lhs: Quantity[Q],
       rhs: Quantity[Q],
-      tolerance: Double
+      tolerance: Double,
   ) = s"The quantities $lhs and $rhs differ less than $tolerance in value"
 }

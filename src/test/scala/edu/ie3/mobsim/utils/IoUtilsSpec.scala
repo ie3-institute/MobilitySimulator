@@ -14,7 +14,7 @@ import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.{
   KILOWATT,
   KILOWATTHOUR,
-  KILOWATTHOUR_PER_KILOMETRE
+  KILOWATTHOUR_PER_KILOMETRE,
 }
 
 import java.io.{BufferedReader, File, FileReader}
@@ -28,7 +28,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         firstEv,
         currentTime,
         status,
-        uuid
+        uuid,
       )
 
       val data = new BufferedReader(
@@ -99,7 +99,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         cs6,
         chargingStationOccupancy,
         currentTime,
-        uuid
+        uuid,
       )
 
       val data = new BufferedReader(
@@ -182,7 +182,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         } else {
           (
             firstEv.destinationPoi.categoricalLocation.toString,
-            firstEv.destinationPoi.toString
+            firstEv.destinationPoi.toString,
           )
         }
 
@@ -202,7 +202,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       val path = Path.of(getClass.getResource("ev_input_data").toURI)
       val csvParams = CsvParams(
         ",",
-        path.toString
+        path.toString,
       )
       val evInputs = IoUtils.readEvInputs(csvParams)
       evInputs should have size 1

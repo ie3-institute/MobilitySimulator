@@ -26,7 +26,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
         destinationPoi = chargingHubHighwayPoi,
         destinationPoiType = PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
         parkingTimeStart = givenSimulationStart,
-        departureTime = givenSimulationStart.plusHours(5)
+        departureTime = givenSimulationStart.plusHours(5),
       )
     }
 
@@ -39,7 +39,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
         destinationPoi = workPoi,
         destinationPoiType = PoiTypeDictionary.WORK,
         parkingTimeStart = givenSimulationStart.plusHours(-4),
-        departureTime = givenSimulationStart
+        departureTime = givenSimulationStart,
       ).setChargingAtSimona()
         .setChosenChargingStation(Some(cs6.uuid))
     }
@@ -60,21 +60,21 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     ev1.copy(
       destinationPoi = chargingHubHighwayPoi,
       destinationPoiType = PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
-      parkingTimeStart = givenSimulationStart.plusMinutes(30)
+      parkingTimeStart = givenSimulationStart.plusMinutes(30),
     )
   }
 
   protected val departingEv: ElectricVehicle = {
     ev1.copy(
       destinationPoi = culturePoi,
-      destinationPoiType = PoiTypeDictionary.LEISURE
+      destinationPoiType = PoiTypeDictionary.LEISURE,
     )
   }
 
   protected val evChargingAtSimonaWithStation: ElectricVehicle = {
     ev1.copy(
       chargingAtSimona = true,
-      chosenChargingStation = Some(cs6.uuid)
+      chosenChargingStation = Some(cs6.uuid),
     )
   }
 
@@ -94,7 +94,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
     tripProbabilities,
     maxDistanceFromPoi = maxDistance,
     thresholdChargingHubDistance = maxDistance,
-    round15 = false
+    round15 = false,
   )
 
 }

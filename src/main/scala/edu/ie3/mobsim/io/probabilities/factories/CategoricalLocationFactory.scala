@@ -9,12 +9,12 @@ package edu.ie3.mobsim.io.probabilities.factories
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
-  PoiTypeDictionary
+  PoiTypeDictionary,
 }
 import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
 import edu.ie3.mobsim.io.probabilities.{
   CategoricalLocation,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.utils.DayType
 
@@ -47,7 +47,7 @@ object CategoricalLocationFactory
         Failure(
           SourceException(
             "Unable to build categorical locations probabilities. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -75,7 +75,7 @@ object CategoricalLocationFactory
               CategoricalLocation(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
               )
             )
           case None =>
@@ -95,7 +95,7 @@ object CategoricalLocationFactory
       .groupBy(entry =>
         CategoricalLocationKey(
           entry.time,
-          entry.poiType
+          entry.poiType,
         )
       )
       .map { case (key, entries) =>
@@ -109,7 +109,7 @@ object CategoricalLocationFactory
       dayType: DayType.Value,
       poiType: PoiTypeDictionary.Value,
       categoricalLocation: CategoricalLocationDictionary.Value,
-      probability: Double
+      probability: Double,
   )
 
   private object Entry {
@@ -119,7 +119,7 @@ object CategoricalLocationFactory
           time,
           throw SourceException(
             "Unable to get minute information from entity field data"
-          )
+          ),
         ) match {
         case "5:00-10:00"  => 0
         case "10:00-12:00" => 1
@@ -137,7 +137,7 @@ object CategoricalLocationFactory
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -149,7 +149,7 @@ object CategoricalLocationFactory
             poiType,
             throw SourceException(
               "Unable to get poi type information from entity field data"
-            )
+            ),
           )
       )
       val categoricalLocationValue = CategoricalLocationDictionary(
@@ -158,7 +158,7 @@ object CategoricalLocationFactory
             categoricalLocation,
             throw SourceException(
               "Unable to get categorical location information from entity field data"
-            )
+            ),
           )
       )
       val probabilityValue = entityFieldData
@@ -166,7 +166,7 @@ object CategoricalLocationFactory
           probability,
           throw SourceException(
             "Unable to get probability information from entity field data"
-          )
+          ),
         )
         .toDouble
 
@@ -175,7 +175,7 @@ object CategoricalLocationFactory
         dayTypeValue,
         poiTypeValue,
         categoricalLocationValue,
-        probabilityValue
+        probabilityValue,
       )
     }
   }

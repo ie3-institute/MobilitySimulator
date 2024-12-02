@@ -30,7 +30,7 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
           2 -> 20.0,
           3 -> 50.0,
           4 -> 10.0,
-          5 -> 15.0
+          5 -> 15.0,
         ) // Can be seen as percent
         val expectedCdf =
           TreeMap(0.15 -> 5, 0.2 -> 1, 0.4 -> 2, 0.9 -> 3, 1.0 -> 4)
@@ -41,7 +41,7 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
             expectedCdf.zip(cdf).foreach {
               case (
                     (expectedWeight, expectedValue),
-                    (actualWeight, actualValue)
+                    (actualWeight, actualValue),
                   ) =>
                 actualWeight shouldBe expectedWeight +- 1e-6
                 actualValue shouldBe expectedValue
@@ -56,7 +56,7 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
           2 -> 0d,
           3 -> 70.0,
           4 -> 0d,
-          5 -> 25.0
+          5 -> 25.0,
         ) // Can be seen as percent
         val expectedCdf =
           TreeMap(0.25 -> 5, 0.3 -> 1, 1.0 -> 3)
@@ -67,7 +67,7 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
             expectedCdf.zip(cdf).foreach {
               case (
                     (expectedWeight, expectedValue),
-                    (actualWeight, actualValue)
+                    (actualWeight, actualValue),
                   ) =>
                 actualWeight shouldBe expectedWeight +- 1e-6
                 actualValue shouldBe expectedValue
@@ -81,7 +81,7 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
       "nearly provide the same empirical distribution" in {
         val pdf = ProbabilityDensityFunction(
           Map(1 -> 0.05, 2 -> 0.2, 3 -> 0.5, 4 -> 0.1, 5 -> 0.15),
-          randomSeed
+          randomSeed,
         )
 
         val noOfSamples = 10000

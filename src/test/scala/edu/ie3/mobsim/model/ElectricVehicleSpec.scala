@@ -28,7 +28,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          isChargingAtHomePossible = true
+          isChargingAtHomePossible = true,
         ) match {
           case ElectricVehicle(
                 simulationStart,
@@ -48,7 +48,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
                 finalDestinationPoi,
                 finalDestinationPoiType,
                 remainingDistanceAfterChargingHub,
-                chargingPricesMemory
+                chargingPricesMemory,
               ) =>
             simulationStart shouldBe givenSimulationStart
             id shouldBe "test_car"
@@ -57,7 +57,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
             workPoi shouldBe givenWorkPoi
             storedEnergy shouldBe Quantities.getQuantity(
               givenModel.capacity.toKilowattHours,
-              PowerSystemUnits.KILOWATTHOUR
+              PowerSystemUnits.KILOWATTHOUR,
             )
             chargingAtSimona shouldBe false
             destinationPoi shouldBe givenHomePoi
@@ -83,12 +83,12 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenFirstDeparture,
-          isChargingAtHomePossible = true
+          isChargingAtHomePossible = true,
         ) match {
           case model: ElectricVehicle =>
             model.getSRatedDC shouldBe Quantities.getQuantity(
               givenModel.acPower.toKilowatts,
-              PowerSystemUnits.KILOWATT
+              PowerSystemUnits.KILOWATT,
             )
         }
       }
@@ -101,7 +101,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           givenWorkPoi,
           givenSimulationStart,
           givenSimulationStart,
-          isChargingAtHomePossible = true
+          isChargingAtHomePossible = true,
         ) match {
           case model: ElectricVehicle =>
             model.departureTime shouldBe givenSimulationStart.plusMinutes(1L)
@@ -120,7 +120,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           evWithHomeCharging.copyWith(evWithHomeCharging.getStoredEnergy)
         evFull.getStoredEnergy shouldBe Quantities.getQuantity(
           givenModel.capacity.toKilowattHours,
-          PowerSystemUnits.KILOWATTHOUR
+          PowerSystemUnits.KILOWATTHOUR,
         )
 
         val zero: ComparableQuantity[javax.measure.quantity.Energy] =
@@ -155,7 +155,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           bbpgPoi,
           PoiTypeDictionary.LEISURE,
           parkingTimeStart = ev1.parkingTimeStart,
-          departureTime = ev1.departureTime
+          departureTime = ev1.departureTime,
         )
 
         ev.destinationPoiType shouldBe PoiTypeDictionary.LEISURE
@@ -169,7 +169,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           destinationPoi = ev1.destinationPoi,
           destinationPoiType = ev1.destinationPoiType,
           parkingTimeStart = ev1.parkingTimeStart,
-          time
+          time,
         )
 
         ev.departureTime shouldBe time

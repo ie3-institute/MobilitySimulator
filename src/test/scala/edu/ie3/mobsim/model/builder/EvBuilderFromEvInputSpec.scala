@@ -23,7 +23,7 @@ class EvBuilderFromEvInputSpec extends UnitSpec with TripSimulationTestData {
           id = s"home_poi_$cnt",
           nearestChargingStations = Map(
             givenChargingStation -> Meters(1.0)
-          )
+          ),
         )
       } ++ Range(100, 200).map { cnt =>
         givenHomePoi.copy(
@@ -39,13 +39,13 @@ class EvBuilderFromEvInputSpec extends UnitSpec with TripSimulationTestData {
           ("targetAmount", "targetShare", "expectedAmountOfHomeCharging"),
           (120, 1.0, 120),
           (120, 0.1, 12),
-          (120, 0.12, 14)
+          (120, 0.12, 14),
         )
       ) {
         case (
               targetAmount: Int,
               targetShare: Double,
-              expectedAmountOfHomeCharging: Int
+              expectedAmountOfHomeCharging: Int,
             ) =>
           val evs = EvBuilderFromEvInput.build(
             evInputs,
@@ -54,7 +54,7 @@ class EvBuilderFromEvInputSpec extends UnitSpec with TripSimulationTestData {
             Seq(givenChargingStation),
             givenSimulationStart,
             targetShare,
-            givenFirstDepartureMetaData
+            givenFirstDepartureMetaData,
           )
 
           evs should have size targetAmount

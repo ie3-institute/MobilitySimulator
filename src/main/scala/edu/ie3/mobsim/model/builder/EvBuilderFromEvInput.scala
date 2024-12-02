@@ -11,11 +11,11 @@ import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.model.ElectricVehicle.{
   buildEvWithType,
-  determineHomePoiPdf
+  determineHomePoiPdf,
 }
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 
@@ -30,7 +30,7 @@ object EvBuilderFromEvInput extends LazyLogging {
       chargingStations: Seq[ChargingStation],
       startTime: ZonedDateTime,
       targetSharePrivateCharging: Double,
-      firstDepartureOfDay: FirstDepartureOfDay
+      firstDepartureOfDay: FirstDepartureOfDay,
   ): Seq[ElectricVehicle] = {
     val (homePoiPdfWithHomeCharging, homePoiPdfWithoutHomeCharging) =
       determineHomePoiPdf(homePOIsWithSizes, chargingStations)
@@ -46,7 +46,7 @@ object EvBuilderFromEvInput extends LazyLogging {
         homePoiPdfWithHomeCharging,
         workPoiPdf,
         firstDepartureOfDay,
-        startTime
+        startTime,
       )
 
     /* Build the remaining cars */
@@ -57,7 +57,7 @@ object EvBuilderFromEvInput extends LazyLogging {
       homePoiPdfWithoutHomeCharging,
       workPoiPdf,
       firstDepartureOfDay,
-      startTime
+      startTime,
     )
 
     require(
@@ -75,7 +75,7 @@ object EvBuilderFromEvInput extends LazyLogging {
       homePoiPdfWithHomeCharging: ProbabilityDensityFunction[PointOfInterest],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       firstDepartureOfDay: FirstDepartureOfDay,
-      simulationStart: ZonedDateTime
+      simulationStart: ZonedDateTime,
   ): (Iterable[ElectricVehicle], Seq[EvInput]) = {
     val assignedEvs = homePoiPdfWithHomeCharging.pdf.keys
       .zip(evs)
@@ -91,7 +91,7 @@ object EvBuilderFromEvInput extends LazyLogging {
           firstDepartureOfDay,
           simulationStart,
           homePoi,
-          isHomeChargingPossible = true
+          isHomeChargingPossible = true,
         )
       }
     (assignedEvs, evs.drop(assignedEvs.size))
@@ -106,7 +106,7 @@ object EvBuilderFromEvInput extends LazyLogging {
       ],
       workPoiPdf: ProbabilityDensityFunction[PointOfInterest],
       firstDepartureOfDay: FirstDepartureOfDay,
-      simulationStart: ZonedDateTime
+      simulationStart: ZonedDateTime,
   ): Seq[ElectricVehicle] = {
     unassignedEvs.zipWithIndex.map { case (ev, idx) =>
       /* As long as there are still cars unassigned with home charging option, do that, otherwise assign the rest to the
@@ -126,7 +126,7 @@ object EvBuilderFromEvInput extends LazyLogging {
         firstDepartureOfDay,
         simulationStart,
         homePoi,
-        isHomeChargingPossible
+        isHomeChargingPossible,
       )
     }
   }

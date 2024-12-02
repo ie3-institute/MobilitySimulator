@@ -12,24 +12,24 @@ final case class MobSimConfig(
 object MobSimConfig {
   final case class CsvParams(
       colSep: java.lang.String,
-      path: java.lang.String
+      path: java.lang.String,
   )
   object CsvParams {
     def apply(
         c: com.typesafe.config.Config,
         parentPath: java.lang.String,
-        $tsCfgValidator: $TsCfgValidator
+        $tsCfgValidator: $TsCfgValidator,
     ): MobSimConfig.CsvParams = {
       MobSimConfig.CsvParams(
         colSep = $_reqStr(parentPath, c, "colSep", $tsCfgValidator),
-        path = $_reqStr(parentPath, c, "path", $tsCfgValidator)
+        path = $_reqStr(parentPath, c, "path", $tsCfgValidator),
       )
     }
     private def $_reqStr(
         parentPath: java.lang.String,
         c: com.typesafe.config.Config,
         path: java.lang.String,
-        $tsCfgValidator: $TsCfgValidator
+        $tsCfgValidator: $TsCfgValidator,
     ): java.lang.String = {
       if (c == null) null
       else
@@ -46,24 +46,24 @@ object MobSimConfig {
   final case class Mobsim(
       input: MobSimConfig.Mobsim.Input,
       output: MobSimConfig.Mobsim.Output,
-      simulation: MobSimConfig.Mobsim.Simulation
+      simulation: MobSimConfig.Mobsim.Simulation,
   )
   object Mobsim {
     final case class Input(
         evInputSource: scala.Option[MobSimConfig.Mobsim.Input.EvInputSource],
         grid: MobSimConfig.Mobsim.Input.Grid,
-        mobility: MobSimConfig.Mobsim.Input.Mobility
+        mobility: MobSimConfig.Mobsim.Input.Mobility,
     )
     object Input {
       final case class EvInputSource(
           homePoiMapping: scala.Option[MobSimConfig.CsvParams],
-          source: MobSimConfig.CsvParams
+          source: MobSimConfig.CsvParams,
       )
       object EvInputSource {
         def apply(
             c: com.typesafe.config.Config,
             parentPath: java.lang.String,
-            $tsCfgValidator: $TsCfgValidator
+            $tsCfgValidator: $TsCfgValidator,
         ): MobSimConfig.Mobsim.Input.EvInputSource = {
           MobSimConfig.Mobsim.Input.EvInputSource(
             homePoiMapping =
@@ -72,7 +72,7 @@ object MobSimConfig {
                   MobSimConfig.CsvParams(
                     c.getConfig("homePoiMapping"),
                     parentPath + "homePoiMapping.",
-                    $tsCfgValidator
+                    $tsCfgValidator,
                   )
                 )
               else None,
@@ -80,21 +80,21 @@ object MobSimConfig {
               if (c.hasPathOrNull("source")) c.getConfig("source")
               else com.typesafe.config.ConfigFactory.parseString("source{}"),
               parentPath + "source.",
-              $tsCfgValidator
-            )
+              $tsCfgValidator,
+            ),
           )
         }
       }
 
       final case class Grid(
           name: java.lang.String,
-          source: MobSimConfig.CsvParams
+          source: MobSimConfig.CsvParams,
       )
       object Grid {
         def apply(
             c: com.typesafe.config.Config,
             parentPath: java.lang.String,
-            $tsCfgValidator: $TsCfgValidator
+            $tsCfgValidator: $TsCfgValidator,
         ): MobSimConfig.Mobsim.Input.Grid = {
           MobSimConfig.Mobsim.Input.Grid(
             name = $_reqStr(parentPath, c, "name", $tsCfgValidator),
@@ -102,15 +102,15 @@ object MobSimConfig {
               if (c.hasPathOrNull("source")) c.getConfig("source")
               else com.typesafe.config.ConfigFactory.parseString("source{}"),
               parentPath + "source.",
-              $tsCfgValidator
-            )
+              $tsCfgValidator,
+            ),
           )
         }
         private def $_reqStr(
             parentPath: java.lang.String,
             c: com.typesafe.config.Config,
             path: java.lang.String,
-            $tsCfgValidator: $TsCfgValidator
+            $tsCfgValidator: $TsCfgValidator,
         ): java.lang.String = {
           if (c == null) null
           else
@@ -131,14 +131,14 @@ object MobSimConfig {
         def apply(
             c: com.typesafe.config.Config,
             parentPath: java.lang.String,
-            $tsCfgValidator: $TsCfgValidator
+            $tsCfgValidator: $TsCfgValidator,
         ): MobSimConfig.Mobsim.Input.Mobility = {
           MobSimConfig.Mobsim.Input.Mobility(
             source = MobSimConfig.CsvParams(
               if (c.hasPathOrNull("source")) c.getConfig("source")
               else com.typesafe.config.ConfigFactory.parseString("source{}"),
               parentPath + "source.",
-              $tsCfgValidator
+              $tsCfgValidator,
             )
           )
         }
@@ -147,7 +147,7 @@ object MobSimConfig {
       def apply(
           c: com.typesafe.config.Config,
           parentPath: java.lang.String,
-          $tsCfgValidator: $TsCfgValidator
+          $tsCfgValidator: $TsCfgValidator,
       ): MobSimConfig.Mobsim.Input = {
         MobSimConfig.Mobsim.Input(
           evInputSource =
@@ -156,7 +156,7 @@ object MobSimConfig {
                 MobSimConfig.Mobsim.Input.EvInputSource(
                   c.getConfig("evInputSource"),
                   parentPath + "evInputSource.",
-                  $tsCfgValidator
+                  $tsCfgValidator,
                 )
               )
             else None,
@@ -164,34 +164,34 @@ object MobSimConfig {
             if (c.hasPathOrNull("grid")) c.getConfig("grid")
             else com.typesafe.config.ConfigFactory.parseString("grid{}"),
             parentPath + "grid.",
-            $tsCfgValidator
+            $tsCfgValidator,
           ),
           mobility = MobSimConfig.Mobsim.Input.Mobility(
             if (c.hasPathOrNull("mobility")) c.getConfig("mobility")
             else com.typesafe.config.ConfigFactory.parseString("mobility{}"),
             parentPath + "mobility.",
-            $tsCfgValidator
-          )
+            $tsCfgValidator,
+          ),
         )
       }
     }
 
     final case class Output(
         outputDir: scala.Option[java.lang.String],
-        writeMovements: scala.Boolean
+        writeMovements: scala.Boolean,
     )
     object Output {
       def apply(
           c: com.typesafe.config.Config,
           parentPath: java.lang.String,
-          $tsCfgValidator: $TsCfgValidator
+          $tsCfgValidator: $TsCfgValidator,
       ): MobSimConfig.Mobsim.Output = {
         MobSimConfig.Mobsim.Output(
           outputDir =
             if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
             else None,
           writeMovements =
-            !c.hasPathOrNull("writeMovements") || c.getBoolean("writeMovements")
+            !c.hasPathOrNull("writeMovements") || c.getBoolean("writeMovements"),
         )
       }
     }
@@ -203,19 +203,19 @@ object MobSimConfig {
         numberOfEv: scala.Int,
         round15: scala.Boolean,
         startDate: java.lang.String,
-        targetHomeChargingShare: scala.Double
+        targetHomeChargingShare: scala.Double,
     )
     object Simulation {
       final case class Location(
           chargingHubThresholdDistance: scala.Double,
           maxDistanceToChargingStation: scala.Double,
-          maxDistanceToHomeChargingStation: scala.Double
+          maxDistanceToHomeChargingStation: scala.Double,
       )
       object Location {
         def apply(
             c: com.typesafe.config.Config,
             parentPath: java.lang.String,
-            $tsCfgValidator: $TsCfgValidator
+            $tsCfgValidator: $TsCfgValidator,
         ): MobSimConfig.Mobsim.Simulation.Location = {
           MobSimConfig.Mobsim.Simulation.Location(
             chargingHubThresholdDistance =
@@ -229,7 +229,7 @@ object MobSimConfig {
             maxDistanceToHomeChargingStation =
               if (c.hasPathOrNull("maxDistanceToHomeChargingStation"))
                 c.getDouble("maxDistanceToHomeChargingStation")
-              else 30.0
+              else 30.0,
           )
         }
       }
@@ -237,7 +237,7 @@ object MobSimConfig {
       def apply(
           c: com.typesafe.config.Config,
           parentPath: java.lang.String,
-          $tsCfgValidator: $TsCfgValidator
+          $tsCfgValidator: $TsCfgValidator,
       ): MobSimConfig.Mobsim.Simulation = {
         MobSimConfig.Mobsim.Simulation(
           averageCarUsage =
@@ -248,21 +248,21 @@ object MobSimConfig {
             if (c.hasPathOrNull("location")) c.getConfig("location")
             else com.typesafe.config.ConfigFactory.parseString("location{}"),
             parentPath + "location.",
-            $tsCfgValidator
+            $tsCfgValidator,
           ),
           name = $_reqStr(parentPath, c, "name", $tsCfgValidator),
           numberOfEv = $_reqInt(parentPath, c, "numberOfEv", $tsCfgValidator),
           round15 = c.hasPathOrNull("round15") && c.getBoolean("round15"),
           startDate = $_reqStr(parentPath, c, "startDate", $tsCfgValidator),
           targetHomeChargingShare =
-            $_reqDbl(parentPath, c, "targetHomeChargingShare", $tsCfgValidator)
+            $_reqDbl(parentPath, c, "targetHomeChargingShare", $tsCfgValidator),
         )
       }
       private def $_reqDbl(
           parentPath: java.lang.String,
           c: com.typesafe.config.Config,
           path: java.lang.String,
-          $tsCfgValidator: $TsCfgValidator
+          $tsCfgValidator: $TsCfgValidator,
       ): scala.Double = {
         if (c == null) 0
         else
@@ -278,7 +278,7 @@ object MobSimConfig {
           parentPath: java.lang.String,
           c: com.typesafe.config.Config,
           path: java.lang.String,
-          $tsCfgValidator: $TsCfgValidator
+          $tsCfgValidator: $TsCfgValidator,
       ): scala.Int = {
         if (c == null) 0
         else
@@ -294,7 +294,7 @@ object MobSimConfig {
           parentPath: java.lang.String,
           c: com.typesafe.config.Config,
           path: java.lang.String,
-          $tsCfgValidator: $TsCfgValidator
+          $tsCfgValidator: $TsCfgValidator,
       ): java.lang.String = {
         if (c == null) null
         else
@@ -311,27 +311,27 @@ object MobSimConfig {
     def apply(
         c: com.typesafe.config.Config,
         parentPath: java.lang.String,
-        $tsCfgValidator: $TsCfgValidator
+        $tsCfgValidator: $TsCfgValidator,
     ): MobSimConfig.Mobsim = {
       MobSimConfig.Mobsim(
         input = MobSimConfig.Mobsim.Input(
           if (c.hasPathOrNull("input")) c.getConfig("input")
           else com.typesafe.config.ConfigFactory.parseString("input{}"),
           parentPath + "input.",
-          $tsCfgValidator
+          $tsCfgValidator,
         ),
         output = MobSimConfig.Mobsim.Output(
           if (c.hasPathOrNull("output")) c.getConfig("output")
           else com.typesafe.config.ConfigFactory.parseString("output{}"),
           parentPath + "output.",
-          $tsCfgValidator
+          $tsCfgValidator,
         ),
         simulation = MobSimConfig.Mobsim.Simulation(
           if (c.hasPathOrNull("simulation")) c.getConfig("simulation")
           else com.typesafe.config.ConfigFactory.parseString("simulation{}"),
           parentPath + "simulation.",
-          $tsCfgValidator
-        )
+          $tsCfgValidator,
+        ),
       )
     }
   }
@@ -344,7 +344,7 @@ object MobSimConfig {
         if (c.hasPathOrNull("mobsim")) c.getConfig("mobsim")
         else com.typesafe.config.ConfigFactory.parseString("mobsim{}"),
         parentPath + "mobsim.",
-        $tsCfgValidator
+        $tsCfgValidator,
       )
     )
     $tsCfgValidator.validate()
@@ -356,7 +356,7 @@ object MobSimConfig {
 
     def addBadPath(
         path: java.lang.String,
-        e: com.typesafe.config.ConfigException
+        e: com.typesafe.config.ConfigException,
     ): Unit = {
       badPaths += s"'$path': ${e.getClass.getName}(${e.getMessage})"
     }
@@ -364,7 +364,7 @@ object MobSimConfig {
     def addInvalidEnumValue(
         path: java.lang.String,
         value: java.lang.String,
-        enumName: java.lang.String
+        enumName: java.lang.String,
     ): Unit = {
       badPaths += s"'$path': invalid value $value for enumeration $enumName"
     }

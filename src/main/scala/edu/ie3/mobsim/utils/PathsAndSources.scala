@@ -14,7 +14,7 @@ import edu.ie3.datamodel.io.source.{
   RawGridSource,
   SystemParticipantSource,
   ThermalSource,
-  TypeSource
+  TypeSource,
 }
 import edu.ie3.mobsim.config.MobSimConfig
 import org.apache.commons.io.FilenameUtils
@@ -37,7 +37,7 @@ final case class PathsAndSources private (
     outputDir: String,
     rawGridSource: RawGridSource,
     systemParticipantSource: SystemParticipantSource,
-    colSep: String
+    colSep: String,
 )
 
 /** Beware: Since the simulation is executed as a jar within SIMONA relative
@@ -52,7 +52,7 @@ object PathsAndSources extends LazyLogging {
   def apply(
       simulationName: String,
       inputConfig: MobSimConfig.Mobsim.Input,
-      maybeOutputDir: Option[String]
+      maybeOutputDir: Option[String],
   ): PathsAndSources = {
 
     val gridDir = harmonizeFileSeparators(inputConfig.grid.source.path)
@@ -130,7 +130,7 @@ object PathsAndSources extends LazyLogging {
         csvThermalSource,
         csvRawGridSource,
         csvEnergyManagementSource,
-        csvDataSource
+        csvDataSource,
       )
 
     new PathsAndSources(
@@ -148,7 +148,7 @@ object PathsAndSources extends LazyLogging {
       outputDir,
       csvRawGridSource,
       csvSystemParticipantSource,
-      inputConfig.mobility.source.colSep
+      inputConfig.mobility.source.colSep,
     )
 
   }

@@ -18,7 +18,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.utils.sq.KilowattHoursPerKilometer
 import edu.ie3.util.quantities.PowerSystemUnits
@@ -40,7 +40,7 @@ trait ElectricVehicleTestData {
     KilowattHours(100d),
     KilowattHoursPerKilometer(10d),
     Kilowatts(11d),
-    Kilowatts(50d)
+    Kilowatts(50d),
   )
   protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
@@ -51,7 +51,7 @@ trait ElectricVehicleTestData {
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116482, 51.4843281),
     1.0,
-    Map.empty[ChargingStation, Length]
+    Map.empty[ChargingStation, Length],
   )
   protected val givenHomePoiPdf: ProbabilityDensityFunction[PointOfInterest] =
     ProbabilityDensityFunction(Map(givenHomePoi -> 1.0))
@@ -62,7 +62,7 @@ trait ElectricVehicleTestData {
     CategoricalLocationDictionary.WORK,
     new Coordinate(7.4116482, 51.4843281),
     1.0,
-    Map.empty[ChargingStation, Length]
+    Map.empty[ChargingStation, Length],
   )
   protected val givenWorkPoiPdf: ProbabilityDensityFunction[PointOfInterest] =
     ProbabilityDensityFunction(Map(givenWorkPoi -> 1.0))
@@ -79,7 +79,7 @@ trait ElectricVehicleTestData {
       ProbabilityDensityFunction(departureProbability),
       ProbabilityDensityFunction(departureProbability),
       round15 = false,
-      averageCarUsage = averageCarUsage
+      averageCarUsage = averageCarUsage,
     )
 
   protected val givenChargingStation: ChargingStation = ChargingStation(
@@ -89,10 +89,10 @@ trait ElectricVehicleTestData {
     new ChargingPointType(
       "cs_type",
       Quantities.getQuantity(11d, PowerSystemUnits.KILOWATT),
-      ElectricCurrentType.AC
+      ElectricCurrentType.AC,
     ),
     EvcsLocationType.HOME,
-    1
+    1,
   )
 
   protected val evWithHomeCharging: ElectricVehicle = ElectricVehicle.buildEv(
@@ -102,7 +102,7 @@ trait ElectricVehicleTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible = true
+    isChargingAtHomePossible = true,
   )
   protected val evWithoutHomeCharging: ElectricVehicle = {
     evWithHomeCharging.copy(chargingAtHomePossible = false)
@@ -115,7 +115,7 @@ trait ElectricVehicleTestData {
     false,
     NodeInput.DEFAULT_GEO_POSITION,
     GermanVoltageLevelUtils.LV,
-    1
+    1,
   )
 
   protected val evInputType = new EvTypeInput(
@@ -127,7 +127,7 @@ trait ElectricVehicleTestData {
     5d.asKiloWattHourPerKiloMetre,
     11d.asKiloVoltAmpere,
     0.9,
-    11d.asKiloWatt
+    11d.asKiloWatt,
   )
 
   protected val evInput = new EvInput(
@@ -136,6 +136,6 @@ trait ElectricVehicleTestData {
     node,
     ReactivePowerCharacteristic.parse("cosPhiFixed:{(0.0, 0.95)}"),
     null,
-    evInputType
+    evInputType,
   )
 }
