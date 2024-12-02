@@ -587,8 +587,6 @@ object MobilitySimulator
 
     val initTick = -1L
 
-    val availableEvData = evDataConnection
-
     logger.info("Starting setup...")
 
     logger.debug("Parsing config")
@@ -798,7 +796,7 @@ object MobilitySimulator
     )
 
     val mobSim = new MobilitySimulator(
-      availableEvData,
+      evDataConnection,
       chargingStations,
       poisWithSizes,
       startTime,
@@ -823,7 +821,7 @@ object MobilitySimulator
     val firstArrivalTick = initTick + timeUntilFirstArrival
 
     // Also provide first tick to the data service
-    availableEvData.provideArrivingEvs(
+    evDataConnection.provideArrivingEvs(
       Map.empty[UUID, java.util.List[EvModel]].asJava,
       Some(long2Long(firstArrivalTick)).toJava,
     )

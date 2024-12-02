@@ -11,12 +11,10 @@ import edu.ie3.simona.api.simulation.{ExtSimAdapterData, ExtSimulation}
 
 class ExtLink extends ExtLinkInterface {
 
-  private val simulator: MobilitySimulator.type = MobilitySimulator
-
   @Override
-  override def getExtSimulation: ExtSimulation = simulator
+  override def getExtSimulation: ExtSimulation = MobilitySimulator
 
   @Override
   override def setup(extSimAdapterData: ExtSimAdapterData): Unit =
-    simulator.setAdapterData(extSimAdapterData)
+    MobilitySimulator.setAdapterData(extSimAdapterData)
 }
