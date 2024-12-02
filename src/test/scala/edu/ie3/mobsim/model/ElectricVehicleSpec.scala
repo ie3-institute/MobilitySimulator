@@ -32,7 +32,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
         ) match {
           case ElectricVehicle(
                 simulationStart,
-                uuid,
+                _,
                 id,
                 evType,
                 homePoi,
@@ -86,7 +86,7 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
           isChargingAtHomePossible = true,
         ) match {
           case model: ElectricVehicle =>
-            model.getSRatedDC shouldBe Quantities.getQuantity(
+            model.getPRatedDC shouldBe Quantities.getQuantity(
               givenModel.acPower.toKilowatts,
               PowerSystemUnits.KILOWATT,
             )

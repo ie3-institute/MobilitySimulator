@@ -7,25 +7,14 @@
 package edu.ie3.mobsim
 
 import edu.ie3.simona.api.ExtLinkInterface
-import edu.ie3.simona.api.data.ExtDataSimulation
-import edu.ie3.simona.api.simulation.ExtSimulation
-
-import java.util
+import edu.ie3.simona.api.simulation.{ExtSimAdapterData, ExtSimulation}
 
 class ExtLink extends ExtLinkInterface {
 
-  private val simulator: MobilitySimulator.type = MobilitySimulator
+  @Override
+  override def getExtSimulation: ExtSimulation = MobilitySimulator
 
   @Override
-  def getExtSimulation: ExtSimulation = {
-    simulator
-  }
-
-  @Override
-  def getExtDataSimulations: util.List[ExtDataSimulation] = {
-    val list = new util.ArrayList[ExtDataSimulation]()
-    list.add(simulator)
-    list
-  }
-
+  override def setup(extSimAdapterData: ExtSimAdapterData): Unit =
+    MobilitySimulator.setAdapterData(extSimAdapterData)
 }

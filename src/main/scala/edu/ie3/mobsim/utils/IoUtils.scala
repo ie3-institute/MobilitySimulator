@@ -87,9 +87,9 @@ final case class IoUtils private (
       "battery_capacity" ->
         ev.getEStorage.to(KILOWATTHOUR).getValue.doubleValue().toString,
       "max_charging_power_ac" ->
-        ev.getSRatedAC.to(KILOWATT).getValue.doubleValue().toString,
+        ev.getPRatedAC.to(KILOWATT).getValue.doubleValue().toString,
       "max_charging_power_dc" ->
-        ev.getSRatedDC.to(KILOWATT).getValue.doubleValue().toString,
+        ev.getPRatedDC.to(KILOWATT).getValue.doubleValue().toString,
       "consumption" ->
         ev.evType.consumption.toKilowattHoursPerKilometer.toString,
       "home_poi" -> ev.homePoi.id,
