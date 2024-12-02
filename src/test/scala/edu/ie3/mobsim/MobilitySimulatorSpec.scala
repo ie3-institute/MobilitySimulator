@@ -28,20 +28,20 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         ("parkingEvs", "departingEvs"),
         (
           setEvsAsParking(Seq(ev1, ev2, ev3)),
-          Seq.empty[ElectricVehicle]
+          Seq.empty[ElectricVehicle],
         ),
         (
           setEvsAsParking(Seq(ev1, ev2)),
-          setEvsAsDeparting(Seq(ev3))
+          setEvsAsDeparting(Seq(ev3)),
         ),
         (
           setEvsAsParking(Seq(ev1)),
-          setEvsAsDeparting(Seq(ev2, ev3))
+          setEvsAsDeparting(Seq(ev2, ev3)),
         ),
         (
           Seq.empty[ElectricVehicle],
-          setEvsAsDeparting(Seq(ev1, ev2, ev3))
-        )
+          setEvsAsDeparting(Seq(ev1, ev2, ev3)),
+        ),
       )
 
       forAll(cases) { (parkingEvs, departingEvs) =>
@@ -50,7 +50,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         val (resultParking, resultDeparting) =
           mobilitySimulator invokePrivate defineMovements(
             evs,
-            givenSimulationStart
+            givenSimulationStart,
           )
 
         resultParking shouldBe parkingEvs
@@ -72,7 +72,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           Seq(ev1, ev2),
           2,
-          Seq(EvMovement(cs6.uuid, ev1), EvMovement(cs6.uuid, ev2))
+          Seq(EvMovement(cs6.uuid, ev1), EvMovement(cs6.uuid, ev2)),
         ),
         (
           Seq(ev1, ev2, ev3),
@@ -80,16 +80,16 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           Seq(
             EvMovement(cs6.uuid, ev1),
             EvMovement(cs6.uuid, ev2),
-            EvMovement(cs6.uuid, ev3)
-          )
-        )
+            EvMovement(cs6.uuid, ev3),
+          ),
+        ),
       )
 
       forAll(cases) { (departingEvs, expectedCsCount, expectedMovements) =>
         val (movements, actualChargingPoints) =
           mobilitySimulator invokePrivate handleDepartures(
             setEvsAsDeparting(departingEvs),
-            chargingPointsAllTaken
+            chargingPointsAllTaken,
           )
 
         actualChargingPoints shouldBe Map(
@@ -114,7 +114,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         ("evs", "expectedFreeCs"),
         (Seq(ev1), Map(cs6.uuid -> 1)),
         (Seq(ev1, ev2), Map(cs6.uuid -> 2)),
-        (Seq(ev1, ev2, ev3), Map(cs6.uuid -> 3))
+        (Seq(ev1, ev2, ev3), Map(cs6.uuid -> 3)),
       )
 
       forAll(cases) { (evs, expectedFreeCs) =>
@@ -133,8 +133,8 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
               parkingTimeStart = givenSimulationStart.plusHours(-4),
               departureTime = givenSimulationStart,
               chargingAtSimona = false,
-              chosenChargingStation = None
-            )
+              chosenChargingStation = None,
+            ),
           )
         }
 
@@ -168,11 +168,11 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
               cs6.uuid,
               evChargingAtSimonaWithStation
                 .removeChargingAtSimona()
-                .setChosenChargingStation(None)
+                .setChosenChargingStation(None),
             )
-          )
+          ),
         ),
-        (evChargingAtSimonaWithoutStation, None)
+        (evChargingAtSimonaWithoutStation, None),
       )
 
       forAll(cases) { (ev, expectedResults) =>
@@ -202,13 +202,13 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (
           Map(cs6.uuid -> 0, cs5.uuid -> 0),
           Map(cs6.uuid -> 1),
-          Map(cs6.uuid -> 1, cs5.uuid -> 0)
+          Map(cs6.uuid -> 1, cs5.uuid -> 0),
         ),
         (
           Map(cs6.uuid -> 0, cs5.uuid -> 0),
           Map(cs6.uuid -> 2, cs5.uuid -> 1),
-          Map(cs6.uuid -> 2, cs5.uuid -> 1)
-        )
+          Map(cs6.uuid -> 2, cs5.uuid -> 1),
+        ),
       )
 
       forAll(cases) { (freeLots, change, expectedFreeLots) =>
@@ -230,7 +230,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         "evs",
         setEvsAsParking(Seq(ev1)),
         setEvsAsParking(Seq(ev1, ev2)),
-        setEvsAsParking(Seq(ev1, ev2, ev3))
+        setEvsAsParking(Seq(ev1, ev2, ev3)),
       )
 
       forAll(cases) { evs =>
@@ -238,13 +238,13 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           evs,
           pricesAtChargingStation,
           chargingPointsAllFree,
-          maxDistance
+          maxDistance,
         )
 
         val expectedMovements: Seq[EvMovement] = evs.toSeq.map { ev =>
           EvMovement(
             cs6.uuid,
-            ev.setChargingAtSimona().setChosenChargingStation(Some(cs6.uuid))
+            ev.setChargingAtSimona().setChosenChargingStation(Some(cs6.uuid)),
           )
         }
 
@@ -278,22 +278,22 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
               cs6.uuid,
               arrivingEv
                 .setChargingAtSimona()
-                .setChosenChargingStation(Some(cs6.uuid))
+                .setChosenChargingStation(Some(cs6.uuid)),
             )
-          )
+          ),
         ),
         (
           arrivingEv,
           Map(cs6.uuid -> 0.0),
           Map(cs6.uuid -> 0),
-          None
+          None,
         ),
         (
           arrivingEv,
           Map.empty[UUID, Double],
           Map.empty[UUID, Int],
-          None
-        )
+          None,
+        ),
       )
 
       forAll(cases) { (ev, prices, availablePoints, expectedMovement) =>
@@ -301,7 +301,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
           ev,
           prices,
           availablePoints,
-          maxDistance
+          maxDistance,
         )
 
         actualMovement shouldBe expectedMovement
@@ -321,14 +321,14 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         ("evs", "expectedNextDeparture"),
         (Seq(departingEv), 3600),
         (Seq(ev2), 2700),
-        (Seq(departingEv, ev2), 2700)
+        (Seq(departingEv, ev2), 2700),
       )
 
       forAll(cases) { (evs, expectedNextDeparture) =>
         val actualNextDepartureOption =
           MobilitySimulator invokePrivate getTimeUntilNextDeparture(
             evs,
-            givenSimulationStart
+            givenSimulationStart,
           )
 
         val actualNextDeparture = actualNextDepartureOption.getOrElse(
@@ -352,14 +352,14 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         ("evs", "expectedNextArrival"),
         (Seq(arrivingEv), 1800L),
         (Seq(ev2), 900L),
-        (Seq(arrivingEv, ev2), 900L)
+        (Seq(arrivingEv, ev2), 900L),
       )
 
       forAll(cases) { (evs, expectedNextArrival) =>
         val actualNextArrivalOption =
           MobilitySimulator invokePrivate getTimeUntilNextArrival(
             evs,
-            givenSimulationStart
+            givenSimulationStart,
           )
 
         val actualNextArrival = actualNextArrivalOption.getOrElse(
@@ -381,7 +381,7 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       val evArriving: ElectricVehicle =
         ev2.copy(
           departureTime = givenSimulationStart.plusHours(18),
-          parkingTimeStart = givenSimulationStart.plusHours(1)
+          parkingTimeStart = givenSimulationStart.plusHours(1),
         )
 
       val cases = Table(
@@ -389,25 +389,25 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
         (Seq.empty[ElectricVehicle], None),
         (Seq(evArriving), Some(3600L)),
         (Seq(evDeparting), Some(2700L)),
-        (Seq(evArriving, evDeparting), Some(2700L))
+        (Seq(evArriving, evDeparting), Some(2700L)),
       )
 
       forAll(cases) { (electricVehicles, expectedNextEvent) =>
         val actualNextArrival: Option[Long] =
           MobilitySimulator invokePrivate getTimeUntilNextArrival(
             electricVehicles,
-            givenSimulationStart
+            givenSimulationStart,
           )
 
         val actualNextDeparture: Option[Long] =
           MobilitySimulator invokePrivate getTimeUntilNextDeparture(
             electricVehicles,
-            givenSimulationStart
+            givenSimulationStart,
           )
 
         val timeUntilNextEvent = Seq(
           actualNextArrival,
-          actualNextDeparture
+          actualNextDeparture,
         ).flatten.minOption
 
         timeUntilNextEvent shouldBe expectedNextEvent
@@ -427,22 +427,22 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
             cs0.uuid,
             ev1.copy(
               homePoi = chargingHubHighwayPoi,
-              chargingAtHomePossible = false
-            )
+              chargingAtHomePossible = false,
+            ),
           )
         ),
         Seq(
           EvMovement(cs0.uuid, ev1.copy(workPoi = givenHomePoi)),
-          EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid)))
+          EvMovement(cs0.uuid, ev2.copy(chosenChargingStation = Some(cs2.uuid))),
         ),
         Seq(
           EvMovement(cs0.uuid, ev1.copy(storedEnergy = zero)),
           EvMovement(cs0.uuid, ev2.setChargingAtSimona()),
           EvMovement(
             cs0.uuid,
-            ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi))
-          )
-        )
+            ev3.copy(finalDestinationPoi = Some(chargingHubTownPoi)),
+          ),
+        ),
       )
 
       forAll(cases) { updatedMovements =>

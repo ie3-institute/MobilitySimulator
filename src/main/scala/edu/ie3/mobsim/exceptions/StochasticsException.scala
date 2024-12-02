@@ -8,5 +8,5 @@ package edu.ie3.mobsim.exceptions
 
 final case class StochasticsException(
     msg: String = "",
-    cause: Throwable = None.orNull
+    cause: Throwable = None.orNull,
 ) extends Exception(msg, cause)

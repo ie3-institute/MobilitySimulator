@@ -23,14 +23,14 @@ class PathsAndSourcesSpec extends UnitSpec {
       val inputConfigRelative = Input(
         None,
         Grid("myGrid", CsvParams(",", "relativePath/grid")),
-        Mobility(CsvParams(",", "relativePath/mobility"))
+        Mobility(CsvParams(",", "relativePath/mobility")),
       )
 
       val actualRelative =
         PathsAndSources(
           "mySimulation",
           inputConfigRelative,
-          Some("relativePath/results")
+          Some("relativePath/results"),
         )
 
       val relPath = basePath.resolve("relativePath")
@@ -48,14 +48,14 @@ class PathsAndSourcesSpec extends UnitSpec {
       val inputConfigAbsolute = Input(
         None,
         Grid("myGrid", CsvParams(",", absPath.resolve("grid").toString)),
-        Mobility(CsvParams(",", absPath.resolve("mobility").toString))
+        Mobility(CsvParams(",", absPath.resolve("mobility").toString)),
       )
 
       val actualAbsolute =
         PathsAndSources(
           "mySimulation",
           inputConfigAbsolute,
-          Some(absPath.resolve("results").toString)
+          Some(absPath.resolve("results").toString),
         )
 
       actualAbsolute.mobSimInputDir shouldBe absPath

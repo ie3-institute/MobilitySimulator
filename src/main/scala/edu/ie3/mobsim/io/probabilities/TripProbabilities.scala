@@ -15,7 +15,7 @@ import edu.ie3.mobsim.io.probabilities.factories.{
   LastTripFactory,
   ParkingTimeFactory,
   PoiTransitionFactory,
-  TripDistanceFactory
+  TripDistanceFactory,
 }
 import edu.ie3.mobsim.utils.PathsAndSources
 
@@ -45,7 +45,7 @@ final case class TripProbabilities(
     lastTripOfDay: LastTripOfDay,
     parkingTime: ParkingTime,
     poiTransition: PoiTransition,
-    tripDistance: TripDistance
+    tripDistance: TripDistance,
 )
 
 object TripProbabilities extends LazyLogging {
@@ -54,30 +54,30 @@ object TripProbabilities extends LazyLogging {
       pathsAndSources: PathsAndSources,
       colSep: String,
       averageCarUsage: Double,
-      round15: Boolean
+      round15: Boolean,
   ): TripProbabilities = {
 
     val firstDepartureOfDay =
       FirstDepartureFactory(averageCarUsage).getFromFile(
         pathsAndSources.firstDepartureOfDayPath,
-        colSep
+        colSep,
       ) match {
         case Failure(exception) =>
           throw SourceException(
             "Unable to get probabilities for first departure of day from path.",
-            exception
+            exception,
           )
         case Success(value) => value.copy(round15 = round15)
       }
 
     val categoricalLocation = CategoricalLocationFactory.getFromFile(
       pathsAndSources.categoricalLocationPath,
-      colSep
+      colSep,
     ) match {
       case Failure(exception) =>
         throw SourceException(
           "Unable to get categorical location probabilities from path.",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -85,12 +85,12 @@ object TripProbabilities extends LazyLogging {
 
     val drivingSpeed = DrivingSpeedFactory.getFromFile(
       pathsAndSources.drivingSpeedPath,
-      colSep
+      colSep,
     ) match {
       case Failure(exception) =>
         throw SourceException(
           "Unable to get driving speed parameters from path.",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -98,12 +98,12 @@ object TripProbabilities extends LazyLogging {
 
     val lastTripOfDay = LastTripFactory.getFromFile(
       pathsAndSources.lastTripPath,
-      colSep
+      colSep,
     ) match {
       case Failure(exception) =>
         throw SourceException(
           "Unable to get last trip probabilities from path.",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -111,12 +111,12 @@ object TripProbabilities extends LazyLogging {
 
     val parkingTime = ParkingTimeFactory.getFromFile(
       pathsAndSources.parkingTimePath,
-      colSep
+      colSep,
     ) match {
       case Failure(exception) =>
         throw SourceException(
           "Unable to get probabilities for parking time from path.",
-          exception
+          exception,
         )
       case Success(value: ParkingTime) => value.copy(round15 = round15)
     }
@@ -124,12 +124,12 @@ object TripProbabilities extends LazyLogging {
 
     val poiTransition = PoiTransitionFactory.getFromFile(
       pathsAndSources.poiTransitionPath,
-      colSep
+      colSep,
     ) match {
       case Failure(exception) =>
         throw SourceException(
           "Unable to get probabilities for poi type transitions from path.",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -137,12 +137,12 @@ object TripProbabilities extends LazyLogging {
 
     val tripDistance = TripDistanceFactory.getFromFile(
       pathsAndSources.tripDistancePath,
-      colSep
+      colSep,
     ) match {
       case Failure(exception) =>
         throw SourceException(
           "Unable to get probabilities for trip distance transitions from path.",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -155,7 +155,7 @@ object TripProbabilities extends LazyLogging {
       lastTripOfDay,
       parkingTime,
       poiTransition,
-      tripDistance
+      tripDistance,
     )
   }
 

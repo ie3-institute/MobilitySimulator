@@ -19,7 +19,7 @@ final case class FirstDepartureOfDay(
     probabilitySaturday: ProbabilityDensityFunction[Int],
     probabilitySunday: ProbabilityDensityFunction[Int],
     averageCarUsage: Double,
-    round15: Boolean
+    round15: Boolean,
 ) {
 
   /** Sample the first departure time on a day dependent on day type. Using data
@@ -62,7 +62,7 @@ final case class FirstDepartureOfDay(
       departureTimeAsInt % 60,
       0,
       0,
-      ZoneId.of("UTC")
+      ZoneId.of("UTC"),
     )
 
     /* Departure time cannot be same as current time, so in that case add one minute. */

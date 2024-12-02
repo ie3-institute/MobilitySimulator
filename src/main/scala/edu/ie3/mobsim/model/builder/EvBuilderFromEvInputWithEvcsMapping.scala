@@ -10,7 +10,7 @@ import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 import edu.ie3.util.geo.GeoUtils
@@ -30,7 +30,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
       startTime: ZonedDateTime,
       firstDepartureOfDay: FirstDepartureOfDay,
       ev2homePoi: Map[UUID, UUID],
-      homePoi2evcs: Map[UUID, UUID]
+      homePoi2evcs: Map[UUID, UUID],
   ): Seq[ElectricVehicle] = {
     val homePoiMap = homePOIsWithSizes.keys.map(poi => poi.uuid -> poi).toMap
     val evcsMap = chargingStations.map(evcs => evcs.uuid -> evcs).toMap
@@ -40,7 +40,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
     val homePoisWithEvcsMap = assignEvcsToHomePoi(
       homePoi2evcs,
       homePoiMap,
-      evcsMap
+      evcsMap,
     )
 
     val evType2homeChargingEv = ElectricVehicle.buildEvWithType(
@@ -51,7 +51,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
       firstDepartureOfDay,
       startTime,
       _,
-      _
+      _,
     )
 
     // assign home ev to corresponding home poi
@@ -59,7 +59,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
       ev2homePoi,
       homePoisWithEvcsMap,
       evMap,
-      evType2homeChargingEv
+      evType2homeChargingEv,
     )
 
     // assign rest of evs to home poi that is not inside mapping
@@ -85,7 +85,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
           ev.getUuid,
           EvType(ev.getType),
           homePoi,
-          false
+          false,
         )
       }
     (homeChargingCars ++ nonHomeChargingCars)
@@ -94,20 +94,20 @@ object EvBuilderFromEvInputWithEvcsMapping {
   private def assignEvcsToHomePoi(
       homePoi2EvcsUuid: Map[UUID, UUID],
       homePoiMap: Map[UUID, PointOfInterest],
-      evcsMap: Map[UUID, ChargingStation]
+      evcsMap: Map[UUID, ChargingStation],
   ): Map[UUID, PointOfInterest] = {
     homePoi2EvcsUuid.map { case (homePoiUuid, evcsUuid) =>
       val evcs = evcsMap.getOrElse(
         evcsUuid,
         throw new IllegalArgumentException(
           s"Evcs with UUID: $evcsUuid could not be found"
-        )
+        ),
       )
       val homePoi = homePoiMap.getOrElse(
         homePoiUuid,
         throw new IllegalArgumentException(
           s"Home poi with UUID: $evcsUuid could not be found"
-        )
+        ),
       )
       val poiCoordinate = homePoi.geoPosition
       val distance = Kilometers(
@@ -116,7 +116,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
             poiCoordinate.y,
             poiCoordinate.x,
             evcs.geoPosition.y,
-            evcs.geoPosition.x
+            evcs.geoPosition.x,
           )
           .to(PowerSystemUnits.KILOMETRE)
           .getValue
@@ -138,21 +138,21 @@ object EvBuilderFromEvInputWithEvcsMapping {
           UUID,
           EvType,
           PointOfInterest,
-          Boolean
-      ) => ElectricVehicle
+          Boolean,
+      ) => ElectricVehicle,
   ): Seq[ElectricVehicle] = {
     ev2homePoiUuid.zipWithIndex.map { case ((evUuid, poiUuid), idx) =>
       val ev = evMap.getOrElse(
         evUuid,
         throw new IllegalArgumentException(
           s"Ev with UUID: $evUuid could not be found"
-        )
+        ),
       )
       val homePoi = homePoiMap.getOrElse(
         poiUuid,
         throw new IllegalArgumentException(
           s"Home poi with UUID: $poiUuid could not be found"
-        )
+        ),
       )
       evType2ev(s"EV_$idx", ev.getUuid, EvType(ev.getType), homePoi, true)
     }.toSeq

@@ -8,7 +8,7 @@ package edu.ie3.mobsim.io.geodata
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
-  PoiTypeDictionary
+  PoiTypeDictionary,
 }
 import edu.ie3.test.common.UnitSpec
 
@@ -26,7 +26,7 @@ class PoiEnumsSpec extends UnitSpec {
         ("leisure", PoiTypeDictionary.LEISURE),
         ("other", PoiTypeDictionary.OTHER),
         ("charging_hub_town", PoiTypeDictionary.CHARGING_HUB_TOWN),
-        ("charging_hub_highway", PoiTypeDictionary.CHARGING_HUB_HIGHWAY)
+        ("charging_hub_highway", PoiTypeDictionary.CHARGING_HUB_HIGHWAY),
       )
 
       forAll(cases) { (poiType, expectedResult) =>
@@ -61,8 +61,8 @@ class PoiEnumsSpec extends UnitSpec {
         ("charging_hub_town", CategoricalLocationDictionary.CHARGING_HUB_TOWN),
         (
           "charging_hub_highway",
-          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
-        )
+          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY,
+        ),
       )
 
       forAll(cases) { (categoricalLocation, expectedResult) =>
@@ -90,12 +90,12 @@ class PoiEnumsSpec extends UnitSpec {
         (PoiTypeDictionary.WORK, CategoricalLocationDictionary.WORK),
         (
           PoiTypeDictionary.CHARGING_HUB_TOWN,
-          CategoricalLocationDictionary.CHARGING_HUB_TOWN
+          CategoricalLocationDictionary.CHARGING_HUB_TOWN,
         ),
         (
           PoiTypeDictionary.CHARGING_HUB_HIGHWAY,
-          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY
-        )
+          CategoricalLocationDictionary.CHARGING_HUB_HIGHWAY,
+        ),
       )
 
       forAll(cases) { (poiType, expectedResult) =>

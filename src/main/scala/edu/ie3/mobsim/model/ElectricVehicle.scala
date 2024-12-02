@@ -13,7 +13,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.io.probabilities.{
   FirstDepartureOfDay,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.utils.utils.toTick
 import edu.ie3.simona.api.data.ev.model.EvModel
@@ -85,7 +85,7 @@ final case class ElectricVehicle(
     remainingDistanceAfterChargingHub: Option[
       ComparableQuantity[Length]
     ],
-    chargingPricesMemory: Queue[Double]
+    chargingPricesMemory: Queue[Double],
 ) extends EvModel
     with Ordered[ElectricVehicle] {
 
@@ -96,7 +96,7 @@ final case class ElectricVehicle(
   def getEStorage: ComparableQuantity[Energy] =
     Quantities.getQuantity(
       evType.capacity.toKilowattHours,
-      PowerSystemUnits.KILOWATTHOUR
+      PowerSystemUnits.KILOWATTHOUR,
     )
 
   def getPRatedAC: ComparableQuantity[Power] = Quantities
@@ -127,14 +127,14 @@ final case class ElectricVehicle(
       destinationPoi: PointOfInterest,
       destinationPoiType: PoiTypeDictionary.Value,
       parkingTimeStart: ZonedDateTime,
-      departureTime: ZonedDateTime
+      departureTime: ZonedDateTime,
   ): ElectricVehicle =
     copy(
       storedEnergy = storedEnergy,
       destinationPoi = destinationPoi,
       destinationPoiType = destinationPoiType,
       parkingTimeStart = parkingTimeStart,
-      departureTime = departureTime
+      departureTime = departureTime,
     )
 
   def setChosenChargingStation(
@@ -157,11 +157,11 @@ final case class ElectricVehicle(
 
   def setFinalDestination(
       destinationPoi: PointOfInterest,
-      destinationPoiType: PoiTypeDictionary.Value
+      destinationPoiType: PoiTypeDictionary.Value,
   ): ElectricVehicle = {
     copy(
       finalDestinationPoi = Some(destinationPoi),
-      finalDestinationPoiType = Some(destinationPoiType)
+      finalDestinationPoiType = Some(destinationPoiType),
     )
   }
 
@@ -205,10 +205,10 @@ case object ElectricVehicle extends LazyLogging {
     */
   def determineHomePoiPdf(
       homePoisWithSizes: Map[PointOfInterest, Double],
-      chargingStations: Seq[ChargingStation]
+      chargingStations: Seq[ChargingStation],
   ): (
       ProbabilityDensityFunction[PointOfInterest],
-      ProbabilityDensityFunction[PointOfInterest]
+      ProbabilityDensityFunction[PointOfInterest],
   ) = {
     /* Map all home POIs to the possibility to charge at home */
     val homePoiToHomeChargingOption = homePoisWithSizes.keys.map { poi =>
@@ -226,7 +226,7 @@ case object ElectricVehicle extends LazyLogging {
       case Failure(exception) =>
         throw InitializationException(
           "Unable to build pdf for home POI with home charging option",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -240,7 +240,7 @@ case object ElectricVehicle extends LazyLogging {
       case Failure(exception) =>
         throw InitializationException(
           "Unable to build pdf for home POI without home charging option",
-          exception
+          exception,
         )
       case Success(value) => value
     }
@@ -258,12 +258,12 @@ case object ElectricVehicle extends LazyLogging {
     */
   private def chargingAtHomePossibleForHomePOI(
       homePoi: PointOfInterest,
-      chargingStations: Seq[ChargingStation]
+      chargingStations: Seq[ChargingStation],
   ): Boolean = {
     homePoi.nearestChargingStations.foldLeft(false)(
       (
           chargeAtHome: Boolean,
-          cs: (ChargingStation, squants.Length)
+          cs: (ChargingStation, squants.Length),
       ) => {
         val evcsIsHomeType: Boolean =
           chargingStations
@@ -282,7 +282,7 @@ case object ElectricVehicle extends LazyLogging {
       firstDepartureOfDay: FirstDepartureOfDay,
       startTime: ZonedDateTime,
       homePoi: PointOfInterest,
-      isHomeChargingPossible: Boolean
+      isHomeChargingPossible: Boolean,
   ): ElectricVehicle = {
     /* Sample work POI based on sizes */
     val workPoi = workPoiPdf.sample()
@@ -299,7 +299,7 @@ case object ElectricVehicle extends LazyLogging {
       startTime,
       firstDeparture,
       isHomeChargingPossible,
-      uuid
+      uuid,
     )
   }
 
@@ -330,7 +330,7 @@ case object ElectricVehicle extends LazyLogging {
       simulationStart: ZonedDateTime,
       firstDeparture: ZonedDateTime,
       isChargingAtHomePossible: Boolean,
-      uuid: UUID = UUID.randomUUID()
+      uuid: UUID = UUID.randomUUID(),
   ): ElectricVehicle = {
     ElectricVehicle(
       simulationStart = simulationStart,
@@ -346,7 +346,7 @@ case object ElectricVehicle extends LazyLogging {
       workPoi = workPoi,
       storedEnergy = Quantities.getQuantity(
         evType.capacity.toKilowattHours,
-        PowerSystemUnits.KILOWATTHOUR
+        PowerSystemUnits.KILOWATTHOUR,
       ),
       destinationPoiType = PoiTypeDictionary.HOME,
       destinationPoi = homePoi, // is updated when trip is sampled
@@ -361,7 +361,7 @@ case object ElectricVehicle extends LazyLogging {
       finalDestinationPoi = None,
       finalDestinationPoiType = None,
       remainingDistanceAfterChargingHub = None,
-      chargingPricesMemory = Queue[Double]()
+      chargingPricesMemory = Queue[Double](),
     )
   }
 

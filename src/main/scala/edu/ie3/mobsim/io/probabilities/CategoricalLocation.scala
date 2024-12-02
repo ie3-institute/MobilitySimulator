@@ -8,7 +8,7 @@ package edu.ie3.mobsim.io.probabilities
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
-  PoiTypeDictionary
+  PoiTypeDictionary,
 }
 import edu.ie3.mobsim.io.probabilities.CategoricalLocation.CategoricalLocationKey
 
@@ -17,16 +17,16 @@ import java.time.{DayOfWeek, ZonedDateTime}
 final case class CategoricalLocation(
     probabilitiesWeekday: Map[
       CategoricalLocationKey,
-      ProbabilityDensityFunction[CategoricalLocationDictionary.Value]
+      ProbabilityDensityFunction[CategoricalLocationDictionary.Value],
     ],
     probabilitiesSaturday: Map[
       CategoricalLocationKey,
-      ProbabilityDensityFunction[CategoricalLocationDictionary.Value]
+      ProbabilityDensityFunction[CategoricalLocationDictionary.Value],
     ],
     probabilitiesSunday: Map[
       CategoricalLocationKey,
-      ProbabilityDensityFunction[CategoricalLocationDictionary.Value]
-    ]
+      ProbabilityDensityFunction[CategoricalLocationDictionary.Value],
+    ],
 ) {
 
   /** Sample a categorical location dependent on day type, day time and the POI.
@@ -41,7 +41,7 @@ final case class CategoricalLocation(
     */
   def sample(
       time: ZonedDateTime,
-      poiType: PoiTypeDictionary.Value
+      poiType: PoiTypeDictionary.Value,
   ): CategoricalLocationDictionary.Value =
     poiType match {
       case PoiTypeDictionary.HOME =>
@@ -75,7 +75,7 @@ final case class CategoricalLocation(
         probabilities.get(
           CategoricalLocationKey(
             timeInterval,
-            poiType
+            poiType,
           )
         ) match {
           case Some(pdf) => pdf.sample()
@@ -87,6 +87,6 @@ final case class CategoricalLocation(
 case object CategoricalLocation {
   final case class CategoricalLocationKey(
       time: Int,
-      poi: PoiTypeDictionary.Value
+      poi: PoiTypeDictionary.Value,
   )
 }

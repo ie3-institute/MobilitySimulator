@@ -26,7 +26,7 @@ import java.time.{DayOfWeek, ZonedDateTime}
 final case class DrivingSpeed(
     parametersWeekday: Map[Int, SpeedFunction],
     parametersSaturday: Map[Int, SpeedFunction],
-    parametersSunday: Map[Int, SpeedFunction]
+    parametersSunday: Map[Int, SpeedFunction],
 ) {
 
   /** Sample a driving speed dependent on day type, day time and the distance to
@@ -41,7 +41,7 @@ final case class DrivingSpeed(
     */
   def sample(
       time: ZonedDateTime,
-      distance: Length
+      distance: Length,
   ): Velocity = {
 
     /* Get current time on 15min basis */
@@ -95,7 +95,7 @@ case object DrivingSpeed extends LazyLogging {
   final case class SpeedFunction(
       a: Double,
       b: Double,
-      minimumSpeed: Velocity
+      minimumSpeed: Velocity,
   ) {
 
     /** Calculate the driving speed according to the distance

@@ -12,7 +12,7 @@ import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
-  UninitializedException
+  UninitializedException,
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
@@ -22,13 +22,13 @@ import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.builder.{
   EvBuilderFromEvInput,
   EvBuilderFromEvInputWithEvcsMapping,
-  EvBuilderFromRandomModel
+  EvBuilderFromRandomModel,
 }
 import edu.ie3.mobsim.model.{
   ChargingStation,
   ElectricVehicle,
   EvMovement,
-  EvType
+  EvType,
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
 import edu.ie3.simona.api.data.ExtDataConnection
@@ -53,7 +53,7 @@ final class MobilitySimulator(
     chargingStations: Seq[ChargingStation],
     poisWithSizes: Map[
       CategoricalLocationDictionary.Value,
-      ProbabilityDensityFunction[PointOfInterest]
+      ProbabilityDensityFunction[PointOfInterest],
     ],
     startTime: ZonedDateTime,
     var electricVehicles: Seq[ElectricVehicle],
@@ -63,7 +63,7 @@ final class MobilitySimulator(
     tripProbabilities: TripProbabilities,
     maxDistanceFromPoi: Length,
     thresholdChargingHubDistance: Length,
-    round15: Boolean
+    round15: Boolean,
 ) extends LazyLogging {
 
   /** Activities to be performed every time the mobility simulator is triggered.
@@ -103,13 +103,13 @@ final class MobilitySimulator(
       tick,
       availableChargingPoints,
       currentPricesAtChargingStations,
-      maxDistanceFromPoi
+      maxDistanceFromPoi,
     )
 
     /* Get time until next event for one of the EVs and return corresponding tick to SIMONA */
     val timeUntilNextEvent = Seq(
       MobilitySimulator.getTimeUntilNextArrival(electricVehicles, currentTime),
-      MobilitySimulator.getTimeUntilNextDeparture(electricVehicles, currentTime)
+      MobilitySimulator.getTimeUntilNextDeparture(electricVehicles, currentTime),
     ).flatten.minOption
 
     timeUntilNextEvent.foreach { nextEvent =>
@@ -124,7 +124,7 @@ final class MobilitySimulator(
       ioUtils.writeEvcs(
         cs,
         chargingStationOccupancy,
-        currentTime
+        currentTime,
       )
     )
 
@@ -157,7 +157,7 @@ final class MobilitySimulator(
       tick: Long,
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
-      maxDistance: Length
+      maxDistance: Length,
   ): Map[UUID, Seq[ElectricVehicle]] = {
 
     // Determine parking and departing evs in this tick
@@ -188,7 +188,7 @@ final class MobilitySimulator(
       parkingEvs,
       currentPricesAtChargingStations,
       updatedChargingPoints,
-      maxDistance
+      maxDistance,
     )
 
     // Update and simulate all EVs that were returned from SIMONA
@@ -197,7 +197,7 @@ final class MobilitySimulator(
       departedEvs,
       tripProbabilities,
       thresholdChargingHubDistance,
-      round15
+      round15,
     )
 
     // Finally, send arrivals to SIMONA
@@ -214,7 +214,7 @@ final class MobilitySimulator(
         .map(_ + tick)
     evDataConnection.provideArrivingEvs(
       EvMovement.buildMovementsMap(arrivals),
-      timeUntilNextEvent.map(long2Long).toJava
+      timeUntilNextEvent.map(long2Long).toJava,
     )
 
     // compile map from evcs to their parked evs
@@ -241,7 +241,7 @@ final class MobilitySimulator(
     */
   private def defineMovements(
       evs: Seq[ElectricVehicle],
-      currentTime: ZonedDateTime
+      currentTime: ZonedDateTime,
   ): (Seq[ElectricVehicle], Seq[ElectricVehicle]) = {
     val isParking = (ev: ElectricVehicle) => ev.parkingTimeStart == currentTime
     /* Relevant are only cars, that depart AND that are charging at a suitable charging station in SIMONA */
@@ -268,14 +268,14 @@ final class MobilitySimulator(
     */
   private def handleDepartures(
       evs: Seq[ElectricVehicle],
-      availableChargingPoints: Map[UUID, Int]
+      availableChargingPoints: Map[UUID, Int],
   ): (Seq[EvMovement], Map[UUID, Int]) = {
     val (additionallyFreeChargingPoints, departures) =
       handleDepartingEvs(evs)
 
     (
       departures,
-      updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints)
+      updateFreeLots(availableChargingPoints, additionallyFreeChargingPoints),
     )
   }
 
@@ -304,7 +304,7 @@ final class MobilitySimulator(
               uuid -> uuids.size
             }
             .seq,
-          movements.seq
+          movements.seq,
         )
     }
 
@@ -346,7 +346,7 @@ final class MobilitySimulator(
     */
   private def updateFreeLots(
       freeLots: Map[UUID, Int],
-      change: Map[UUID, Int]
+      change: Map[UUID, Int],
   ): Map[UUID, Int] =
     freeLots.map { case (uuid, freeLots) =>
       val lotDiff = change.getOrElse(uuid, 0)
@@ -379,7 +379,7 @@ final class MobilitySimulator(
       evs: Seq[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
-      maxDistance: Length
+      maxDistance: Length,
   ): Seq[EvMovement] =
     evs.foldLeft((availableChargingPoints, Seq.empty[EvMovement])) {
       case ((updatedAvailableChargingPoints, movements), ev) =>
@@ -388,7 +388,7 @@ final class MobilitySimulator(
           ev,
           pricesAtChargingStation,
           updatedAvailableChargingPoints,
-          maxDistance
+          maxDistance,
         ).flatMap {
           // in case of a successful start of charging,
           // remove the charging point from available points
@@ -397,7 +397,7 @@ final class MobilitySimulator(
             updatedAvailableChargingPoints.get(cs).map { count =>
               (
                 updatedAvailableChargingPoints + (cs -> (count - 1)),
-                movements :+ movement
+                movements :+ movement,
               )
             }
         }.getOrElse((updatedAvailableChargingPoints, movements))
@@ -426,7 +426,7 @@ final class MobilitySimulator(
       ev: ElectricVehicle,
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
-      maxDistance: Length
+      maxDistance: Length,
   ): Option[EvMovement] = {
     val minParkingTimeForCharging = 15
     val staysLongEnough = ev.parkingTimeStart
@@ -437,7 +437,7 @@ final class MobilitySimulator(
         pricesAtChargingStation,
         availableChargingPoints,
         MobilitySimulator.seed,
-        maxDistance
+        maxDistance,
       )
 
       chosenCsOpt
@@ -494,7 +494,7 @@ final class MobilitySimulator(
       departedEvsFromSimona: Seq[ElectricVehicle],
       tripProbabilities: TripProbabilities,
       thresholdChargingHubDistance: Length,
-      round15: Boolean
+      round15: Boolean,
   ): Unit = {
 
     // here a set is useful for fast containment checking
@@ -527,7 +527,7 @@ final class MobilitySimulator(
           ioUtils,
           tripProbabilities,
           thresholdChargingHubDistance,
-          round15
+          round15,
         )
       } else ev
     })
@@ -608,7 +608,7 @@ object MobilitySimulator
       PathsAndSources(
         config.mobsim.simulation.name,
         config.mobsim.input,
-        config.mobsim.output.outputDir
+        config.mobsim.output.outputDir,
       )
 
     val ioUtils = IoUtils(
@@ -618,13 +618,13 @@ object MobilitySimulator
       "evcs.csv",
       "positions.csv",
       "pois.csv",
-      config.mobsim.output.writeMovements
+      config.mobsim.output.writeMovements,
     )
 
     /* Load charging stations in the grid */
     val chargingStations = ChargingStation.loadChargingStationsWithPSDM(
       pathsAndSources.rawGridSource,
-      pathsAndSources.systemParticipantSource
+      pathsAndSources.systemParticipantSource,
     )
 
     /* Load all POIs in the area */
@@ -653,7 +653,7 @@ object MobilitySimulator
       pathsAndSources.poiPath,
       maxDistanceFromPoi,
       maxDistanceFromHomePoi,
-      assignHomeNearestChargingStations
+      assignHomeNearestChargingStations,
     )
     ioUtils.writePois(pois)
     val poisWithSizes = PoiUtils.createPoiPdf(pois)
@@ -672,7 +672,7 @@ object MobilitySimulator
     val evModelPdf =
       EvType.getEvInputModelsWithProbabilities(
         pathsAndSources.evInputModelPath,
-        pathsAndSources.evSegmentPath
+        pathsAndSources.evSegmentPath,
       )
     val numberOfEvsInArea = config.mobsim.simulation.numberOfEv
     val targetShareOfHomeCharging =
@@ -687,7 +687,7 @@ object MobilitySimulator
       pathsAndSources,
       config.mobsim.input.mobility.source.colSep,
       config.mobsim.simulation.averageCarUsage,
-      config.mobsim.simulation.round15
+      config.mobsim.simulation.round15,
     )
 
     val homePOIsWithSizes = poisWithSizes
@@ -695,7 +695,7 @@ object MobilitySimulator
         CategoricalLocationDictionary.HOME,
         throw InitializationException(
           "Unable to obtain the probability density function for home POI."
-        )
+        ),
       )
       .pdf
 
@@ -703,7 +703,7 @@ object MobilitySimulator
       CategoricalLocationDictionary.WORK,
       throw InitializationException(
         "Unable to obtain the probability density function for work POI."
-      )
+      ),
     )
 
     val evs = config.mobsim.input.evInputSource match {
@@ -726,7 +726,7 @@ object MobilitySimulator
               startTime,
               tripProbabilities.firstDepartureOfDay,
               ev2poi,
-              poi2evcs
+              poi2evcs,
             )
 
           case None =>
@@ -737,7 +737,7 @@ object MobilitySimulator
               chargingStations,
               startTime,
               targetShareOfHomeCharging,
-              tripProbabilities.firstDepartureOfDay
+              tripProbabilities.firstDepartureOfDay,
             )
         }
 
@@ -750,7 +750,7 @@ object MobilitySimulator
           startTime,
           targetShareOfHomeCharging,
           evModelPdf,
-          tripProbabilities.firstDepartureOfDay
+          tripProbabilities.firstDepartureOfDay,
         )
     }
 
@@ -766,7 +766,7 @@ object MobilitySimulator
     val numberOfChargingPointsInArea = chargingStations.foldLeft((0, 0, 0, 0))(
       (
           totalNumberOfChargingPoints: (Int, Int, Int, Int),
-          cs: ChargingStation
+          cs: ChargingStation,
       ) => {
         (
           totalNumberOfChargingPoints._1 + cs.chargingPoints,
@@ -784,7 +784,7 @@ object MobilitySimulator
             || cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY
           )
             totalNumberOfChargingPoints._4 + cs.chargingPoints
-          else totalNumberOfChargingPoints._4
+          else totalNumberOfChargingPoints._4,
         )
       }
     )
@@ -809,7 +809,7 @@ object MobilitySimulator
       tripProbabilities,
       maxDistanceFromPoi,
       thresholdChargingHubDistance,
-      config.mobsim.simulation.round15
+      config.mobsim.simulation.round15,
     )
     simulator = Some(mobSim)
 
@@ -825,7 +825,7 @@ object MobilitySimulator
     // Also provide first tick to the data service
     availableEvData.provideArrivingEvs(
       Map.empty[UUID, java.util.List[EvModel]].asJava,
-      Some(long2Long(firstArrivalTick)).toJava
+      Some(long2Long(firstArrivalTick)).toJava,
     )
 
     logger.info("Finished setup!")
@@ -846,7 +846,7 @@ object MobilitySimulator
     */
   private def getTimeUntilNextDeparture(
       evs: Seq[ElectricVehicle],
-      currentTime: ZonedDateTime
+      currentTime: ZonedDateTime,
   ): Option[Long] =
     evs
       .foldLeft[Option[ZonedDateTime]](None)(
@@ -873,7 +873,7 @@ object MobilitySimulator
     */
   private def getTimeUntilNextArrival(
       evs: Seq[ElectricVehicle],
-      currentTime: ZonedDateTime
+      currentTime: ZonedDateTime,
   ): Option[Long] =
     evs
       .foldLeft[Option[ZonedDateTime]](None)(
@@ -882,7 +882,7 @@ object MobilitySimulator
             Seq(
               earliestEvent,
               Some(ev.parkingTimeStart),
-              Some(ev.departureTime)
+              Some(ev.departureTime),
             ).flatten.minOption
           } else
             earliestEvent

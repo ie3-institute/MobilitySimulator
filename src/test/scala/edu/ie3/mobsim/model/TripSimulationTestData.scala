@@ -8,13 +8,13 @@ package edu.ie3.mobsim.model
 
 import edu.ie3.mobsim.io.geodata.PoiEnums.{
   CategoricalLocationDictionary,
-  PoiTypeDictionary
+  PoiTypeDictionary,
 }
 import edu.ie3.mobsim.io.geodata.{
   PoiEnums,
   PoiTestData,
   PoiUtils,
-  PointOfInterest
+  PointOfInterest,
 }
 import edu.ie3.mobsim.io.probabilities.DrivingSpeed.SpeedFunction
 import edu.ie3.mobsim.io.probabilities._
@@ -47,7 +47,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible
+    isChargingAtHomePossible,
   )
 
   val ev2: ElectricVehicle = ElectricVehicle.buildEv(
@@ -57,7 +57,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible
+    isChargingAtHomePossible,
   )
 
   val ev3: ElectricVehicle = ElectricVehicle.buildEv(
@@ -67,7 +67,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible
+    isChargingAtHomePossible,
   )
 
   val ev4: ElectricVehicle = ElectricVehicle.buildEv(
@@ -77,7 +77,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible
+    isChargingAtHomePossible,
   )
 
   val ev5: ElectricVehicle = ElectricVehicle.buildEv(
@@ -87,7 +87,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     givenWorkPoi,
     givenSimulationStart,
     givenFirstDeparture,
-    isChargingAtHomePossible
+    isChargingAtHomePossible,
   )
 
   protected val chargingStations: Seq[ChargingStation] =
@@ -106,7 +106,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     sportsPoi,
     supermarketPoi,
     chargingHubTownPoi,
-    chargingHubHighwayPoi
+    chargingHubHighwayPoi,
   )
 
   protected val plannedDestinationPoi: PointOfInterest = poiData(11)
@@ -128,7 +128,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
 
   protected val poisWithSizes: Map[
     PoiEnums.CategoricalLocationDictionary.Value,
-    ProbabilityDensityFunction[PointOfInterest]
+    ProbabilityDensityFunction[PointOfInterest],
   ] = PoiUtils.createPoiPdf(
     pois.map { poi =>
       poi.categoricalLocation -> Set(poi)
@@ -157,7 +157,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     "edu",
     "ie3",
     "mobsim",
-    "model"
+    "model",
   ).mkString(File.separator) + File.separator
   private val catLocFile: String = basePath + "categorical_location.csv"
   private val drivingSpeedFile: String = basePath + "driving_speed.csv"
@@ -170,7 +170,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val categoricalLocation: CategoricalLocation = {
     CategoricalLocationFactory.getFromFile(
       catLocFile,
-      ","
+      ",",
     ) match {
       case Success(value)     => value
       case Failure(exception) => throw exception
@@ -180,7 +180,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val drivingSpeed: DrivingSpeed = {
     DrivingSpeedFactory.getFromFile(
       drivingSpeedFile,
-      ","
+      ",",
     ) match {
       case Success(value)     => value
       case Failure(exception) => throw exception
@@ -190,7 +190,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val firstDepartureOfDay: FirstDepartureOfDay = {
     FirstDepartureFactory(averageCarUsage).getFromFile(
       departureFile,
-      ","
+      ",",
     ) match {
       case Success(value: FirstDepartureOfDay) => value
       case Failure(exception)                  => throw exception
@@ -200,7 +200,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val lastTripOfDay: LastTripOfDay = {
     LastTripFactory.getFromFile(
       lastTripFile,
-      ","
+      ",",
     ) match {
       case Success(value)     => value
       case Failure(exception) => throw exception
@@ -210,7 +210,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val parkingTime: ParkingTime = {
     ParkingTimeFactory.getFromFile(
       parkingTimeFile,
-      ","
+      ",",
     ) match {
       case Success(value)     => value
       case Failure(exception) => throw exception
@@ -220,7 +220,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val poiTransition: PoiTransition = {
     PoiTransitionFactory.getFromFile(
       poiTransitionFile,
-      ","
+      ",",
     ) match {
       case Success(value)     => value
       case Failure(exception) => throw exception
@@ -230,7 +230,7 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
   protected val tripDistance: TripDistance = {
     TripDistanceFactory.getFromFile(
       tripDistanceFile,
-      ","
+      ",",
     ) match {
       case Success(value)     => value
       case Failure(exception) => throw exception
@@ -244,6 +244,6 @@ trait TripSimulationTestData extends ElectricVehicleTestData with PoiTestData {
     lastTripOfDay,
     parkingTime,
     poiTransition,
-    tripDistance
+    tripDistance,
   )
 }

@@ -11,7 +11,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.io.probabilities.PoiTransition.PoiTransitionKey
 import edu.ie3.mobsim.io.probabilities.{
   PoiTransition,
-  ProbabilityDensityFunction
+  ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.utils.DayType
 
@@ -43,7 +43,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
         Failure(
           SourceException(
             "Unable to build poi transitions probabilities. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -71,7 +71,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
               PoiTransition(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
               )
             )
           case None =>
@@ -100,7 +100,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
       dayType: DayType.Value,
       from: PoiTypeDictionary.Value,
       to: PoiTypeDictionary.Value,
-      probability: Double
+      probability: Double,
   )
 
   private object Entry {
@@ -110,7 +110,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
           quarterHour,
           throw SourceException(
             "Unable to get minute information from entity field data"
-          )
+          ),
         )
         .toInt
       val dayTypeValue = DayType(
@@ -118,7 +118,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -130,7 +130,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
             fromPoi,
             throw SourceException(
               "Unable to get poi type information from entity field data"
-            )
+            ),
           )
       )
       val toPoiValue = PoiTypeDictionary(
@@ -139,7 +139,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
             toPoi,
             throw SourceException(
               "Unable to get poi type information from entity field data"
-            )
+            ),
           )
       )
       val probabilityValue = entityFieldData
@@ -147,7 +147,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
           probability,
           throw SourceException(
             "Unable to get probability information from entity field data"
-          )
+          ),
         )
         .toDouble
 
@@ -156,7 +156,7 @@ object PoiTransitionFactory extends ProbabilityFactory[PoiTransition] {
         dayTypeValue,
         fromPoiValue,
         toPoiValue,
-        probabilityValue
+        probabilityValue,
       )
     }
   }

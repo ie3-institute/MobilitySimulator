@@ -36,7 +36,7 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
         Failure(
           SourceException(
             "Unable to build last trip probabilities. First failure in stack trace.",
-            firstFailure.exception
+            firstFailure.exception,
           )
         )
       case Some(_) =>
@@ -64,7 +64,7 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
               LastTripOfDay(
                 weekdayProbability,
                 saturdayProbability,
-                sundayProbability
+                sundayProbability,
               )
             )
           case None =>
@@ -85,7 +85,7 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
   private final case class Entry(
       quarterHour: Int,
       dayType: DayType.Value,
-      probability: Double
+      probability: Double,
   )
 
   private object Entry {
@@ -95,7 +95,7 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
           quarterHour,
           throw SourceException(
             "Unable to get quarter hour information from entity field data"
-          )
+          ),
         )
         .toInt
       val dayTypeValue = DayType(
@@ -103,7 +103,7 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
           dayType,
           throw SourceException(
             "Unable to get day type information from entity field data"
-          )
+          ),
         )
       ) match {
         case Failure(exception) => throw exception
@@ -114,14 +114,14 @@ object LastTripFactory extends ProbabilityFactory[LastTripOfDay] {
           probability,
           throw SourceException(
             "Unable to get probability information from entity field data"
-          )
+          ),
         )
         .toDouble
 
       new Entry(
         quarterHourValue,
         dayTypeValue,
-        probabilityValue
+        probabilityValue,
       )
     }
   }

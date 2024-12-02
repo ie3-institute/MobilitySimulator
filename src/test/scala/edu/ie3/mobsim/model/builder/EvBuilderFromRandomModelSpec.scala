@@ -33,7 +33,7 @@ class EvBuilderFromRandomModelSpec
             (0, 0),
             (10, 10),
             (100, 100),
-            (120, 100)
+            (120, 100),
           )
         ) { case (amountOfHomeChargingCars: Int, expectedAmount: Int) =>
           val initialCars =
@@ -47,7 +47,7 @@ class EvBuilderFromRandomModelSpec
               givenWorkPoiPdf,
               givenModelPdf,
               givenFirstDepartureMetaData,
-              givenSimulationStart
+              givenSimulationStart,
             )
           /* There are 100 home charging stations available. The actual amount of cars is limited by the minimum of
            * their target amount and the amount of available home POI */
@@ -63,7 +63,7 @@ class EvBuilderFromRandomModelSpec
           "amountOfHomeChargingCars",
           "amountOfAssignedCars",
           "expectedHomeChargingAmount",
-          "expectedOverallAmount"
+          "expectedOverallAmount",
         ),
         (100, 0, 0, 0, 100), // All cars already assigned
         (100, 10, 10, 0, 90),
@@ -71,7 +71,7 @@ class EvBuilderFromRandomModelSpec
         (100, 0, 10, 0, 90), // Too many already assigned
         (100, 10, 20, 0, 80),
         (100, 100, 110, 0, 0),
-        (100, 30, 10, 20, 90)
+        (100, 30, 10, 20, 90),
       )
 
       "determine the amount of needed cars correctly" in {
@@ -84,12 +84,12 @@ class EvBuilderFromRandomModelSpec
                 amountOfHomeChargingCars: Int,
                 amountOfAssignedCars: Int,
                 expectedHomeChargingAmount: Int,
-                expectedOverallAmount: Int
+                expectedOverallAmount: Int,
               ) =>
             EvBuilderFromRandomModel invokePrivate determineUnassignedCars(
               amountOfEvsInArea,
               amountOfHomeChargingCars,
-              amountOfAssignedCars
+              amountOfAssignedCars,
             ) match {
               case (amountOfHomeCharging, overallAmount) =>
                 amountOfHomeCharging shouldBe expectedHomeChargingAmount
@@ -108,7 +108,7 @@ class EvBuilderFromRandomModelSpec
                 amountOfHomeChargingCars: Int,
                 amountOfAssignedCars: Int,
                 expectedHomeChargingAmount: Int,
-                expectedOverallAmount: Int
+                expectedOverallAmount: Int,
               ) =>
             val additionalCars =
               EvBuilderFromRandomModel invokePrivate assignRemainingCars(
@@ -120,7 +120,7 @@ class EvBuilderFromRandomModelSpec
                 givenWorkPoiPdf,
                 givenModelPdf,
                 givenFirstDepartureMetaData,
-                givenSimulationStart
+                givenSimulationStart,
               )
 
             additionalCars should have size expectedOverallAmount
@@ -141,7 +141,7 @@ class EvBuilderFromRandomModelSpec
           id = s"home_poi_$cnt",
           nearestChargingStations = Map(
             givenChargingStation -> Meters(1.0)
-          )
+          ),
         )
       } ++ Range(100, 200).map { cnt =>
         givenHomePoi.copy(
@@ -155,13 +155,13 @@ class EvBuilderFromRandomModelSpec
           (10, 1.0, 10),
           (100, 1.0, 100),
           (100, 0.1, 10),
-          (100, 0.125, 13)
+          (100, 0.125, 13),
         )
       ) {
         case (
               targetAmount: Int,
               targetShare: Double,
-              expectedAmountOfHomeCharging: Int
+              expectedAmountOfHomeCharging: Int,
             ) =>
           val evs = EvBuilderFromRandomModel.build(
             targetAmount,
@@ -171,7 +171,7 @@ class EvBuilderFromRandomModelSpec
             givenSimulationStart,
             targetShare,
             givenModelPdf,
-            givenFirstDepartureMetaData
+            givenFirstDepartureMetaData,
           )
 
           evs should have size targetAmount
