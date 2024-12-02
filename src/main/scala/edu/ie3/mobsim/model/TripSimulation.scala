@@ -1102,9 +1102,9 @@ object TripSimulation extends LazyLogging {
     val availableChargingPowerForEV =
       chargingHub.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
-          ev.getSRatedAC.min(chargingPowerOfChargingHub).to(KILOWATT)
+          ev.getPRatedAC.min(chargingPowerOfChargingHub).to(KILOWATT)
         case ElectricCurrentType.DC =>
-          ev.getSRatedDC.min(chargingPowerOfChargingHub).to(KILOWATT)
+          ev.getPRatedDC.min(chargingPowerOfChargingHub).to(KILOWATT)
       }
 
     val energyUntilFullCharge: Energy = KilowattHours(

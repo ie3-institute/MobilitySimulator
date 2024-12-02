@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change from quantities to squants [#257](https://github.com/ie3-institute/MobilitySimulator/issues/257)
 - MobSim informs EVCS in SIMONA about estimated next arrivals [#254](https://github.com/ie3-institute/MobilitySimulator/issues/254)
 - Updated `Gradle` to version V8.10 [#282](https://github.com/ie3-institute/MobilitySimulator/issues/282)
+- Adapting to recent changes in the API [#303](https://github.com/ie3-institute/MobilitySimulator/issues/303)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]

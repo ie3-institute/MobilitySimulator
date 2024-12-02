@@ -31,9 +31,9 @@ import edu.ie3.mobsim.model.{
   EvType
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
-import edu.ie3.simona.api.data.ExtDataSimulation
+import edu.ie3.simona.api.data.ExtDataConnection
+import edu.ie3.simona.api.data.ev.ExtEvDataConnection
 import edu.ie3.simona.api.data.ev.model.EvModel
-import edu.ie3.simona.api.data.ev.{ExtEvData, ExtEvSimulation}
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
 import squants.Length
@@ -41,6 +41,7 @@ import squants.space.{Kilometers, Meters}
 
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
+import java.util
 import java.util.{Optional, UUID}
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
@@ -48,7 +49,7 @@ import scala.jdk.OptionConverters._
 import scala.util.Random
 
 final class MobilitySimulator(
-    evData: ExtEvData,
+    evDataConnection: ExtEvDataConnection,
     chargingStations: Seq[ChargingStation],
     poisWithSizes: Map[
       CategoricalLocationDictionary.Value,
@@ -64,6 +65,14 @@ final class MobilitySimulator(
     thresholdChargingHubDistance: Length,
     round15: Boolean
 ) extends LazyLogging {
+
+  /** Activities to be performed every time the mobility simulator is triggered.
+    *
+    * @param tick
+    *   Current time tick
+    * @return
+    *   Next time tick when simulation should be triggered again
+    */
   private def doActivity(tick: Long): Optional[java.lang.Long] = {
     /* Update current time */
     val currentTime = startTime.plusSeconds(tick)
@@ -73,7 +82,7 @@ final class MobilitySimulator(
     )
 
     /* Receive available charging points of evcs from SIMONA and converting them to scala values */
-    val availableChargingPoints = evData
+    val availableChargingPoints = evDataConnection
       .requestAvailablePublicEvcs()
       .asScala
       .view
@@ -81,7 +90,7 @@ final class MobilitySimulator(
       .toMap
 
     /* Receive current prices for public evcs situation and converting them to scala values */
-    val currentPricesAtChargingStations = evData
+    val currentPricesAtChargingStations = evDataConnection
       .requestCurrentPrices()
       .asScala
       .view
@@ -160,7 +169,7 @@ final class MobilitySimulator(
     val (departures, updatedChargingPoints) =
       handleDepartures(departingEvs, availableChargingPoints)
 
-    val departedEvs = evData
+    val departedEvs = evDataConnection
       .requestDepartingEvs(
         EvMovement.buildMovementsUuidMap(departures)
       )
@@ -203,7 +212,7 @@ final class MobilitySimulator(
             .getTimeUntilNextDeparture(electricVehicles, currentTime)
         )
         .map(_ + tick)
-    evData.provideArrivingEvs(
+    evDataConnection.provideArrivingEvs(
       EvMovement.buildMovementsMap(arrivals),
       timeUntilNextEvent.map(long2Long).toJava
     )
@@ -537,9 +546,7 @@ final class MobilitySimulator(
 }
 
 object MobilitySimulator
-    extends ExtSimulation
-    with ExtEvSimulation
-    with ExtDataSimulation
+    extends ExtSimulation("MobilitySimulator")
     with LazyLogging {
 
   private var simulator: Option[MobilitySimulator] = None
@@ -551,12 +558,10 @@ object MobilitySimulator
   /* random seed */
   val seed: Random = new scala.util.Random(6)
 
-  private var evData: Option[ExtEvData] = None
+  private val evDataConnection: ExtEvDataConnection = new ExtEvDataConnection()
 
-  /** Set external EvAdapter during simulation setup */
-  override def setExtEvData(evAdapter: ExtEvData): Unit = {
-    this.evData = Some(evAdapter)
-  }
+  override def getDataConnections: util.Set[ExtDataConnection] =
+    util.Set.of(evDataConnection)
 
   /** Activities to be performed every time the mobility simulator is triggered.
     *
@@ -582,11 +587,7 @@ object MobilitySimulator
 
     val initTick = -1L
 
-    val availableEvData = evData.getOrElse(
-      throw InitializationException(
-        "Unable to access external ev data, although setup should have provided them."
-      )
-    )
+    val availableEvData = evDataConnection
 
     logger.info("Starting setup...")
 

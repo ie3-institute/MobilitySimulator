@@ -6,16 +6,17 @@
 
 package edu.ie3.mobsim
 
-import org.apache.pekko.actor.ActorRef
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
-import edu.ie3.simona.api.data.ev.ExtEvData
+import edu.ie3.simona.api.data.ev.ExtEvDataConnection
+import org.apache.pekko.actor.ActorRef
 
 import java.util.UUID
 
 trait MobilitySimulatorTestData extends IoUtilsTestData {
-  val evData: ExtEvData = new ExtEvData(ActorRef.noSender, ActorRef.noSender)
+  val evDataConnection: ExtEvDataConnection = new ExtEvDataConnection()
+  evDataConnection.setActorRefs(ActorRef.noSender, ActorRef.noSender)
 
   def setEvsAsParking(
       evs: Seq[ElectricVehicle]
@@ -83,7 +84,7 @@ trait MobilitySimulatorTestData extends IoUtilsTestData {
   }
 
   def mobSim(): MobilitySimulator = new MobilitySimulator(
-    evData = evData,
+    evDataConnection = evDataConnection,
     chargingStations = chargingStations,
     poisWithSizes = poisWithSizes,
     startTime = givenSimulationStart,
