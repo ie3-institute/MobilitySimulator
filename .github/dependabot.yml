@@ -9,9 +9,10 @@ updates:
   target-branch: main
   reviewers:
   - t-ober
-  - sensarmad
+  - jo-bao
   - sebastian-peter
   - danielfeismann
+  - staudtMarius
   ignore:
     - dependency-name: org.scalatest:scalatest_2.13
       versions:
