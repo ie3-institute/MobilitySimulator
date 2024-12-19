@@ -592,6 +592,18 @@ object MobilitySimulator
     logger.debug("Parsing config")
     val config = ArgsParser
       .prepareConfig(getMainArgs)
+      .map { cfg =>
+        // Set the output directory to /output if not already set
+        val updatedOutputDir = if (cfg.mobsim.output.outputDir.isEmpty) {
+          "/output"
+        } else {
+          cfg.mobsim.output.outputDir
+        }
+        cfg.copy(mobsim =
+          cfg.mobsim
+            .copy(output = cfg.mobsim.output.copy(outputDir = updatedOutputDir))
+        )
+      }
       .getOrElse(
         throw InitializationException(
           s"Unable to parse config from given args '${getMainArgs

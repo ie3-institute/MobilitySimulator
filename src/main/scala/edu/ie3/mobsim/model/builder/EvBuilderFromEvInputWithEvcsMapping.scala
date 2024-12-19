@@ -15,12 +15,14 @@ import edu.ie3.mobsim.io.probabilities.{
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvType}
 import edu.ie3.util.geo.GeoUtils
 import edu.ie3.util.quantities.PowerSystemUnits
+import org.slf4j.LoggerFactory
 import squants.space.Kilometers
 
 import java.time.ZonedDateTime
 import java.util.UUID
 
 object EvBuilderFromEvInputWithEvcsMapping {
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
   def build(
       electricVehicles: Seq[EvInput],
@@ -96,37 +98,35 @@ object EvBuilderFromEvInputWithEvcsMapping {
       homePoiMap: Map[UUID, PointOfInterest],
       evcsMap: Map[UUID, ChargingStation],
   ): Map[UUID, PointOfInterest] = {
-    homePoi2EvcsUuid.map { case (homePoiUuid, evcsUuid) =>
-      val evcs = evcsMap.getOrElse(
-        evcsUuid,
-        throw new IllegalArgumentException(
-          s"Evcs with UUID: $evcsUuid could not be found"
-        ),
-      )
-      val homePoi = homePoiMap.getOrElse(
-        homePoiUuid,
-        throw new IllegalArgumentException(
-          s"Home poi with UUID: $evcsUuid could not be found"
-        ),
-      )
-      val poiCoordinate = homePoi.geoPosition
-      val distance = Kilometers(
-        GeoUtils
-          .calcHaversine(
-            poiCoordinate.y,
-            poiCoordinate.x,
-            evcs.geoPosition.y,
-            evcs.geoPosition.x,
+    homePoi2EvcsUuid.flatMap { case (homePoiUuid, evcsUuid) =>
+      (homePoiMap.get(homePoiUuid), evcsMap.get(evcsUuid)) match {
+        case (Some(homePoi), Some(evcs)) =>
+          val poiCoordinate = homePoi.geoPosition
+          val distance = Kilometers(
+            GeoUtils
+              .calcHaversine(
+                poiCoordinate.y,
+                poiCoordinate.x,
+                evcs.geoPosition.y,
+                evcs.geoPosition.x,
+              )
+              .to(PowerSystemUnits.KILOMETRE)
+              .getValue
+              .doubleValue()
           )
-          .to(PowerSystemUnits.KILOMETRE)
-          .getValue
-          .doubleValue()
-      )
-      homePoi.uuid -> homePoi.copy(nearestChargingStations =
-        Map(evcs -> distance)
-      )
+          Some(
+            homePoi.uuid -> homePoi.copy(nearestChargingStations =
+              Map(evcs -> distance)
+            )
+          )
+        case (None, _) =>
+          logger.warn(s"Home poi with UUID: $homePoiUuid could not be found")
+          None
+        case (_, None) =>
+          logger.warn(s"Evcs with UUID: $evcsUuid could not be found")
+          None
+      }
     }
-
   }
 
   private def assignEvToHomePoiWithMapping(
@@ -141,20 +141,19 @@ object EvBuilderFromEvInputWithEvcsMapping {
           Boolean,
       ) => ElectricVehicle,
   ): Seq[ElectricVehicle] = {
-    ev2homePoiUuid.zipWithIndex.map { case ((evUuid, poiUuid), idx) =>
-      val ev = evMap.getOrElse(
-        evUuid,
-        throw new IllegalArgumentException(
-          s"Ev with UUID: $evUuid could not be found"
-        ),
-      )
-      val homePoi = homePoiMap.getOrElse(
-        poiUuid,
-        throw new IllegalArgumentException(
-          s"Home poi with UUID: $poiUuid could not be found"
-        ),
-      )
-      evType2ev(s"EV_$idx", ev.getUuid, EvType(ev.getType), homePoi, true)
+    ev2homePoiUuid.zipWithIndex.flatMap { case ((evUuid, poiUuid), idx) =>
+      (evMap.get(evUuid), homePoiMap.get(poiUuid)) match {
+        case (Some(ev), Some(homePoi)) =>
+          Some(
+            evType2ev(s"EV_$idx", ev.getUuid, EvType(ev.getType), homePoi, true)
+          )
+        case (None, _) =>
+          logger.warn(s"Ev with UUID: $evUuid could not be found")
+          None
+        case (_, None) =>
+          logger.warn(s"Home poi with UUID: $poiUuid could not be found")
+          None
+      }
     }.toSeq
   }
 }

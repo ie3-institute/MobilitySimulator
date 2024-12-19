@@ -29,7 +29,11 @@ object HomePoiMapping {
   }
 
   implicit val uuids: CellDecoder[Seq[UUID]] = CellDecoder.from((s: String) => {
-    val triedUuids = s.split(" ").map(uuid => Try(UUID.fromString(uuid))).toSeq
+    val triedUuids = s
+      .split(" ")
+      .filter(_.nonEmpty)
+      .map(uuid => Try(UUID.fromString(uuid)))
+      .toSeq
     triedUuids.partitionMap(_.toEither) match {
       case (Nil, uuids) => Right(uuids)
       case (errors, _) =>
