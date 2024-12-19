@@ -595,7 +595,7 @@ object MobilitySimulator
       .map { cfg =>
         // Set the output directory to /output if not already set
         val updatedOutputDir = if (cfg.mobsim.output.outputDir.isEmpty) {
-          "/output"
+          Some("/output")
         } else {
           cfg.mobsim.output.outputDir
         }
