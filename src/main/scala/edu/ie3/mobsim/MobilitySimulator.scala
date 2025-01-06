@@ -160,9 +160,7 @@ final class MobilitySimulator(
       maxDistance: Length,
   ): Map[UUID, Seq[ElectricVehicle]] = {
 
-    // Determine parking and departing evs in this tick
-    val (parkingEvs, departingEvs) =
-      defineMovements(electricVehicles, currentTime)
+    val departingEvs = filterDepartingEvs(electricVehicles, currentTime)
 
     /* !!! Attention - Departing and parking evs have to be treated sequentially !!!
      * The departing cars offer additional free lots to the parking cars */
@@ -182,6 +180,9 @@ final class MobilitySimulator(
           )
       }
       .toSeq
+    logger.debug("Requested {} departing EVs from SIMONA", departures.size)
+
+    val parkingEvs = filterParkingEvs(electricVehicles, currentTime)
 
     // Add EVs that start parking now to movements and assign to Evcs UUID
     val arrivals = handleParkingEvs(
@@ -210,6 +211,7 @@ final class MobilitySimulator(
       EvMovement.buildMovementsMap(arrivals),
       timeUntilNextEvent.map(long2Long).toJava,
     )
+    logger.debug("Sent {} arriving EVs to SIMONA", arrivals.size)
 
     // compile map from evcs to their parked evs
     electricVehicles
@@ -223,32 +225,41 @@ final class MobilitySimulator(
       }
   }
 
-  /** Determine the set of cars, that start to park and that depart in this time
-    * stamp
+  /** Determine the set of EVs that depart at this tick and have been sent to
+    * SIMONA.
     *
     * @param evs
-    *   Collection of known evs
+    *   Collection of known EVs
     * @param currentTime
-    *   The current wall-clock time
+    *   The current simulation time
     * @return
-    *   both sets
+    *   Departing EVs
     */
-  private def defineMovements(
+  private def filterDepartingEvs(
       evs: Seq[ElectricVehicle],
       currentTime: ZonedDateTime,
-  ): (Seq[ElectricVehicle], Seq[ElectricVehicle]) = {
-    val isParking = (ev: ElectricVehicle) => ev.parkingTimeStart == currentTime
+  ): Seq[ElectricVehicle] = {
     /* Relevant are only cars, that depart AND that are charging at a suitable charging station in SIMONA */
     val isDeparting = (ev: ElectricVehicle) =>
       ev.departureTime == currentTime && ev.chargingAtSimona && ev.chosenChargingStation.isDefined
-    evs.par
-      .filter { ev =>
-        isDeparting(ev) || isParking(ev)
-      }
-      .partition(_.parkingTimeStart == currentTime) match {
-      case (arrivals, departures) =>
-        (arrivals.seq, departures.seq)
-    }
+    evs.par.filter(isDeparting).seq
+  }
+
+  /** Determine the set of EVs that start parking at this tick
+    *
+    * @param evs
+    *   Collection of known EVs
+    * @param currentTime
+    *   The current simulation time
+    * @return
+    *   Parking EVs
+    */
+  private def filterParkingEvs(
+      evs: Seq[ElectricVehicle],
+      currentTime: ZonedDateTime,
+  ): Seq[ElectricVehicle] = {
+    val isParking = (ev: ElectricVehicle) => ev.parkingTimeStart == currentTime
+    evs.par.filter(isParking).seq
   }
 
   /** Handle all ev departures
