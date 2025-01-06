@@ -850,7 +850,7 @@ object MobilitySimulator
     * @param evs
     *   Collection of all EVs
     * @param currentTime
-    *   Current time to create a start value for foldLeft
+    *   Current simulation time
     * @return
     *   Time until earliest next parking event for one of the EVs in the set of
     *   all EVs
