@@ -368,8 +368,8 @@ final class MobilitySimulator(
   /** Handle parking evs. Based on given surrounding information, a target
     * charging station is sampled. The movements are tracked and handed back.
     *
-    * @param evs
-    *   Collection of parking evs
+    * @param parkingEvs
+    *   Collection of parking EVs
     * @param pricesAtChargingStation
     *   Prices at known charging stations
     * @param availableChargingPoints
@@ -381,12 +381,12 @@ final class MobilitySimulator(
     *   A collection of movements
     */
   private def handleParkingEvs(
-      evs: Seq[ElectricVehicle],
+      parkingEvs: Seq[ElectricVehicle],
       pricesAtChargingStation: Map[UUID, Double],
       availableChargingPoints: Map[UUID, Int],
       maxDistance: Length,
   ): Seq[EvMovement] =
-    evs.foldLeft((availableChargingPoints, Seq.empty[EvMovement])) {
+    parkingEvs.foldLeft((availableChargingPoints, Seq.empty[EvMovement])) {
       case ((updatedAvailableChargingPoints, movements), ev) =>
         /* Lets the EV choose whether and at which charging station it wants to charge */
         handleArrivingEv(
