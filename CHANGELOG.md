@@ -27,6 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - We now track destination poi types explicitly [#85](https://github.com/ie3-institute/MobilitySimulator/issues/85)
 - Fixed unintentional filtering of nearest cs with equal distance [#125](https://github.com/ie3-institute/MobilitySimulator/issues/125)
 - Fixed exception messages of probability factories [#263](https://github.com/ie3-institute/MobilitySimulator/issues/263)
-
+- MobSim sends arrivals for unexpected tick to SIMONA [#316](https://github.com/ie3-institute/MobilitySimulator/issues/316)
 
 [Unreleased]: https://github.com/ie3-institute/MobilitySimulator

@@ -16,13 +16,13 @@ import java.util.UUID
 class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
   "MobilitySimulator" should {
 
-    "define movement correctly" in {
+    "filter departing and parking EVs correctly" in {
       val mobilitySimulator = mobSim()
 
-      val defineMovements =
-        PrivateMethod[(Seq[ElectricVehicle], Seq[ElectricVehicle])](
-          Symbol("defineMovements")
-        )
+      val filterParkingEvs =
+        PrivateMethod[Seq[ElectricVehicle]](Symbol("filterParkingEvs"))
+      val filterDepartingEvs =
+        PrivateMethod[Seq[ElectricVehicle]](Symbol("filterDepartingEvs"))
 
       val cases = Table(
         ("parkingEvs", "departingEvs"),
@@ -47,14 +47,20 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       forAll(cases) { (parkingEvs, departingEvs) =>
         val evs = parkingEvs ++ departingEvs
 
-        val (resultParking, resultDeparting) =
-          mobilitySimulator invokePrivate defineMovements(
+        val actualParking =
+          mobilitySimulator invokePrivate filterParkingEvs(
             evs,
             givenSimulationStart,
           )
+        actualParking shouldBe parkingEvs
 
-        resultParking shouldBe parkingEvs
-        resultDeparting shouldBe departingEvs
+        val actualDeparting =
+          mobilitySimulator invokePrivate filterDepartingEvs(
+            evs,
+            givenSimulationStart,
+          )
+        actualDeparting shouldBe departingEvs
+
       }
     }
 
@@ -308,73 +314,9 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       }
     }
 
-    "get time until next departure" in {
-      val getTimeUntilNextDeparture =
-        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextDeparture"))
-
-      val ev2: ElectricVehicle =
-        evChargingAtSimonaWithStation.copy(departureTime =
-          givenSimulationStart.plusMinutes(45)
-        )
-
-      val cases = Table(
-        ("evs", "expectedNextDeparture"),
-        (Seq(departingEv), 3600),
-        (Seq(ev2), 2700),
-        (Seq(departingEv, ev2), 2700),
-      )
-
-      forAll(cases) { (evs, expectedNextDeparture) =>
-        val actualNextDepartureOption =
-          MobilitySimulator invokePrivate getTimeUntilNextDeparture(
-            evs,
-            givenSimulationStart,
-          )
-
-        val actualNextDeparture = actualNextDepartureOption.getOrElse(
-          fail("getTimeUntilNextDeparture returned None")
-        )
-
-        actualNextDeparture shouldBe expectedNextDeparture
-      }
-    }
-
-    "get time until next arrival" in {
-      val getTimeUntilNextArrival =
-        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
-
-      val ev2: ElectricVehicle =
-        evChargingAtSimonaWithStation.copy(
-          parkingTimeStart = givenSimulationStart.plusMinutes(15)
-        )
-
-      val cases = Table(
-        ("evs", "expectedNextArrival"),
-        (Seq(arrivingEv), 1800L),
-        (Seq(ev2), 900L),
-        (Seq(arrivingEv, ev2), 900L),
-      )
-
-      forAll(cases) { (evs, expectedNextArrival) =>
-        val actualNextArrivalOption =
-          MobilitySimulator invokePrivate getTimeUntilNextArrival(
-            evs,
-            givenSimulationStart,
-          )
-
-        val actualNextArrival = actualNextArrivalOption.getOrElse(
-          fail("getTimeUntilNextArrival returned None")
-        )
-
-        actualNextArrival shouldBe expectedNextArrival
-      }
-    }
-
     "get time until next event" in {
-      val getTimeUntilNextArrival =
-        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextArrival"))
-      val getTimeUntilNextDeparture =
-        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextDeparture"))
+      val getTimeUntilNextEvent =
+        PrivateMethod[Option[Long]](Symbol("getTimeUntilNextEvent"))
 
       val evDeparting: ElectricVehicle =
         ev1.copy(departureTime = givenSimulationStart.plusMinutes(45))
@@ -393,24 +335,13 @@ class MobilitySimulatorSpec extends UnitSpec with MobilitySimulatorTestData {
       )
 
       forAll(cases) { (electricVehicles, expectedNextEvent) =>
-        val actualNextArrival: Option[Long] =
-          MobilitySimulator invokePrivate getTimeUntilNextArrival(
+        val actualTimeUntilNextEvent: Option[Long] =
+          MobilitySimulator invokePrivate getTimeUntilNextEvent(
             electricVehicles,
             givenSimulationStart,
           )
 
-        val actualNextDeparture: Option[Long] =
-          MobilitySimulator invokePrivate getTimeUntilNextDeparture(
-            electricVehicles,
-            givenSimulationStart,
-          )
-
-        val timeUntilNextEvent = Seq(
-          actualNextArrival,
-          actualNextDeparture,
-        ).flatten.minOption
-
-        timeUntilNextEvent shouldBe expectedNextEvent
+        actualTimeUntilNextEvent shouldBe expectedNextEvent
       }
     }
 
