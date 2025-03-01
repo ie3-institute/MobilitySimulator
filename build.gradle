@@ -21,7 +21,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.2.4'
-  scapegoatVersion = '3.1.4'
+  scapegoatVersion = '3.1.5'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -67,7 +67,7 @@ dependencies {
   testImplementation "org.apache.pekko:pekko-actor_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.5.16'
+  implementation 'ch.qos.logback:logback-classic:1.5.17'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
