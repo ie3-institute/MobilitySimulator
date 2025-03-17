@@ -109,7 +109,7 @@ object EvType {
           .getsRated()
           .to(PowerSystemUnits.KILOWATT)
           .getValue
-          .doubleValue()
+          .doubleValue() * evTypeInput.getCosPhiRated
       ),
       Kilowatts(
         evTypeInput
