@@ -21,7 +21,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.2.4'
-  scapegoatVersion = '3.1.5'
+  scapegoatVersion = '3.1.6'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -44,14 +44,14 @@ dependencies {
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
-  implementation('com.github.ie3-institute:PowerSystemDataModel:5.1.0') {
+  implementation('com.github.ie3-institute:PowerSystemDataModel:6.0.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.6.0'
+  implementation 'com.github.ie3-institute:simonaAPI:0.7.0'
 
   implementation 'tech.units:indriya:2.2.2' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
