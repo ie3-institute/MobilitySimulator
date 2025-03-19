@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `Gradle` to version V8.10 [#282](https://github.com/ie3-institute/MobilitySimulator/issues/282)
 - Changed Spotless to format with trailing commas [#301](https://github.com/ie3-institute/MobilitySimulator/issues/301)
 - Adapting to recent changes in the API [#303](https://github.com/ie3-institute/MobilitySimulator/issues/303)
+- Remove entry uuid from MobilitySim outputs [#341](https://github.com/ie3-institute/MobilitySimulator/issues/341)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
