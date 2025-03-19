@@ -119,15 +119,6 @@ final class MobilitySimulator(
       )
     }
 
-    /* Save occupancy of charging stations for csv output */
-    chargingStations.foreach(cs =>
-      ioUtils.writeEvcs(
-        cs,
-        chargingStationOccupancy,
-        currentTime,
-      )
-    )
-
     timeUntilNextEvent.map { nextEvent =>
       long2Long(tick + nextEvent)
     }.toJava

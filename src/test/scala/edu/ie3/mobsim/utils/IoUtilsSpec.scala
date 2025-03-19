@@ -89,45 +89,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
-    "write electric vehicle charging stations correctly" in {
-      ioUtils.writeEvcs(
-        cs6,
-        chargingStationOccupancy,
-        currentTime,
-      )
-
-      val data = new BufferedReader(
-        new FileReader(new File(outputFileDir, "evcs.csv"))
-      )
-
-      val list: util.ArrayList[String] = new util.ArrayList[String]()
-      var line = data.readLine()
-
-      while (line != null) {
-        list.add(line)
-        line = data.readLine()
-      }
-
-      val chargingPoints: Int = cs6.chargingPoints
-      val chargingEvs: String =
-        chargingStationOccupancy
-          .getOrElse(cs6.uuid, Seq.empty)
-          .map(_.uuid)
-          .mkString("[", "|", "]")
-
-      val entry: String = s"$uuid;" +
-        s"$currentTime;" +
-        s"${cs6.uuid};" +
-        s"$chargingPoints;" +
-        s"$chargingEvs"
-
-      list.forEach { str =>
-        if (str.contains(uuid.toString)) {
-          str shouldBe entry
-        }
-      }
-    }
-
     "write pois correctly" in {
       ioUtils.writePois(poiMap)
 
