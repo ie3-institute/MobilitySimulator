@@ -11,11 +11,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.PowerSystemUnits.{
-  KILOWATT,
-  KILOWATTHOUR,
-  KILOWATTHOUR_PER_KILOMETRE,
-}
+import edu.ie3.util.quantities.PowerSystemUnits.KILOWATTHOUR
 
 import java.io.{BufferedReader, File, FileReader}
 import java.nio.file.Path
@@ -28,7 +24,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         firstEv,
         currentTime,
         status,
-        uuid,
       )
 
       val data = new BufferedReader(
@@ -99,7 +94,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         cs6,
         chargingStationOccupancy,
         currentTime,
-        uuid,
       )
 
       val data = new BufferedReader(
@@ -162,7 +156,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write positions correctly" in {
-      ioUtils.writeEvPosition(firstEv, currentTime, uuid)
+      ioUtils.writeEvPosition(firstEv, currentTime)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "positions.csv"))
