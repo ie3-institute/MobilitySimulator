@@ -16,8 +16,8 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
-import kantan.csv.{RowDecoder, _}
 import kantan.csv.ops.toCsvInputOps
+import kantan.csv.{RowDecoder, _}
 
 import java.io.IOException
 import java.nio.file.{Files, Path, Paths}
