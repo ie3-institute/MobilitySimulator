@@ -43,7 +43,6 @@ final case class IoUtils private (
     *   current time
     * @param status
     *   If the car arrives or departs
-    * @param uuid
     */
   def writeMovement(
       ev: ElectricVehicle,
