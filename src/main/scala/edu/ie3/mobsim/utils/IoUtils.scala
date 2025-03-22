@@ -14,10 +14,11 @@ import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
+import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
-import kantan.csv.{RowDecoder, _}
 import kantan.csv.ops.toCsvInputOps
+import kantan.csv.{RowDecoder, _}
+import squants.space.Kilometers
 
 import java.io.IOException
 import java.nio.file.{Files, Path, Paths}
@@ -28,7 +29,6 @@ import scala.jdk.CollectionConverters._
 final case class IoUtils private (
     movementWriter: BufferedCsvWriter,
     evWriter: BufferedCsvWriter,
-    evcsWriter: BufferedCsvWriter,
     evPosWriter: BufferedCsvWriter,
     poiWriter: BufferedCsvWriter,
     csvSep: String,
@@ -43,18 +43,15 @@ final case class IoUtils private (
     *   current time
     * @param status
     *   If the car arrives or departs
-    * @param uuid
-    *   Unique identifier fot the entry
     */
   def writeMovement(
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
       status: String,
-      uuid: UUID = UUID.randomUUID(),
   ): Unit = {
     val fieldData = Map(
-      "uuid" -> uuid.toString,
       "ev" -> ev.getUuid.toString,
+      "currentTime" -> currentTime.toString,
       "status" -> status,
       "soc" -> ev.getStoredEnergy
         .divide(ev.getEStorage)
@@ -100,59 +97,51 @@ final case class IoUtils private (
     evWriter.write(fieldData)
   }
 
-  /** Define relevant data for charging station and call IO function to write it
-    * to csv.
-    *
-    * @param cs
-    *   charging station
-    * @param chargingStationOccupancy
-    *   current mapping of charging station UUID to parking evs
-    * @param currentTime
-    *   current time
-    * @param uuid
-    *   Unique identifier fot the entry
-    */
-  def writeEvcs(
-      cs: ChargingStation,
-      chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]],
-      currentTime: ZonedDateTime,
-      uuid: UUID = UUID.randomUUID(),
-  ): Unit = {
-    val fieldData = Map(
-      "uuid" -> uuid.toString,
-      "time" -> currentTime.toString,
-      "evcs" -> cs.uuid.toString,
-      "charging_points" -> cs.chargingPoints.toString,
-      "charging_evs" -> chargingStationOccupancy
-        .getOrElse(cs.uuid, Seq.empty)
-        .map(_.uuid)
-        .mkString("[", "|", "]"),
-    ).asJava
-
-    evcsWriter.write(fieldData)
-  }
-
   /** Write given POIs to csv file
     *
     * @param pois
     *   POIs to write
+    * @param evcsDirectHomePoiMapping
+    *   * POIs of Homes that got directly mapped
     */
   def writePois(
-      pois: Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]]
+      pois: Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]],
+      evcsDirectHomePoiMapping: Map[UUID, UUID],
   ): Unit = pois.foreach { case (poiType, typePois) =>
     typePois.foreach { poi =>
       /* Get all charging stations nearby */
-      poi.nearestChargingStations.foreach { case (evcsUuid, distance) =>
+
+      val nearestStations = poi.nearestChargingStations
+      // Write POI data even if there are no nearby charging stations
+      if (nearestStations.isEmpty) {
+
         val fieldData = Map(
           "uuid" -> UUID.randomUUID().toString,
           "id" -> poi.id,
           "type" -> poiType.toString,
           "size" -> poi.size.toString,
-          "evcs" -> evcsUuid.toString,
-          "distance" -> distance.toKilometers.toString,
+          "evcs" -> evcsDirectHomePoiMapping
+            .get(poi.uuid)
+            .orElse(None)
+            .toString,
+          "distance" -> Kilometers(0).toString(),
         ).asJava
 
         poiWriter.write(fieldData)
+      } else {
+        // Write data for each nearby charging station
+        nearestStations.foreach { case (evcsUuid, distance) =>
+          val fieldData = Map(
+            "uuid" -> UUID.randomUUID().toString,
+            "id" -> poi.id,
+            "type" -> poiType.toString,
+            "size" -> poi.size.toString,
+            "evcs" -> evcsUuid.toString,
+            "distance" -> distance.toKilometers.toString,
+          ).asJava
+
+          poiWriter.write(fieldData)
+        }
       }
     }
   }
@@ -163,13 +152,10 @@ final case class IoUtils private (
     *   EV
     * @param time
     *   current time
-    * @param uuid
-    *   Unique identifier fot the entry
     */
   def writeEvPosition(
       ev: ElectricVehicle,
       time: ZonedDateTime,
-      uuid: UUID = UUID.randomUUID(),
   ): Unit = {
     val (location, destinationPoi) =
       if (time.isBefore(ev.parkingTimeStart)) {
@@ -182,7 +168,7 @@ final case class IoUtils private (
       }
 
     val fieldData = Map(
-      "uuid" -> uuid.toString,
+      "time" -> time.toString,
       "ev" -> ev.getUuid.toString,
       "current_location_type" -> location,
       "destination_poi" -> destinationPoi,
@@ -212,8 +198,8 @@ object IoUtils {
       new BufferedCsvWriter(
         filePath,
         Array(
-          "uuid",
           "ev",
+          "currentTime",
           "status",
           "soc",
           "destination_poi",
@@ -252,31 +238,13 @@ object IoUtils {
     }
     evWriter.writeFileHeader()
 
-    /* Create writer for evcs and write headline */
-    val evcsWriter = {
-      val filePath = Path.of(outputPath, evcsFileName)
-      new BufferedCsvWriter(
-        filePath,
-        Array(
-          "uuid",
-          "time",
-          "evcs",
-          "charging_points",
-          "charging_evs",
-        ),
-        csvSep,
-        true,
-      )
-    }
-    evcsWriter.writeFileHeader()
-
     /* Create writer for ev positions and write headline */
     val evPosWriter = {
       val filePath = Path.of(outputPath, evPosFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
-          "uuid",
+          "time",
           "ev",
           "current_location_type",
           "destination_poi",
@@ -309,7 +277,6 @@ object IoUtils {
     new IoUtils(
       movementWriter,
       evWriter,
-      evcsWriter,
       evPosWriter,
       poiWriter,
       csvSep,

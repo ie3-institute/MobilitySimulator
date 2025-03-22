@@ -11,11 +11,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.PowerSystemUnits.{
-  KILOWATT,
-  KILOWATTHOUR,
-  KILOWATTHOUR_PER_KILOMETRE,
-}
+import edu.ie3.util.quantities.PowerSystemUnits.KILOWATTHOUR
 
 import java.io.{BufferedReader, File, FileReader}
 import java.nio.file.Path
@@ -28,7 +24,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         firstEv,
         currentTime,
         status,
-        uuid,
       )
 
       val data = new BufferedReader(
@@ -94,46 +89,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
       }
     }
 
-    "write electric vehicle charging stations correctly" in {
-      ioUtils.writeEvcs(
-        cs6,
-        chargingStationOccupancy,
-        currentTime,
-        uuid,
-      )
-
-      val data = new BufferedReader(
-        new FileReader(new File(outputFileDir, "evcs.csv"))
-      )
-
-      val list: util.ArrayList[String] = new util.ArrayList[String]()
-      var line = data.readLine()
-
-      while (line != null) {
-        list.add(line)
-        line = data.readLine()
-      }
-
-      val chargingPoints: Int = cs6.chargingPoints
-      val chargingEvs: String =
-        chargingStationOccupancy
-          .getOrElse(cs6.uuid, Seq.empty)
-          .map(_.uuid)
-          .mkString("[", "|", "]")
-
-      val entry: String = s"$uuid;" +
-        s"$currentTime;" +
-        s"${cs6.uuid};" +
-        s"$chargingPoints;" +
-        s"$chargingEvs"
-
-      list.forEach { str =>
-        if (str.contains(uuid.toString)) {
-          str shouldBe entry
-        }
-      }
-    }
-
     "write pois correctly" in {
       ioUtils.writePois(poiMap)
 
@@ -162,7 +117,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write positions correctly" in {
-      ioUtils.writeEvPosition(firstEv, currentTime, uuid)
+      ioUtils.writeEvPosition(firstEv, currentTime)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "positions.csv"))
