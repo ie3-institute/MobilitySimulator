@@ -158,8 +158,8 @@ final case class IoUtils private (
           "size" -> poi.size.toString,
           "evcs" -> evcsDirectHomePoiMapping
             .get(poi.uuid)
-            .orElse(None)
-            .toString,
+            .map(_.toString)
+            .getOrElse(""),
           "distance" -> Kilometers(0).toString(),
         ).asJava
 
