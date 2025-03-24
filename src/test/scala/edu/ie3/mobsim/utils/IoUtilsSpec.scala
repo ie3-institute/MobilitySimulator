@@ -132,7 +132,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write pois correctly" in {
-      ioUtils.writePois(poiMap, Map.empty[UUID,UUID])
+      ioUtils.writePois(poiMap, Map.empty[UUID, UUID])
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "pois.csv"))
