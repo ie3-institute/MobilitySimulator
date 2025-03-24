@@ -111,7 +111,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      list.stream().count() shouldBe 2
+      list.size() shouldBe 2
 
       list
         .stream()
@@ -153,7 +153,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      list.stream().count() shouldBe 4
+      list.size() shouldBe 4
 
       list
         .stream()
@@ -221,7 +221,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      list.stream().count() shouldBe 2
+      list.size() shouldBe 2
 
       list
         .stream()
