@@ -185,7 +185,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
           parts(1) shouldBe homePoiWithoutNearestCharger.id
           parts(2) shouldBe CategoricalLocationDictionary.HOME.toString
           parts(3) shouldBe homePoiWithoutNearestCharger.size.toString
-          parts(4) shouldBe "None"
+          parts(4) shouldBe ""
           parts(5) shouldBe Kilometers(0).toString
         }
 
