@@ -658,7 +658,6 @@ object MobilitySimulator
       maxDistanceFromHomePoi,
       assignHomeNearestChargingStations,
     )
-    ioUtils.writePois(pois)
     val poisWithSizes = PoiUtils.createPoiPdf(pois)
 
     val chargingHubTownIsPresent =
@@ -709,53 +708,65 @@ object MobilitySimulator
       ),
     )
 
-    val evs = config.mobsim.input.evInputSource match {
-      case Some(csvParams) =>
-        val evInputs =
-          IoUtils.readEvInputs(
-            csvParams.source
-          )
-
-        csvParams.homePoiMapping match {
-          case Some(mappingSource) =>
-            val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
-            val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
-
-            EvBuilderFromEvInputWithEvcsMapping.build(
-              evInputs,
-              homePOIsWithSizes,
-              workPoiPdf,
-              chargingStations,
-              startTime,
-              tripProbabilities.firstDepartureOfDay,
-              ev2poi,
-              poi2evcs,
+    val (evs, evcsDirectHomePoiMapping) =
+      config.mobsim.input.evInputSource match {
+        case Some(csvParams) =>
+          val evInputs =
+            IoUtils.readEvInputs(
+              csvParams.source
             )
 
-          case None =>
-            EvBuilderFromEvInput.build(
-              evInputs,
+          csvParams.homePoiMapping match {
+            case Some(mappingSource) =>
+              val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
+              val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
+
+              (
+                EvBuilderFromEvInputWithEvcsMapping.build(
+                  evInputs,
+                  homePOIsWithSizes,
+                  workPoiPdf,
+                  chargingStations,
+                  startTime,
+                  tripProbabilities.firstDepartureOfDay,
+                  ev2poi,
+                  poi2evcs,
+                ),
+                poi2evcs,
+              )
+
+            case None =>
+              (
+                EvBuilderFromEvInput.build(
+                  evInputs,
+                  homePOIsWithSizes,
+                  workPoiPdf,
+                  chargingStations,
+                  startTime,
+                  targetShareOfHomeCharging,
+                  tripProbabilities.firstDepartureOfDay,
+                ),
+                Map.empty[UUID, UUID],
+              )
+          }
+
+        case None =>
+          (
+            EvBuilderFromRandomModel.build(
+              numberOfEvsInArea,
               homePOIsWithSizes,
               workPoiPdf,
               chargingStations,
               startTime,
               targetShareOfHomeCharging,
+              evModelPdf,
               tripProbabilities.firstDepartureOfDay,
-            )
-        }
+            ),
+            Map.empty[UUID, UUID],
+          )
+      }
 
-      case None =>
-        EvBuilderFromRandomModel.build(
-          numberOfEvsInArea,
-          homePOIsWithSizes,
-          workPoiPdf,
-          chargingStations,
-          startTime,
-          targetShareOfHomeCharging,
-          evModelPdf,
-          tripProbabilities.firstDepartureOfDay,
-        )
-    }
+    ioUtils.writePois(pois, evcsDirectHomePoiMapping)
 
     ioUtils.writeEvs(evs)
 
