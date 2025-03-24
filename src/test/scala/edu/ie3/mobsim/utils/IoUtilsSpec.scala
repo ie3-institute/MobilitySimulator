@@ -11,15 +11,12 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
-import edu.ie3.util.quantities.PowerSystemUnits.{
-  KILOWATT,
-  KILOWATTHOUR,
-  KILOWATTHOUR_PER_KILOMETRE,
-}
+import edu.ie3.util.quantities.PowerSystemUnits.KILOWATTHOUR
 
 import java.io.{BufferedReader, File, FileReader}
 import java.nio.file.Path
 import java.util
+import java.util.UUID
 
 class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
   "IoUtils" should {
@@ -135,7 +132,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write pois correctly" in {
-      ioUtils.writePois(poiMap)
+      ioUtils.writePois(poiMap, Map.empty[UUID,UUID])
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "pois.csv"))
