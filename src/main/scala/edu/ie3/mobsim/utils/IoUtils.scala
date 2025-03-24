@@ -17,6 +17,7 @@ import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import kantan.csv.ops.toCsvInputOps
+import squants.space.Kilometers
 import kantan.csv.{RowDecoder, _}
 
 import java.io.IOException
@@ -130,23 +131,47 @@ final case class IoUtils private (
     *
     * @param pois
     *   POIs to write
+    * @param evcsDirectHomePoiMapping
+    *   * POIs of Homes that got directly mapped
     */
   def writePois(
-      pois: Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]]
+      pois: Map[CategoricalLocationDictionary.Value, Set[PointOfInterest]],
+      evcsDirectHomePoiMapping: Map[UUID, UUID],
   ): Unit = pois.foreach { case (poiType, typePois) =>
     typePois.foreach { poi =>
       /* Get all charging stations nearby */
-      poi.nearestChargingStations.foreach { case (evcsUuid, distance) =>
+
+      val nearestStations = poi.nearestChargingStations
+      // Write POI data even if there are no nearby charging stations
+      if (nearestStations.isEmpty) {
+
         val fieldData = Map(
           "uuid" -> UUID.randomUUID().toString,
           "id" -> poi.id,
           "type" -> poiType.toString,
           "size" -> poi.size.toString,
-          "evcs" -> evcsUuid.toString,
-          "distance" -> distance.toKilometers.toString,
+          "evcs" -> evcsDirectHomePoiMapping
+            .get(poi.uuid)
+            .orElse(None)
+            .toString,
+          "distance" -> Kilometers(0).toString(),
         ).asJava
 
         poiWriter.write(fieldData)
+      } else {
+        // Write data for each nearby charging station
+        nearestStations.foreach { case (evcsUuid, distance) =>
+          val fieldData = Map(
+            "uuid" -> UUID.randomUUID().toString,
+            "id" -> poi.id,
+            "type" -> poiType.toString,
+            "size" -> poi.size.toString,
+            "evcs" -> evcsUuid.toString,
+            "distance" -> distance.toKilometers.toString,
+          ).asJava
+
+          poiWriter.write(fieldData)
+        }
       }
     }
   }
