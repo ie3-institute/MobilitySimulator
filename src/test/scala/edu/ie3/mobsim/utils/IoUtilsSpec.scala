@@ -193,7 +193,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         .stream()
         .filter(entry => entry.contains(workPoi.id))
         .toArray
-        .map(_.asInstanceOf[String])
+        .map(_.toString)
 
       workEntries.length shouldBe 1
 
