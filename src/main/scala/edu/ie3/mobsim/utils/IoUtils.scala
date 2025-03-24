@@ -17,8 +17,8 @@ import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import kantan.csv.ops.toCsvInputOps
-import kantan.csv.{RowDecoder, _}
 import squants.space.Kilometers
+import kantan.csv.{RowDecoder, _}
 
 import java.io.IOException
 import java.nio.file.{Files, Path, Paths}
