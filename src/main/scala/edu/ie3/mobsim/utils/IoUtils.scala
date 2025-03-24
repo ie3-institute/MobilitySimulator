@@ -16,9 +16,9 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
-import kantan.csv.{RowDecoder, _}
 import kantan.csv.ops.toCsvInputOps
 import squants.space.Kilometers
+import kantan.csv.{RowDecoder, _}
 
 import java.io.IOException
 import java.nio.file.{Files, Path, Paths}
@@ -44,18 +44,15 @@ final case class IoUtils private (
     *   current time
     * @param status
     *   If the car arrives or departs
-    * @param uuid
-    *   Unique identifier fot the entry
     */
   def writeMovement(
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
       status: String,
-      uuid: UUID = UUID.randomUUID(),
   ): Unit = {
     val fieldData = Map(
-      "uuid" -> uuid.toString,
       "ev" -> ev.getUuid.toString,
+      "currentTime" -> currentTime.toString,
       "status" -> status,
       "soc" -> ev.getStoredEnergy
         .divide(ev.getEStorage)
@@ -110,17 +107,13 @@ final case class IoUtils private (
     *   current mapping of charging station UUID to parking evs
     * @param currentTime
     *   current time
-    * @param uuid
-    *   Unique identifier fot the entry
     */
   def writeEvcs(
       cs: ChargingStation,
       chargingStationOccupancy: Map[UUID, Seq[ElectricVehicle]],
       currentTime: ZonedDateTime,
-      uuid: UUID = UUID.randomUUID(),
   ): Unit = {
     val fieldData = Map(
-      "uuid" -> uuid.toString,
       "time" -> currentTime.toString,
       "evcs" -> cs.uuid.toString,
       "charging_points" -> cs.chargingPoints.toString,
@@ -188,13 +181,10 @@ final case class IoUtils private (
     *   EV
     * @param time
     *   current time
-    * @param uuid
-    *   Unique identifier fot the entry
     */
   def writeEvPosition(
       ev: ElectricVehicle,
       time: ZonedDateTime,
-      uuid: UUID = UUID.randomUUID(),
   ): Unit = {
     val (location, destinationPoi) =
       if (time.isBefore(ev.parkingTimeStart)) {
@@ -207,7 +197,7 @@ final case class IoUtils private (
       }
 
     val fieldData = Map(
-      "uuid" -> uuid.toString,
+      "time" -> time.toString,
       "ev" -> ev.getUuid.toString,
       "current_location_type" -> location,
       "destination_poi" -> destinationPoi,
@@ -237,8 +227,8 @@ object IoUtils {
       new BufferedCsvWriter(
         filePath,
         Array(
-          "uuid",
           "ev",
+          "currentTime",
           "status",
           "soc",
           "destination_poi",
@@ -283,7 +273,6 @@ object IoUtils {
       new BufferedCsvWriter(
         filePath,
         Array(
-          "uuid",
           "time",
           "evcs",
           "charging_points",
@@ -301,7 +290,7 @@ object IoUtils {
       new BufferedCsvWriter(
         filePath,
         Array(
-          "uuid",
+          "time",
           "ev",
           "current_location_type",
           "destination_poi",
