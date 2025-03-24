@@ -7,18 +7,20 @@
 package edu.ie3.mobsim.utils
 
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
-import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
+import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
+import edu.ie3.mobsim.io.geodata.PoiTestData
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsSpec.evString
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.util.quantities.PowerSystemUnits.KILOWATTHOUR
+import squants.space.Kilometers
 
 import java.io.{BufferedReader, File, FileReader}
 import java.nio.file.Path
 import java.util
 import java.util.UUID
 
-class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
+class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
   "IoUtils" should {
     "write movement correctly" in {
       ioUtils.writeMovement(
@@ -132,7 +134,17 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
     }
 
     "write pois correctly" in {
-      ioUtils.writePois(poiMap, Map.empty[UUID, UUID])
+      val homePoiUuid = UUID.randomUUID()
+      val evcsUuid = UUID.randomUUID()
+      val directHomeMapping = Map(homePoiUuid -> evcsUuid)
+
+      val testPoiMap = Map(
+        CategoricalLocationDictionary.HOME -> Set(homePoi),
+        CategoricalLocationDictionary.HOME -> Set(homePoiWithoutNearestCharger),
+        CategoricalLocationDictionary.WORK -> Set(workPoi),
+      )
+
+      ioUtils.writePois(testPoiMap, directHomeMapping)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "pois.csv"))
@@ -146,16 +158,56 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData {
         line = data.readLine()
       }
 
-      val compareString: String = s"${chargingHubTownPoi.id};" +
-        s"${PoiTypeDictionary.CHARGING_HUB_TOWN};" +
-        s"${chargingHubTownPoi.size};" +
-        s"$cs4;" +
-        s"${0.0}"
+      list.stream().count() shouldBe 3
 
-      val str = list.get(list.size() - 1)
-      val randomUuid = str.split(";")(0)
+      list
+        .stream()
+        .filter(entry => entry.contains(homePoi.id))
+        .findFirst()
+        .ifPresent { str =>
+          val parts = str.split(";")
+          parts(1) shouldBe homePoi.id
+          parts(2) shouldBe CategoricalLocationDictionary.HOME.toString
+          parts(3) shouldBe homePoi.size.toString
+          parts(4) shouldBe evcsUuid.toString
+          parts(5) shouldBe "0.0"
+        }
 
-      str shouldBe randomUuid + ";" + compareString
+      list
+        .stream()
+        .filter(entry => entry.contains(homePoiWithoutNearestCharger.id))
+        .findFirst()
+        .ifPresent { str =>
+          val parts = str.split(";")
+          parts(1) shouldBe homePoiWithoutNearestCharger.id
+          parts(2) shouldBe CategoricalLocationDictionary.HOME.toString
+          parts(3) shouldBe homePoiWithoutNearestCharger.size.toString
+          parts(4) shouldBe "None"
+          parts(5) shouldBe Kilometers(0).toString
+        }
+
+      val workEntries = list
+        .stream()
+        .filter(entry => entry.contains(workPoi.id))
+        .toArray
+        .map(_.asInstanceOf[String])
+
+      workEntries.length shouldBe 1
+
+      workPoi.nearestChargingStations.foreach { case (stationUuid, distance) =>
+        val foundEntry =
+          workEntries.find(entry => entry.contains(stationUuid.toString))
+        foundEntry shouldBe defined
+
+        foundEntry.foreach { entry =>
+          val parts = entry.split(";")
+          parts(1) shouldBe workPoi.id
+          parts(2) shouldBe CategoricalLocationDictionary.WORK.toString
+          parts(3) shouldBe workPoi.size.toString
+          parts(4) shouldBe stationUuid.toString
+          parts(5) shouldBe distance.toKilometers.toString
+        }
+      }
     }
 
     "write positions correctly" in {
