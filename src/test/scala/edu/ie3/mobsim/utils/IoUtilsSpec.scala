@@ -160,7 +160,7 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      list.stream().count() shouldBe 3
+      list.stream().count() shouldBe 4
 
       list
         .stream()
@@ -171,7 +171,8 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
           parts(1) shouldBe homePoi.id
           parts(2) shouldBe CategoricalLocationDictionary.HOME.toString
           parts(3) shouldBe homePoi.size.toString
-          parts(4) shouldBe evcsUuid.toString
+          parts(4).split(",")(0) shouldBe
+            ("ChargingStation(" + cs1.uuid.toString)
           parts(5) shouldBe "0.0"
         }
 
