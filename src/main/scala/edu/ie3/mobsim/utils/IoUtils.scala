@@ -18,6 +18,7 @@ import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle}
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import kantan.csv.{RowDecoder, _}
 import kantan.csv.ops.toCsvInputOps
+import squants.space.Kilometers
 
 import java.io.IOException
 import java.nio.file.{Files, Path, Paths}
