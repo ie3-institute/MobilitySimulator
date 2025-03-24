@@ -136,13 +136,15 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
       val evcsUuid = UUID.randomUUID()
       val directHomeMapping = Map(homePoiUuid -> evcsUuid)
 
-      val testPoiMap = Map(
-        CategoricalLocationDictionary.HOME -> Set(homePoi),
-        CategoricalLocationDictionary.HOME -> Set(homePoiWithoutNearestCharger),
+      val poiMap = Map(
+        CategoricalLocationDictionary.HOME -> Set(
+          homePoi,
+          homePoiWithoutNearestCharger,
+        ),
         CategoricalLocationDictionary.WORK -> Set(workPoi),
       )
 
-      ioUtils.writePois(testPoiMap, directHomeMapping)
+      ioUtils.writePois(poiMap, directHomeMapping)
 
       val data = new BufferedReader(
         new FileReader(new File(outputFileDir, "pois.csv"))
