@@ -152,7 +152,7 @@ final case class IoUtils private (
       if (nearestStations.isEmpty) {
 
         val fieldData = Map(
-          "uuid" -> UUID.randomUUID().toString,
+          "uuid" -> poi.uuid.toString,
           "id" -> poi.id,
           "type" -> poiType.toString,
           "size" -> poi.size.toString,
@@ -168,7 +168,7 @@ final case class IoUtils private (
         // Write data for each nearby charging station
         nearestStations.foreach { case (evcsUuid, distance) =>
           val fieldData = Map(
-            "uuid" -> UUID.randomUUID().toString,
+            "uuid" -> poi.uuid.toString,
             "id" -> poi.id,
             "type" -> poiType.toString,
             "size" -> poi.size.toString,
