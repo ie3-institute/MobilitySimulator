@@ -139,8 +139,10 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
       val directHomeMapping = Map(homePoiUuid -> evcsUuid)
 
       val poiMap = Map(
-        CategoricalLocationDictionary.HOME -> Set(homePoi),
-        CategoricalLocationDictionary.HOME -> Set(homePoiWithoutNearestCharger),
+        CategoricalLocationDictionary.HOME -> Set(
+          homePoi,
+          homePoiWithoutNearestCharger,
+        ),
         CategoricalLocationDictionary.WORK -> Set(workPoi),
       )
 
