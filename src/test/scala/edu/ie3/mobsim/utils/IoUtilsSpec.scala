@@ -23,9 +23,10 @@ import java.util.UUID
 class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
   "IoUtils" should {
     "write movement correctly" in {
+      val time = currentTime
       ioUtils.writeMovement(
         firstEv,
-        currentTime,
+        time,
         status,
       )
 
@@ -41,26 +42,25 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      val compareString: String = s"$uuid;" +
-        s"${firstEv.uuid};" +
-        s"$status;" +
-        s"${firstEv.getStoredEnergy
-            .divide(firstEv.getEStorage)
-            .getValue
-            .doubleValue()
-            .toString};" +
-        s"${firstEv.destinationPoi.id};" +
-        s"${firstEv.destinationPoiType.toString};" +
-        s"${firstEv.destinationPoi.categoricalLocation};" +
-        s"${firstEv.parkingTimeStart.toString};" +
-        s"${firstEv.departureTime};" +
-        s"${firstEv.chargingAtSimona}"
+      list.stream().count() shouldBe 2
 
-      list.forEach { str =>
-        if (str.contains(uuid.toString)) {
-          str shouldBe compareString
+      list
+        .stream()
+        .skip(1)
+        .findFirst()
+        .ifPresent { str =>
+          val parts = str.split(";")
+          parts(0) shouldBe firstEv.uuid.toString
+          parts(1) shouldBe time.toString
+          parts(2) shouldBe status
+          parts(3) shouldBe "1.0"
+          parts(4) shouldBe "test"
+          parts(5) shouldBe CategoricalLocationDictionary.HOME.toString
+          parts(6) shouldBe CategoricalLocationDictionary.HOME.toString
+          parts(7) shouldBe firstEv.parkingTimeStart.toString
+          parts(8) shouldBe firstEv.departureTime.toString
+          parts(9) shouldBe "false"
         }
-      }
     }
 
     "write evs correctly" in {
@@ -111,24 +111,19 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      val chargingPoints: Int = cs6.chargingPoints
-      val chargingEvs: String =
-        chargingStationOccupancy
-          .getOrElse(cs6.uuid, Seq.empty)
-          .map(_.uuid)
-          .mkString("[", "|", "]")
+      list.stream().count() shouldBe 2
 
-      val entry: String = s"$uuid;" +
-        s"$currentTime;" +
-        s"${cs6.uuid};" +
-        s"$chargingPoints;" +
-        s"$chargingEvs"
-
-      list.forEach { str =>
-        if (str.contains(uuid.toString)) {
-          str shouldBe entry
+      list
+        .stream()
+        .skip(1)
+        .findFirst()
+        .ifPresent { str =>
+          val parts = str.split(";")
+          parts(0) shouldBe currentTime.toString
+          parts(1) shouldBe cs6.uuid.toString
+          parts(2) shouldBe cs6.chargingPoints.toString
+          parts(3) shouldBe "[]"
         }
-      }
     }
 
     "write pois correctly" in {
@@ -226,26 +221,19 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
         line = data.readLine()
       }
 
-      val (location, destinationPoi) =
-        if (currentTime.isBefore(firstEv.parkingTimeStart)) {
-          ("DRIVING", "")
-        } else {
-          (
-            firstEv.destinationPoi.categoricalLocation.toString,
-            firstEv.destinationPoi.toString,
-          )
-        }
+      list.stream().count() shouldBe 2
 
-      val compareString: String = s"$uuid;" +
-        s"${firstEv.uuid.toString};" +
-        s"$location;" +
-        s"$destinationPoi"
-
-      list.forEach { str =>
-        if (str.contains(uuid.toString)) {
-          str shouldBe compareString
+      list
+        .stream()
+        .skip(1)
+        .findFirst()
+        .ifPresent { str =>
+          val parts = str.split(";")
+          parts(0) shouldBe currentTime.toString
+          parts(1) shouldBe firstEv.uuid.toString
+          parts(2) shouldBe firstEv.destinationPoiType.toString
+          parts(3) shouldBe firstEv.destinationPoi.toString
         }
-      }
     }
 
     "read ev inputs successfully" in {
