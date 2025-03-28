@@ -89,13 +89,22 @@ trait PoiTestData {
     1,
   )
 
-  protected val poiHome: PointOfInterest = PointOfInterest(
+  protected val homePoi: PointOfInterest = PointOfInterest(
     UUID.fromString("91b8a161-7e44-4363-aaa3-2d2adbaaab6d"),
     "POI_home_1",
     CategoricalLocationDictionary.HOME,
     new Coordinate(7.4116472, 51.4843381),
     25.557183061784293,
     Map(cs1 -> Meters(0)),
+  )
+
+  protected val homePoiWithoutNearestCharger: PointOfInterest = PointOfInterest(
+    UUID.fromString("91b8a161-7e44-4363-aaa3-2d2adbaaab6d"),
+    "POI_home_without_nearest_charger",
+    CategoricalLocationDictionary.HOME,
+    new Coordinate(7.4116472, 51.4843381),
+    25.557183061784293,
+    Map.empty[ChargingStation, Length],
   )
 
   protected val workPoi: PointOfInterest = PointOfInterest(
@@ -218,7 +227,7 @@ trait PoiTestData {
   )
 
   protected val itData: Seq[PointOfInterest] = Seq(
-    poiHome,
+    homePoi,
     workPoi,
     bbpgPoi,
     culturePoi,
