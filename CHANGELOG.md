@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adapting to recent changes in the API [#303](https://github.com/ie3-institute/MobilitySimulator/issues/303)
 - Write all POIs on initialisation by poiWriter [#346](https://github.com/ie3-institute/MobilitySimulator/issues/346)
 - Remove entry uuid from MobilitySim outputs [#341](https://github.com/ie3-institute/MobilitySimulator/issues/341)
+- Remove EvcsWriter [#343](https://github.com/ie3-institute/MobilitySimulator/issues/343)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
