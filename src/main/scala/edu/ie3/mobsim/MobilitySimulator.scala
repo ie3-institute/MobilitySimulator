@@ -609,7 +609,6 @@ object MobilitySimulator
       pathsAndSources.outputDir,
       "movements.csv",
       "evs.csv",
-      "evcs.csv",
       "positions.csv",
       "pois.csv",
       config.mobsim.output.writeMovements,
