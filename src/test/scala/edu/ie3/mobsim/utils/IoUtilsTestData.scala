@@ -23,7 +23,6 @@ trait IoUtilsTestData extends ChargingStationTestData {
     outputFileDir.getPath,
     "movements.csv",
     "evs.csv",
-    "evcs.csv",
     "positions.csv",
     "pois.csv",
     writeMovements = true,
