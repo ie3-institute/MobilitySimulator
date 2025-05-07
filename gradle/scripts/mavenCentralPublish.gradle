@@ -1,0 +1,107 @@
+/* Maven publish - start */
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allJava
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+if (project.hasProperty('user') && project.hasProperty('password')) {
+    signing {
+        required { !version.endsWith('SNAPSHOT') }
+        if(required)
+            sign(publishing.publications)
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+
+                versionMapping {
+                    // resolves dynamic versioning to current version number
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+                pom {
+                    description = 'Stochastic-based simulator for individual mobility'
+                    name = 'Mobility Simulator'
+                    url = 'https://github.com/ie3-institute/MobilitySimulator'
+                    organization {
+                        name = 'Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University'
+                        url = 'https:www.ie3.tu-dortmund.de'
+                    }
+                    issueManagement {
+                        system = 'GitHub'
+                        url = 'https://github.com/ie3-institute/MobilitySimulator/issues'
+                    }
+                    licenses {
+                        license {
+                            name = 'BSD 3-Clause License'
+                            url = 'https://github.com/ie3-institute/MobilitySimulator/blob/main/LICENSE'
+                        }
+                    }
+                    developers {
+                        developer {
+                            organization = "Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University"
+                            organizationUrl = "https:ie3.etit.tu-dortmund.de"
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git:github.com/ie3-institute/MobilitySimulator.git'
+                        developerConnection = 'scm:git:ssh:github.com:ie3-institute/MobilitySimulator.git'
+                        url = 'https:github.com/ie3-institute/MobilitySimulator'
+                    }
+                }
+
+                removeTestDependenciesFromPom(pom)
+                groupId group
+                artifactId 'MobilitySimulator'
+                version version
+
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+            }
+        }
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username project.getProperty('user')
+                    password project.getProperty('password')
+                }
+            }
+        }
+    }
+
+
+    model {
+        tasks.generatePomFileForMavenJavaPublication {
+            destination = file("$rootDir/build/generated-pom.xml")
+        }
+    }
+}
+
+def removeTestDependenciesFromPom(pom) {
+
+    pom.withXml {
+        def root = asNode()
+        // eliminate test-scoped dependencies (no need in maven central POMs)
+        root.dependencies.removeAll { dep ->
+            dep.scope == "test"
+        }
+    }
+}
+
+
+/* Maven publish - end */

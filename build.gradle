@@ -9,6 +9,7 @@ plugins {
   id "org.scoverage" version "8.1" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.33" // run scalatest without specific spec task
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
+  id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
   id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
@@ -31,6 +32,9 @@ apply from: scriptsLocation + 'pmd.gradle'
 apply from: scriptsLocation + 'spotless.gradle'
 apply from: scriptsLocation + 'sonarqube.gradle' // sonarqube config
 apply from: scriptsLocation + 'scoverage.gradle' // scoverage scala code coverage
+apply from: scriptsLocation + 'semVer.gradle'
+apply from: scriptsLocation + 'branchName.gradle'
+apply from: scriptsLocation + 'mavenCentralPublish.gradle'
 
 repositories {
   mavenCentral() // searches in Sonatype's central repository
