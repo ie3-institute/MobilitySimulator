@@ -3,7 +3,7 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '7.0.2'//code format
+  id 'com.diffplug.spotless' version '7.0.3'//code format
   id "de.undercouch.download" version "5.6.0" // downloads plugin
   id "org.sonarqube" version "6.1.0.5360" // sonarqube
   id "org.scoverage" version "8.1" // scala code coverage scoverage
@@ -22,7 +22,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.2.4'
-  scapegoatVersion = '3.1.7'
+  scapegoatVersion = '3.1.8'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
@@ -57,10 +57,10 @@ dependencies {
 
   implementation 'com.github.ie3-institute:simonaAPI:0.7.0'
 
-  implementation 'tech.units:indriya:2.2.2' // Physical units
+  implementation 'tech.units:indriya:2.2.3' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
   implementation 'org.locationtech.jts.io:jts-io-common:1.20.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.18.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.19.0' // I/O functionalities
   implementation 'com.nrinaudo:kantan.csv-generic_2.13:0.8.0' // csv parsing
 
   /* CORE Scala */
