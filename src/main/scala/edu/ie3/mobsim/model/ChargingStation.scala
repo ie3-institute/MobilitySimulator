@@ -13,7 +13,7 @@ import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointT
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
-import edu.ie3.util.quantities.QuantityUtils.RichQuantity
+import edu.ie3.util.quantities.QuantityUtils.min
 import org.locationtech.jts.geom.Coordinate
 import squants.{Energy, Length, Time}
 import squants.energy.Kilowatts
