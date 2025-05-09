@@ -16,7 +16,7 @@ ext {
   javaVersion = JavaVersion.VERSION_17
 
   scalaVersion = '3'
-  scalaBinaryVersion = '3.6.4'
+  scalaBinaryVersion = '3.7.0'
 
   pekkoVersion = '1.1.3'
   slf4jVersion = '1.7.30'
@@ -39,20 +39,20 @@ repositories {
 }
 
 dependencies {
-  implementation('com.github.ie3-institute:PowerSystemUtils:3.0.0') {
+  implementation('com.github.ie3-institute:PowerSystemUtils:3.1.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
-  implementation('com.github.ie3-institute:PowerSystemDataModel:6.0.0') {
+  implementation('com.github.ie3-institute:PowerSystemDataModel:7.0.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.8.0'
+  implementation 'com.github.ie3-institute:simonaAPI:0.9.0'
 
   implementation 'tech.units:indriya:2.2.3' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
@@ -72,9 +72,7 @@ dependencies {
 
   /* Scala compiler plugin for static code analysis */
   implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
-  scalaCompilerPlugins(
-      "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
-      )
+  scalaCompilerPlugins("com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}")
 
   /* config */
   implementation 'com.typesafe:config:1.4.3'
@@ -103,7 +101,6 @@ tasks.withType(ScalaCompile) {
     "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
     "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:VariableShadowing",
-    "-P:scapegoat:ignoredFiles:.*/SimonaConfig.scala" // see scapegoat-sbt page for this param
   ]
 }
 
