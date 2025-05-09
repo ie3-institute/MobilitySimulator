@@ -7,9 +7,8 @@
 package edu.ie3.mobsim.io.geodata
 
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
+import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.utils.IoUtils
-import kantan.csv.DecodeError.TypeError
-import kantan.csv.{RowDecoder, _}
 
 import java.util.UUID
 import scala.util.Try
@@ -28,32 +27,29 @@ object HomePoiMapping {
     evs.foldLeft("")((str, uuid) => str + uuid.toString + " ").strip()
   }
 
-  implicit val uuids: CellDecoder[Seq[UUID]] = CellDecoder.from((s: String) => {
+  implicit val uuids: String => Seq[UUID] = (s: String) => {
     val triedUuids = s.split(" ").map(uuid => Try(UUID.fromString(uuid))).toSeq
     triedUuids.partitionMap(_.toEither) match {
-      case (Nil, uuids) => Right(uuids)
+      case (Nil, uuids) => uuids
       case (errors, _) =>
-        Left(
-          TypeError(
-            "Can not convert String(s) to UUID",
-            errors.headOption.getOrElse(
-              throw new IllegalStateException("Expected a throwable.")
-            ),
-          )
-        )
+        throw SourceException("Can not convert String(s) to UUID")
     }
-  })
+  }
 
-  implicit val homePoiDecoder: RowDecoder[HomePoiMapping] =
-    RowDecoder.decoder(0, 1, 2)(HomePoiMapping.apply)
+  implicit val homePoiDecoder: Map[String, String] => HomePoiMapping =
+    row =>
+      HomePoiMapping(
+        UUID.fromString(row("poi")),
+        UUID.fromString(row("evcs")),
+        uuids(row("evs")),
+      )
 
-  def readPoiMapping(csvParams: CsvParams): Seq[HomePoiMapping] = {
+  def readPoiMapping(csvParams: CsvParams): Seq[HomePoiMapping] =
     IoUtils.readCaseClassSeq(
       homePoiDecoder,
       csvParams.path,
-      csvParams.colSep.charAt(0),
+      csvParams.colSep,
     )
-  }
 
   def getMaps(
       mappingEntries: Seq[HomePoiMapping]

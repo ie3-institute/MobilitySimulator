@@ -22,7 +22,7 @@ import edu.ie3.mobsim.io.probabilities.{
 }
 import edu.ie3.mobsim.utils.sq.KilowattHoursPerKilometer
 import edu.ie3.util.quantities.PowerSystemUnits
-import edu.ie3.util.quantities.QuantityUtils.RichQuantityDouble
+import edu.ie3.util.quantities.QuantityUtils.*
 import org.locationtech.jts.geom.Coordinate
 import squants.Length
 import squants.energy.{KilowattHours, Kilowatts}
