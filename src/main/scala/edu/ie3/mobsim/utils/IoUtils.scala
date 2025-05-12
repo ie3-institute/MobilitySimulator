@@ -41,18 +41,14 @@ final case class IoUtils private (
     *   EV
     * @param currentTime
     *   current time
-    * @param status
-    *   If the car arrives or departs
     */
   def writeMovement(
       ev: ElectricVehicle,
       currentTime: ZonedDateTime,
-      status: String,
   ): Unit = {
     val fieldData = Map(
       "ev" -> ev.getUuid.toString,
       "currentTime" -> currentTime.toString,
-      "status" -> status,
       "soc" -> ev.getStoredEnergy
         .divide(ev.getEStorage)
         .getValue
@@ -63,7 +59,6 @@ final case class IoUtils private (
       "categorical_location" -> ev.destinationPoi.categoricalLocation.toString,
       "destination_arrival" -> ev.parkingTimeStart.toString,
       "destination_departure" -> ev.departureTime.toString,
-      "is_charging" -> ev.chargingAtSimona.toString,
     ).asJava
 
     movementWriter.write(fieldData)
@@ -199,14 +194,12 @@ object IoUtils {
         Array(
           "ev",
           "currentTime",
-          "status",
           "soc",
           "destination_poi",
           "destination_poi_type",
           "categorical_location",
           "destination_arrival",
           "destination_departure",
-          "is_charging",
         ),
         csvSep,
         true,
