@@ -8,23 +8,21 @@ package edu.ie3.mobsim.utils
 
 import edu.ie3.datamodel.io.csv.BufferedCsvWriter
 import edu.ie3.datamodel.io.naming.FileNamingStrategy
-import edu.ie3.datamodel.io.source._
-import edu.ie3.datamodel.io.source.csv._
+import edu.ie3.datamodel.io.source.*
+import edu.ie3.datamodel.io.source.csv.*
 import edu.ie3.datamodel.models.input.system.EvInput
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
-import kantan.csv.ops.toCsvInputOps
-import kantan.csv.{RowDecoder, _}
 import squants.space.Kilometers
 
-import java.io.IOException
+import java.io.{BufferedReader, FileReader, IOException}
 import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 final case class IoUtils private (
     movementWriter: BufferedCsvWriter,
@@ -119,7 +117,7 @@ final case class IoUtils private (
             .get(poi.uuid)
             .map(_.toString)
             .getOrElse(""),
-          "distance" -> Kilometers(0).toString(),
+          "distance" -> Kilometers(0).toString,
         ).asJava
 
         poiWriter.write(fieldData)
@@ -329,17 +327,27 @@ object IoUtils {
   }
 
   def readCaseClassSeq[T](implicit
-      decoder: RowDecoder[T],
+      decoder: Map[String, String] => T,
       folderPath: String,
-      csvSep: Char,
+      csvSep: String,
   ): Seq[T] = {
-    val absolutePath = getAbsolutePath(folderPath).toUri
-    ReadResult.sequence(
-      absolutePath.readCsv[List, T](rfc.withHeader.withCellSeparator(csvSep))
-    ) match {
-      case Left(readError) => throw readError
-      case Right(values)   => values
-    }
+    val absolutePath: Path = getAbsolutePath(folderPath)
+
+    val reader = new BufferedReader(new FileReader(absolutePath.toFile))
+    val headline = reader.readLine.split(csvSep).zipWithIndex
+
+    val lines = reader.lines.toList.asScala.toSeq
+    reader.close()
+
+    lines
+      .map { row =>
+        val cells = row.split(csvSep)
+
+        headline.map { case (field, index) =>
+          (field, cells(index))
+        }.toMap
+      }
+      .map(decoder)
   }
 
 }

@@ -13,7 +13,6 @@ import java.nio.file.Path
 import java.util.UUID
 import scala.io.Source
 import scala.jdk.CollectionConverters._
-import scala.reflect.io.File
 import scala.util.{Failure, Success, Try, Using}
 
 object FileChanger extends App {
@@ -424,9 +423,9 @@ object FileChanger extends App {
       targetPath: Path,
       targetHeader: Seq[String],
   ): Unit = {
-    val targetFile = File(targetPath.toFile)
+    val targetFile = targetPath.toFile
     if (!targetFile.exists)
-      targetFile.createFile()
+      targetFile.createNewFile()
 
     Using(
       new BufferedCsvWriter(targetPath, targetHeader.toArray, csvSep, false)
