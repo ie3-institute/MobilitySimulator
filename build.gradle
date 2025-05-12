@@ -21,7 +21,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.2.4'
-  scapegoatVersion = '3.1.8'
+  scapegoatVersion = '3.1.9'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
