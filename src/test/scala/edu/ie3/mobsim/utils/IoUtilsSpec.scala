@@ -27,7 +27,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
       ioUtils.writeMovement(
         firstEv,
         time,
-        status,
       )
 
       val data = new BufferedReader(
@@ -52,14 +51,12 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
           val parts = str.split(";")
           parts(0) shouldBe firstEv.uuid.toString
           parts(1) shouldBe time.toString
-          parts(2) shouldBe status
-          parts(3) shouldBe "1.0"
-          parts(4) shouldBe "test"
+          parts(2) shouldBe "1.0"
+          parts(3) shouldBe "test"
+          parts(4) shouldBe CategoricalLocationDictionary.HOME.toString
           parts(5) shouldBe CategoricalLocationDictionary.HOME.toString
-          parts(6) shouldBe CategoricalLocationDictionary.HOME.toString
-          parts(7) shouldBe firstEv.parkingTimeStart.toString
-          parts(8) shouldBe firstEv.departureTime.toString
-          parts(9) shouldBe "false"
+          parts(6) shouldBe firstEv.parkingTimeStart.toString
+          parts(7) shouldBe firstEv.departureTime.toString
         }
     }
 
