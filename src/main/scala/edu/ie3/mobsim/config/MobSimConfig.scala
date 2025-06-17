@@ -190,8 +190,9 @@ object MobSimConfig {
           outputDir =
             if (c.hasPathOrNull("outputDir")) Some(c.getString("outputDir"))
             else None,
-          writeMovements =
-            !c.hasPathOrNull("writeMovements") || c.getBoolean("writeMovements"),
+          writeMovements = !c.hasPathOrNull("writeMovements") || c.getBoolean(
+            "writeMovements"
+          ),
         )
       }
     }

@@ -81,7 +81,7 @@ object TripSimulation extends LazyLogging {
 
     /* Save EV movement to csv before trip */
     if (ioUtils.writeMovements)
-      ioUtils.writeMovement(ev, currentTime, "departure")
+      ioUtils.writeMovement(ev, currentTime)
 
     val socAtStartOfTrip: Double =
       ev.getStoredEnergy.divide(ev.getEStorage).getValue.doubleValue()

@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Write all POIs on initialisation by poiWriter [#346](https://github.com/ie3-institute/MobilitySimulator/issues/346)
 - Remove entry uuid from MobilitySim outputs [#341](https://github.com/ie3-institute/MobilitySimulator/issues/341)
 - Remove EvcsWriter [#343](https://github.com/ie3-institute/MobilitySimulator/issues/343)
+- Upgraded to scala3 [#357](https://github.com/ie3-institute/MobilitySimulator/issues/357)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
@@ -33,5 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed unintentional filtering of nearest cs with equal distance [#125](https://github.com/ie3-institute/MobilitySimulator/issues/125)
 - Fixed exception messages of probability factories [#263](https://github.com/ie3-institute/MobilitySimulator/issues/263)
 - MobSim sends arrivals for unexpected tick to SIMONA [#316](https://github.com/ie3-institute/MobilitySimulator/issues/316)
+- Fixed movement writer [#363](https://github.com/ie3-institute/MobilitySimulator/issues/363)
 
 [Unreleased]: https://github.com/ie3-institute/MobilitySimulator
