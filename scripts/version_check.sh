@@ -39,7 +39,8 @@ semver_gt() {
 # Version Checking Logic
 if [ "$BASE_BRANCH" = "main" ]; then
   echo "'$BRANCH_TYPE' branch into main => applying '$BRANCH_TYPE' rules"
-  if [ "$PR_VERSION" = "$MAIN_VERSION" ] && [ "$BRANCH_TYPE" = "feature" ]; then
+  if [ "$PR_VERSION" = "$MAIN_VERSION" ] && \
+        { [ "$BRANCH_TYPE" = "feature" ] || [ "$BRANCH_TYPE" = "dependabot" ]; }; then
     echo "OK: PR Version ($PR_VERSION) is identical with the current Main version ($MAIN_VERSION)."
     exit 0
   elif semver_gt "$PR_VERSION" "$MAIN_VERSION" && [ "$BRANCH_TYPE" = "release" ]; then

@@ -37,5 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed exception messages of probability factories [#263](https://github.com/ie3-institute/MobilitySimulator/issues/263)
 - MobSim sends arrivals for unexpected tick to SIMONA [#316](https://github.com/ie3-institute/MobilitySimulator/issues/316)
 - Fixed movement writer [#363](https://github.com/ie3-institute/MobilitySimulator/issues/363)
+- Fixed version check logic for dependabot PRs [#375](https://github.com/ie3-institute/MobilitySimulator/issues/375)
 
 [Unreleased]: https://github.com/ie3-institute/MobilitySimulator
