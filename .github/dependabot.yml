@@ -7,12 +7,6 @@ updates:
     time: "04:00"
   open-pull-requests-limit: 10
   target-branch: main
-  reviewers:
-  - t-ober
-  - jo-bao
-  - sebastian-peter
-  - danielfeismann
-  - staudtMarius
   ignore:
     - dependency-name: org.scalatest:scalatest_2.13
       versions:
