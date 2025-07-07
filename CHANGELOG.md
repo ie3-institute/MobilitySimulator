@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added Bao and Staudt as Reviewers [#299](https://github.com/ie3-institute/MobilitySimulator/issues/299)
 - Added ConfigFailFastSpec to properly test whether ConfigFailFast works as expected [#300](https://github.com/ie3-institute/MobilitySimulator/issues/300)
 - Implemented GitHub Actions Pipeline [#351](https://github.com/ie3-institute/MobilitySimulator/issues/351)
+- Added some infrastructure for GHA pipeline [#371](https://github.com/ie3-institute/MobilitySimulator/issues/371)
 
 ### Changed
 - Changed sets of evs from sorted to unsorted [#113](https://github.com/ie3-institute/MobilitySimulator/issues/113)
