@@ -10,13 +10,11 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
 import edu.ie3.simona.api.data.ev.ExtEvDataConnection
-import org.apache.pekko.actor.ActorRef
 
 import java.util.UUID
 
 trait MobilitySimulatorTestData extends IoUtilsTestData {
   val evDataConnection: ExtEvDataConnection = new ExtEvDataConnection()
-  evDataConnection.setActorRefs(ActorRef.noSender, ActorRef.noSender)
 
   def setEvsAsParking(
       evs: Seq[ElectricVehicle]

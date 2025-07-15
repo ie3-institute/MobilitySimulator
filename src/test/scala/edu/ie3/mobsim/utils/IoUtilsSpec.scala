@@ -27,7 +27,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
       ioUtils.writeMovement(
         firstEv,
         time,
-        status,
       )
 
       val data = new BufferedReader(
@@ -52,14 +51,12 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
           val parts = str.split(";")
           parts(0) shouldBe firstEv.uuid.toString
           parts(1) shouldBe time.toString
-          parts(2) shouldBe status
-          parts(3) shouldBe "1.0"
-          parts(4) shouldBe "test"
+          parts(2) shouldBe "1.0"
+          parts(3) shouldBe "test"
+          parts(4) shouldBe CategoricalLocationDictionary.HOME.toString
           parts(5) shouldBe CategoricalLocationDictionary.HOME.toString
-          parts(6) shouldBe CategoricalLocationDictionary.HOME.toString
-          parts(7) shouldBe firstEv.parkingTimeStart.toString
-          parts(8) shouldBe firstEv.departureTime.toString
-          parts(9) shouldBe "false"
+          parts(6) shouldBe firstEv.parkingTimeStart.toString
+          parts(7) shouldBe firstEv.departureTime.toString
         }
     }
 
@@ -90,40 +87,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
           str shouldBe secondEvString
         }
       }
-    }
-
-    "write electric vehicle charging stations correctly" in {
-      ioUtils.writeEvcs(
-        cs6,
-        chargingStationOccupancy,
-        currentTime,
-      )
-
-      val data = new BufferedReader(
-        new FileReader(new File(outputFileDir, "evcs.csv"))
-      )
-
-      val list: util.ArrayList[String] = new util.ArrayList[String]()
-      var line = data.readLine()
-
-      while (line != null) {
-        list.add(line)
-        line = data.readLine()
-      }
-
-      list.size() shouldBe 2
-
-      list
-        .stream()
-        .skip(1)
-        .findFirst()
-        .ifPresent { str =>
-          val parts = str.split(";")
-          parts(0) shouldBe currentTime.toString
-          parts(1) shouldBe cs6.uuid.toString
-          parts(2) shouldBe cs6.chargingPoints.toString
-          parts(3) shouldBe "[]"
-        }
     }
 
     "write pois correctly" in {

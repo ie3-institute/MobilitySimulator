@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow parsing of PSDM `EvInputs` [#112](https://github.com/ie3-institute/MobilitySimulator/issues/112)
 - Added Bao and Staudt as Reviewers [#299](https://github.com/ie3-institute/MobilitySimulator/issues/299)
 - Added ConfigFailFastSpec to properly test whether ConfigFailFast works as expected [#300](https://github.com/ie3-institute/MobilitySimulator/issues/300)
+- Implemented GitHub Actions Pipeline [#351](https://github.com/ie3-institute/MobilitySimulator/issues/351)
+- Added some infrastructure for GHA pipeline [#371](https://github.com/ie3-institute/MobilitySimulator/issues/371)
 - Added `CITATION.cff` [#379](https://github.com/ie3-institute/MobilitySimulator/issues/379)
 
 ### Changed
@@ -25,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adapting to recent changes in the API [#303](https://github.com/ie3-institute/MobilitySimulator/issues/303)
 - Write all POIs on initialisation by poiWriter [#346](https://github.com/ie3-institute/MobilitySimulator/issues/346)
 - Remove entry uuid from MobilitySim outputs [#341](https://github.com/ie3-institute/MobilitySimulator/issues/341)
+- Remove EvcsWriter [#343](https://github.com/ie3-institute/MobilitySimulator/issues/343)
+- Upgraded to scala3 [#357](https://github.com/ie3-institute/MobilitySimulator/issues/357)
+- Fixed script entry in `build.gradle` [#373](https://github.com/ie3-institute/MobilitySimulator/issues/373)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
@@ -32,5 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed unintentional filtering of nearest cs with equal distance [#125](https://github.com/ie3-institute/MobilitySimulator/issues/125)
 - Fixed exception messages of probability factories [#263](https://github.com/ie3-institute/MobilitySimulator/issues/263)
 - MobSim sends arrivals for unexpected tick to SIMONA [#316](https://github.com/ie3-institute/MobilitySimulator/issues/316)
-
+- Fixed movement writer [#363](https://github.com/ie3-institute/MobilitySimulator/issues/363)
+- Fixed version check for dependabot PRs [#375](https://github.com/ie3-institute/MobilitySimulator/issues/375)
 [Unreleased]: https://github.com/ie3-institute/MobilitySimulator

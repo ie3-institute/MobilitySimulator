@@ -98,7 +98,7 @@ final class MobilitySimulator(
       .toMap
 
     /* Send EV movements to SIMONA and receive charged EVs that ended parking */
-    val chargingStationOccupancy = exchangeEvMovementsWithSimona(
+    exchangeEvMovementsWithSimona(
       currentTime,
       tick,
       availableChargingPoints,
@@ -118,15 +118,6 @@ final class MobilitySimulator(
           s"and ${(nextEvent / 60) % 60} minutes."
       )
     }
-
-    /* Save occupancy of charging stations for csv output */
-    chargingStations.foreach(cs =>
-      ioUtils.writeEvcs(
-        cs,
-        chargingStationOccupancy,
-        currentTime,
-      )
-    )
 
     timeUntilNextEvent.map { nextEvent =>
       long2Long(tick + nextEvent)
@@ -149,8 +140,6 @@ final class MobilitySimulator(
     *   Currently known prices per charging station
     * @param maxDistance
     *   Maximum permissible distance between a POI and a charging station
-    * @return
-    *   The updated charging station occupancy
     */
   private def exchangeEvMovementsWithSimona(
       currentTime: ZonedDateTime,
@@ -158,7 +147,7 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: Length,
-  ): Map[UUID, Seq[ElectricVehicle]] = {
+  ) = {
 
     val departingEvs = filterDepartingEvs(electricVehicles, currentTime)
 
@@ -212,17 +201,6 @@ final class MobilitySimulator(
       timeUntilNextEvent.map(long2Long).toJava,
     )
     logger.debug("Sent {} arriving EVs to SIMONA", arrivals.size)
-
-    // compile map from evcs to their parked evs
-    electricVehicles
-      .flatMap { ev =>
-        ev.chosenChargingStation.map(ev -> _)
-      }
-      .groupMap { case (_, cs) =>
-        cs
-      } { case (ev, _) =>
-        ev
-      }
   }
 
   /** Determine the set of EVs that depart at this tick and have been sent to
@@ -618,7 +596,6 @@ object MobilitySimulator
       pathsAndSources.outputDir,
       "movements.csv",
       "evs.csv",
-      "evcs.csv",
       "positions.csv",
       "pois.csv",
       config.mobsim.output.writeMovements,
