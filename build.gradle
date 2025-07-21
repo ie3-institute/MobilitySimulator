@@ -61,7 +61,7 @@ dependencies {
   implementation 'tech.units:indriya:2.2.3' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
   implementation 'org.locationtech.jts.io:jts-io-common:1.20.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.19.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.20.0' // I/O functionalities
 
   /* CORE Scala */
   implementation "org.scala-lang:scala3-library_3:${scalaBinaryVersion}"
