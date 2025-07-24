@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove EvcsWriter [#343](https://github.com/ie3-institute/MobilitySimulator/issues/343)
 - Upgraded to scala3 [#357](https://github.com/ie3-institute/MobilitySimulator/issues/357)
 - Fixed script entry in `build.gradle` [#373](https://github.com/ie3-institute/MobilitySimulator/issues/373)
+- Removed Jenkins due to redundancy with GHA [#388](https://github.com/ie3-institute/MobilitySimulator/issues/388)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
