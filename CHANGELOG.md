@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+## [1.0.0]
+
 ### Added 
 - Allow parsing of PSDM `EvInputs` [#112](https://github.com/ie3-institute/MobilitySimulator/issues/112)
 - Added Bao and Staudt as Reviewers [#299](https://github.com/ie3-institute/MobilitySimulator/issues/299)
@@ -42,4 +50,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MobSim sends arrivals for unexpected tick to SIMONA [#316](https://github.com/ie3-institute/MobilitySimulator/issues/316)
 - Fixed movement writer [#363](https://github.com/ie3-institute/MobilitySimulator/issues/363)
 - Fixed version check for dependabot PRs [#375](https://github.com/ie3-institute/MobilitySimulator/issues/375)
-[Unreleased]: https://github.com/ie3-institute/MobilitySimulator
+[Unreleased]: https://github.com/ie3-institute/MobilitySimulator/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/ie3-institute/MobilitySimulator/compare/912700d5f86f2f544cd99c801e6173d59a0e56e8...1.0.0
