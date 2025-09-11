@@ -90,8 +90,7 @@ dependencies {
   testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.8' // scalatest html output
 }
 
-group = 'edu.ie3'
-version = '1.0-SNAPSHOT'
+group = 'com.github.ie3-institute'
 description = 'MobilitySimulator'
 
 shadowJar {
