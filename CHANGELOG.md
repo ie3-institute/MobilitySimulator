@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Only run CI tasks `Deploy` and `MavenCentral Staging` only for release branches [#403](https://github.com/ie3-institute/MobilitySimulator/issues/403)
 
 ### Fixed
 
