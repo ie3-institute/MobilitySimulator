@@ -61,7 +61,7 @@ if (project.hasProperty('mavenCentralUser') && project.hasProperty('mavenCentral
                 }
 
                 removeTestDependenciesFromPom(pom)
-                groupId = group
+                groupId = 'com.github.ie3-institute'
                 artifactId = 'MobilitySimulator'
                 version = versionString
 
