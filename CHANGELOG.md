@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added some infrastructure for GHA pipeline [#371](https://github.com/ie3-institute/MobilitySimulator/issues/371)
 - Added `CITATION.cff` [#379](https://github.com/ie3-institute/MobilitySimulator/issues/379)
 - Added `signing` plugin to `build.gradle` [#396](https://github.com/ie3-institute/MobilitySimulator/issues/396)
+- Adapt deploy, upload and staging scripts to changes at MavenCentral [#398](https://github.com/ie3-institute/MobilitySimulator/issues/398)
 
 ### Changed
 - Changed sets of evs from sorted to unsorted [#113](https://github.com/ie3-institute/MobilitySimulator/issues/113)
