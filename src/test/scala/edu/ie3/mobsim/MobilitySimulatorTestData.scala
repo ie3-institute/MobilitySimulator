@@ -9,7 +9,7 @@ package edu.ie3.mobsim
 import edu.ie3.mobsim.io.geodata.PoiEnums.PoiTypeDictionary
 import edu.ie3.mobsim.model.ElectricVehicle
 import edu.ie3.mobsim.utils.IoUtilsTestData
-import edu.ie3.simona.api.data.ev.ExtEvDataConnection
+import edu.ie3.simona.api.data.connection.ExtEvDataConnection
 
 import java.util.UUID
 
