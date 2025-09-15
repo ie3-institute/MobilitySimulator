@@ -6,7 +6,7 @@
 
 package edu.ie3.mobsim.model
 
-import edu.ie3.simona.api.data.ev.model.EvModel
+import edu.ie3.simona.api.data.model.ev.EvModel
 
 import java.util.UUID
 import scala.jdk.CollectionConverters.{MapHasAsJava, SeqHasAsJava}
