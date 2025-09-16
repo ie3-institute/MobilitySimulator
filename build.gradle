@@ -74,7 +74,7 @@ dependencies {
 
   /* Logging */
   implementation 'ch.qos.logback:logback-classic:1.5.18'
-  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
+  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.6" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
   implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
