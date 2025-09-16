@@ -82,7 +82,7 @@ jobs:
 
       #Deployment
       - name: Deploy
-        if: github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/heads/rel')
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVENCENTRAL_SIGNINGKEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVENCENTRAL_SIGNINGPASS }}
@@ -104,7 +104,7 @@ jobs:
 
       #MavenCentral Staging
       - name: MavenCentral Staging
-        if: github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/heads/rel')
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVENCENTRAL_SIGNINGKEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVENCENTRAL_SIGNINGPASS }}
