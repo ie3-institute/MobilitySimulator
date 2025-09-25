@@ -20,7 +20,7 @@ ext {
   scalaVersion = '3'
   scalaBinaryVersion = '3.7.0'
 
-  pekkoVersion = '1.2.0'
+  pekkoVersion = '1.2.1'
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.2.5'
