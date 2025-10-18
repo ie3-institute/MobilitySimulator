@@ -353,8 +353,8 @@ final class MobilitySimulator(
     * @param availableChargingPoints
     *   Available charging points per charging station
     * @param maxDistance
-    *   Maximum permissible distance between a point of interest and a
-    *   candidate charging station
+    *   Maximum permissible distance between a point of interest and a candidate
+    *   charging station
     * @return
     *   A collection of movements
     */
