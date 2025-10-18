@@ -147,7 +147,7 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: Length,
-  ) = {
+  ): Unit = {
 
     val departingEvs = filterDepartingEvs(electricVehicles, currentTime)
 
@@ -353,7 +353,7 @@ final class MobilitySimulator(
     * @param availableChargingPoints
     *   Available charging points per charging station
     * @param maxDistance
-    *   Maximum permissible distance between an point of interest and a
+    *   Maximum permissible distance between a point of interest and a
     *   candidate charging station
     * @return
     *   A collection of movements

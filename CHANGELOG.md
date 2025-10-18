@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Some improvements and format changes [#412](https://github.com/ie3-institute/MobilitySimulator/issues/412)
 
 ### Fixed
 

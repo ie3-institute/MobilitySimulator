@@ -12,7 +12,7 @@ import scopt.OptionParser
 import java.nio.file.Paths
 
 object ArgsParser {
-  final case class Arguments(
+  private final case class Arguments(
       mainArgs: Array[String],
       config: Option[Config] = None,
   )
