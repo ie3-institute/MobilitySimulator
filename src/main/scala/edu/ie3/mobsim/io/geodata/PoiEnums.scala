@@ -36,18 +36,18 @@ object PoiEnums {
 
     def apply(token: String): Value = {
       token.toLowerCase match {
-        case "home"                 => HOME
-        case "work"                 => WORK
-        case "supermarket"          => SUPERMARKET
-        case "services"             => SERVICES
-        case "other_shop"           => OTHER_SHOP
-        case "medicinal"            => MEDICINAL
-        case "bbpg"                 => BBPG // Behörde, Bank, Post oder Geldautomat (Governmental entity, Bank, Post or ATM)
-        case "restaurant"           => RESTAURANT
-        case "culture"              => CULTURE
-        case "sports"               => SPORTS
-        case "religious"            => RELIGIOUS
-        case "charging_hub_town"    => CHARGING_HUB_TOWN
+        case "home"              => HOME
+        case "work"              => WORK
+        case "supermarket"       => SUPERMARKET
+        case "services"          => SERVICES
+        case "other_shop"        => OTHER_SHOP
+        case "medicinal"         => MEDICINAL
+        case "bbpg"              => BBPG // Behörde, Bank, Post oder Geldautomat
+        case "restaurant"        => RESTAURANT
+        case "culture"           => CULTURE
+        case "sports"            => SPORTS
+        case "religious"         => RELIGIOUS
+        case "charging_hub_town" => CHARGING_HUB_TOWN
         case "charging_hub_highway" => CHARGING_HUB_HIGHWAY
         case malformed =>
           throw new RuntimeException(
