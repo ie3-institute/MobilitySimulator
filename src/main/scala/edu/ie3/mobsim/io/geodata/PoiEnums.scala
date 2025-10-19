@@ -42,7 +42,7 @@ object PoiEnums {
         case "services"             => SERVICES
         case "other_shop"           => OTHER_SHOP
         case "medicinal"            => MEDICINAL
-        case "bbpg"                 => BBPG
+        case "bbpg"                 => BBPG // Behörde, Bank, Post oder Geldautomat (Governmental entity, Bank, Post or ATM)
         case "restaurant"           => RESTAURANT
         case "culture"              => CULTURE
         case "sports"               => SPORTS
