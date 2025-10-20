@@ -179,8 +179,8 @@ case object PointOfInterest {
 
   /** Parse Points of Interest of type home. First, all distances between POI
     * coordinates and charging stations are calculated asynchronously, filtered
-    * for the maximum permissible distance and ordered by distance. Afterwards,
-    * the nearest charging station is assigned to each point of interest, taking
+    * for the maximum permissible distance and ordered by distance. Next the
+    * nearest charging station is assigned to each point of interest, taking
     * into account, that a charging station can only be assigned to one home
     * POI. Assignment is carried out synchronously to maintain the same results
     * for multiple simulation runs.
@@ -294,7 +294,8 @@ case object PointOfInterest {
       locationToChargingStations: Map[EvcsLocationType, Seq[ChargingStation]],
       maxDistance: Length,
   ): PointOfInterest = {
-    val (uuid, identifier, sze, coordinate, catLoc) = parse(entries, colToIndex)
+    val (uuid, identifier, size, coordinate, catLoc) =
+      parse(entries, colToIndex)
 
     val allowedChargingStations =
       suitableChargingStations(
@@ -314,7 +315,7 @@ case object PointOfInterest {
       identifier,
       catLoc,
       coordinate,
-      sze,
+      size,
       nearestChargingStations,
     )
   }

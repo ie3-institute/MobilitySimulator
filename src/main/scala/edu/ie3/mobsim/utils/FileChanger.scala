@@ -487,7 +487,7 @@ object FileChanger extends App {
     * @param sourcePath
     *   Path of the source file
     * @param sourceHeader
-    *   Head line elements of the source
+    *   Headline elements of the source
     * @param fieldNameMapping
     *   Mapping from source to target field name
     * @param additionalDataFunction

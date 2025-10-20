@@ -72,7 +72,7 @@ object ChargingStation extends LazyLogging {
   }
 
   /** Chose a charging station to charge at for the EV based on available
-    * information. The EV can either chose a charging station, or return "None"
+    * information. The EV can either choose a charging station, or return "None"
     * if it doesn't want to charge at all.
     *
     * @param ev

@@ -88,7 +88,7 @@ object EvBuilderFromEvInputWithEvcsMapping {
           false,
         )
       }
-    (homeChargingCars ++ nonHomeChargingCars)
+    homeChargingCars ++ nonHomeChargingCars
   }
 
   private def assignEvcsToHomePoi(
