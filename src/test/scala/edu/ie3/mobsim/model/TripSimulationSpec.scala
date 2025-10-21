@@ -128,7 +128,7 @@ class TripSimulationSpec extends UnitSpec with IoUtilsTestData {
           chosenChargingStation shouldBe None
           finalDestinationPoi shouldBe Some(supermarketPoi)
           remainingDistanceAfterChargingHub shouldBe Some(
-            Quantities.getQuantity((10), PowerSystemUnits.KILOMETRE)
+            Quantities.getQuantity(10, PowerSystemUnits.KILOMETRE)
           )
           chargingPricesMemory shouldBe mutable.Queue[Double]()
       }

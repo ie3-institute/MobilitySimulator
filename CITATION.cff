@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+title: "MobilitySimulator - A Stochastic-based simulator for individual mobility"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - name: "ie³ - Institute of Energy Systems, Energy Efficiency and Energy Economics - TU Dortmund University"
+    alias: ie³
+    address: "Martin-Schmeißer-Weg 12"
+    city: Dortmund
+    country: DE
+    post-code: 44227
+    website: "https://ie3.etit.tu-dortmund.de/"
+  - family-names: Oberließen
+    given-names: Thomas
+    orcid: https://orcid.org/0000-0001-5805-5408
+  - family-names: Kittl
+    given-names: Chris
+    orcid: https://orcid.org/0000-0002-1187-0568
+  - family-names: Hiry
+    given-names: Johannes
+    orcid: https://orcid.org/0000-0002-1447-0607
+  - family-names: Peter
+    given-names: Sebastian
+    orcid: https://orcid.org/0000-0001-6311-6113
+  - family-names: Feismann
+    given-names: Daniel
+    orcid: https://orcid.org/0000-0002-3531-9025
+  - family-names: Staudt
+    given-names: Marius
+    orcid: https://orcid.org/0009-0005-3309-5258
+  - family-names: Steffan
+    given-names: Niklas
+repository-code: https://github.com/ie3-institute/MobilitySimulator
+keywords:
+  - stochastic-based
+  - mobility
+  - discrete-event simulation
+license: BSD-3-Clause
+version: 1.0.0
+date-released: 2025-09-11

@@ -31,9 +31,9 @@ import edu.ie3.mobsim.model.{
   EvType,
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
-import edu.ie3.simona.api.data.ExtDataConnection
-import edu.ie3.simona.api.data.ev.ExtEvDataConnection
-import edu.ie3.simona.api.data.ev.model.EvModel
+import edu.ie3.simona.api.data.connection.ExtDataConnection
+import edu.ie3.simona.api.data.connection.ExtEvDataConnection
+import edu.ie3.simona.api.data.model.ev.EvModel
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
 import squants.Length
@@ -147,7 +147,7 @@ final class MobilitySimulator(
       availableChargingPoints: Map[UUID, Int],
       currentPricesAtChargingStations: Map[UUID, Double],
       maxDistance: Length,
-  ) = {
+  ): Unit = {
 
     val departingEvs = filterDepartingEvs(electricVehicles, currentTime)
 
@@ -353,8 +353,8 @@ final class MobilitySimulator(
     * @param availableChargingPoints
     *   Available charging points per charging station
     * @param maxDistance
-    *   Maximum permissible distance between an point of interest and a
-    *   candidate charging station
+    *   Maximum permissible distance between a point of interest and a candidate
+    *   charging station
     * @return
     *   A collection of movements
     */

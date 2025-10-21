@@ -16,7 +16,7 @@ import edu.ie3.mobsim.io.probabilities.{
   ProbabilityDensityFunction,
 }
 import edu.ie3.mobsim.utils.utils.toTick
-import edu.ie3.simona.api.data.ev.model.EvModel
+import edu.ie3.simona.api.data.model.ev.EvModel
 import edu.ie3.util.quantities.PowerSystemUnits
 import squants.energy.Kilowatts
 import tech.units.indriya.ComparableQuantity
@@ -336,7 +336,7 @@ case object ElectricVehicle extends LazyLogging {
       simulationStart = simulationStart,
       uuid = uuid,
       id = id,
-      // todo: check if this is neccessary
+      // todo: check if this is necessary
       evType = evType.copy(
         dcPower =
           if (evType.dcPower < Kilowatts(0.1)) evType.acPower

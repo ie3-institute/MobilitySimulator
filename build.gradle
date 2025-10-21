@@ -3,23 +3,24 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '7.1.0'//code format
+  id 'com.diffplug.spotless' version '8.0.0'//code format
   id "de.undercouch.download" version "5.6.0" // downloads plugin
-  id "org.sonarqube" version "6.2.0.5505" // sonarqube
+  id "org.sonarqube" version "7.0.0.6105" // sonarqube
   id "org.scoverage" version "8.1" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.33" // run scalatest without specific spec task
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
+  id 'signing'
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
   id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 ext {
-  javaVersion = JavaVersion.VERSION_17
+  javaVersion = JavaVersion.VERSION_21
 
   scalaVersion = '3'
   scalaBinaryVersion = '3.7.0'
 
-  pekkoVersion = '1.1.4'
+  pekkoVersion = '1.2.1'
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
   tscfgVersion = '1.2.5'
@@ -33,9 +34,10 @@ apply from: scriptsLocation + 'pmd.gradle'
 apply from: scriptsLocation + 'spotless.gradle'
 apply from: scriptsLocation + 'sonarqube.gradle' // sonarqube config
 apply from: scriptsLocation + 'scoverage.gradle' // scoverage scala code coverage
+apply from: scriptsLocation + 'uploadToMavenCentralPortal.gradle' // upload for deploy
+apply from: scriptsLocation + 'stagingAtMavenCentralPortal.gradle' // stage for deploy
 apply from: scriptsLocation + 'semVer.gradle'
 apply from: scriptsLocation + 'branchName.gradle'
-apply from: scriptsLocation + 'mavenCentralPublish.gradle'
 
 repositories {
   mavenCentral() // searches in Sonatype's central repository
@@ -49,19 +51,19 @@ dependencies {
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
-  implementation('com.github.ie3-institute:PowerSystemDataModel:7.0.0') {
+  implementation('com.github.ie3-institute:PowerSystemDataModel:8.1.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.9.0'
+  implementation 'com.github.ie3-institute:simonaAPI:0.10.0'
 
   implementation 'tech.units:indriya:2.2.3' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
   implementation 'org.locationtech.jts.io:jts-io-common:1.20.0' // Location specific stuff
-  implementation 'commons-io:commons-io:2.19.0' // I/O functionalities
+  implementation 'commons-io:commons-io:2.20.0' // I/O functionalities
 
   /* CORE Scala */
   implementation "org.scala-lang:scala3-library_3:${scalaBinaryVersion}"
@@ -71,15 +73,15 @@ dependencies {
   testImplementation "org.apache.pekko:pekko-actor-typed_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.5.18'
-  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
+  implementation 'ch.qos.logback:logback-classic:1.5.20'
+  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.6" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
   implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}"
   scalaCompilerPlugins("com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}")
 
   /* config */
-  implementation 'com.typesafe:config:1.4.4'
+  implementation 'com.typesafe:config:1.4.5'
   implementation "com.github.carueda:tscfg_${scalaVersion}:$tscfgVersion"
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 
@@ -88,8 +90,7 @@ dependencies {
   testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.8' // scalatest html output
 }
 
-group = 'edu.ie3'
-version = '1.0-SNAPSHOT'
+group = 'com.github.ie3-institute'
 description = 'MobilitySimulator'
 
 shadowJar {

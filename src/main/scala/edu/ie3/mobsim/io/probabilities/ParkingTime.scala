@@ -46,12 +46,11 @@ final case class ParkingTime(
     val parkingTime = probabilities.get(
       ParkingTimeKey(timeQuarter, poiType)
     ) match {
-      case Some(pdf) => {
+      case Some(pdf) =>
         val sampledTime = pdf.sample()
         if (round15) {
           roundToQuarterHourInMinutes(sampledTime)
         } else sampledTime
-      }
       case _ =>
         throw new RuntimeException(
           "No pdf found"

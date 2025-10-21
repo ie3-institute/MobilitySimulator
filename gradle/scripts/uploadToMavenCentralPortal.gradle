@@ -1,25 +1,24 @@
 /* Maven publish - start */
-tasks.register('sourcesJar', Jar) {
+
+tasks.register("sourcesJar", Jar) {
     archiveClassifier.set("sources")
     from sourceSets.main.allJava
 }
 
-tasks.register('javadocJar', Jar) {
-    dependsOn javadoc
+tasks.register("javadocJar", Jar) {
+    dependsOn tasks.named("javadoc", Javadoc)
     archiveClassifier.set("javadoc")
-    from javadoc.destinationDir
+    from { tasks.named("javadoc", Javadoc).get().destinationDir }
 }
 
-if (project.hasProperty('user') && project.hasProperty('password')) {
-    signing {
-        required { !version.endsWith('SNAPSHOT') }
-        if(required)
-            sign(publishing.publications)
-    }
+if (project.hasProperty('mavenCentralUser') && project.hasProperty('mavenCentralPassword') && project.hasProperty('deployVersion')) {
+
+    // snapshot version differs from normal version
+    String versionString = project.getProperty('deployVersion')
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            create("mavenJava", MavenPublication) {
 
                 versionMapping {
                     // resolves dynamic versioning to current version number
@@ -31,21 +30,21 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
                     }
                 }
                 pom {
-                    description = 'Stochastic-based simulator for individual mobility'
-                    name = 'Mobility Simulator'
-                    url = 'https://github.com/ie3-institute/MobilitySimulator'
+                    description = 'Stochastic-based simulator for individual mobility @ the Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3) @ TU Dortmund University'
+                    name = 'MobilitySimulator'
+                    url = 'https:github.com/ie3-institute/MobilitySimulator'
                     organization {
                         name = 'Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University'
-                        url = 'https:www.ie3.tu-dortmund.de'
+                        url = 'https:www.ie3.tu-dortmund.de/'
                     }
                     issueManagement {
                         system = 'GitHub'
-                        url = 'https://github.com/ie3-institute/MobilitySimulator/issues'
+                        url = 'https:github.com/ie3-institute/MobilitySimulator/issues'
                     }
                     licenses {
                         license {
                             name = 'BSD 3-Clause License'
-                            url = 'https://github.com/ie3-institute/MobilitySimulator/blob/main/LICENSE'
+                            url = 'https:github.com/ie3-institute/MobilitySimulator/blob/master/LICENSE'
                         }
                     }
                     developers {
@@ -62,9 +61,9 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
                 }
 
                 removeTestDependenciesFromPom(pom)
-                groupId group
-                artifactId 'MobilitySimulator'
-                version version
+                groupId = 'com.github.ie3-institute'
+                artifactId = 'MobilitySimulator'
+                version = versionString
 
                 from components.java
                 artifact sourcesJar
@@ -73,27 +72,29 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
         }
         repositories {
             maven {
-                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                name = "MavenCentral"
+                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
                 credentials {
-                    username project.getProperty('user')
-                    password project.getProperty('password')
+                    username = project.findProperty('mavenCentralUser')
+                    password = project.findProperty('mavenCentralPassword')
                 }
             }
         }
+        signing {
+            useInMemoryPgpKeys(
+                    findProperty('signingKey') as String,
+                    findProperty('signingPassword') as String
+            )
+            sign publications.mavenJava
+        }
     }
 
-
-    model {
-        tasks.generatePomFileForMavenJavaPublication {
-            destination = file("$rootDir/build/generated-pom.xml")
-        }
+    tasks.named("generatePomFileForMavenJavaPublication") {
+        destination = layout.buildDirectory.file("generated-pom.xml").get().asFile
     }
 }
 
 def removeTestDependenciesFromPom(pom) {
-
     pom.withXml {
         def root = asNode()
         // eliminate test-scoped dependencies (no need in maven central POMs)
@@ -102,6 +103,5 @@ def removeTestDependenciesFromPom(pom) {
         }
     }
 }
-
 
 /* Maven publish - end */

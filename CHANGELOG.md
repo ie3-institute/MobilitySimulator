@@ -6,13 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+Invitation to Join Collaboration EU Project on Grid resilience
+
+### Changed
+- Only run CI tasks `Deploy` and `MavenCentral Staging` only for release branches [#403](https://github.com/ie3-institute/MobilitySimulator/issues/403)
+- Some improvements and format changes [#412](https://github.com/ie3-institute/MobilitySimulator/issues/412)
+
+### Fixed
+
+## [1.0.0]
+
 ### Added 
 - Allow parsing of PSDM `EvInputs` [#112](https://github.com/ie3-institute/MobilitySimulator/issues/112)
 - Added Bao and Staudt as Reviewers [#299](https://github.com/ie3-institute/MobilitySimulator/issues/299)
 - Added ConfigFailFastSpec to properly test whether ConfigFailFast works as expected [#300](https://github.com/ie3-institute/MobilitySimulator/issues/300)
 - Implemented GitHub Actions Pipeline [#351](https://github.com/ie3-institute/MobilitySimulator/issues/351)
 - Added some infrastructure for GHA pipeline [#371](https://github.com/ie3-institute/MobilitySimulator/issues/371)
-- Added 'PlantUML-Diagrams' as basis for documentation [#382](https://github.com/ie3-institute/MobilitySimulator/issues/382) 
+- Added `CITATION.cff` [#379](https://github.com/ie3-institute/MobilitySimulator/issues/379)
+- Added `signing` plugin to `build.gradle` [#396](https://github.com/ie3-institute/MobilitySimulator/issues/396)
+- Adapt deploy, upload and staging scripts to changes at MavenCentral [#398](https://github.com/ie3-institute/MobilitySimulator/issues/398)
 
 ### Changed
 - Changed sets of evs from sorted to unsorted [#113](https://github.com/ie3-institute/MobilitySimulator/issues/113)
@@ -30,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove EvcsWriter [#343](https://github.com/ie3-institute/MobilitySimulator/issues/343)
 - Upgraded to scala3 [#357](https://github.com/ie3-institute/MobilitySimulator/issues/357)
 - Fixed script entry in `build.gradle` [#373](https://github.com/ie3-institute/MobilitySimulator/issues/373)
+- Removed Jenkins due to redundancy with GHA [#388](https://github.com/ie3-institute/MobilitySimulator/issues/388)
 
 ### Fixed
 - Adapting to SIMONA-API changes introduced by [PR#37](https://github.com/ie3-institute/simonaAPI/pull/37) [[#7](https://github.com/ie3-institute/MobilitySimulator/issues/7)]
@@ -39,4 +53,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MobSim sends arrivals for unexpected tick to SIMONA [#316](https://github.com/ie3-institute/MobilitySimulator/issues/316)
 - Fixed movement writer [#363](https://github.com/ie3-institute/MobilitySimulator/issues/363)
 - Fixed version check for dependabot PRs [#375](https://github.com/ie3-institute/MobilitySimulator/issues/375)
-[Unreleased]: https://github.com/ie3-institute/MobilitySimulator
+[Unreleased]: https://github.com/ie3-institute/MobilitySimulator/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/ie3-institute/MobilitySimulator/compare/912700d5f86f2f544cd99c801e6173d59a0e56e8...1.0.0
