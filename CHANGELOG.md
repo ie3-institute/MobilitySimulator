@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+Invitation to Join Collaboration EU Project on Grid resilience
 
 ### Changed
 - Only run CI tasks `Deploy` and `MavenCentral Staging` only for release branches [#403](https://github.com/ie3-institute/MobilitySimulator/issues/403)
