@@ -336,7 +336,7 @@ case object ElectricVehicle extends LazyLogging {
       simulationStart = simulationStart,
       uuid = uuid,
       id = id,
-      // todo: check if this is neccessary
+      // todo: check if this is necessary
       evType = evType.copy(
         dcPower =
           if (evType.dcPower < Kilowatts(0.1)) evType.acPower

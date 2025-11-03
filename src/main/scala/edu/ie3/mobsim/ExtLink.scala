@@ -7,7 +7,8 @@
 package edu.ie3.mobsim
 
 import edu.ie3.simona.api.ExtLinkInterface
-import edu.ie3.simona.api.simulation.{ExtSimAdapterData, ExtSimulation}
+import edu.ie3.simona.api.data.ExtSimAdapterData
+import edu.ie3.simona.api.simulation.ExtSimulation
 
 class ExtLink extends ExtLinkInterface {
 

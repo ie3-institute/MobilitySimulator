@@ -41,7 +41,7 @@ final case class PathsAndSources private (
 )
 
 /** Beware: Since the simulation is executed as a jar within SIMONA relative
-  * paths are set according to your SIMONA project path. Furthermore if the
+  * paths are set according to your SIMONA project path. Furthermore, if the
   * output path is not configured it will be placed within the output simulation
   * folder of the SIMONA run you are executing.
   */

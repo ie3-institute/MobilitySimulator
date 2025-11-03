@@ -118,9 +118,9 @@ object EvBuilderFromRandomModel extends LazyLogging {
 
   /** Create and assign the remaining amount of cars. As long as the targeted
     * amount of home-charging cars is not met, randomly assign cars to home POI
-    * with home charging option (where already one cars is assigned). If all
-    * home charging cars are assigned, randomly assign cars to the home POI,
-    * where no home charging is possible.
+    * with home charging option (where already one car is assigned). If all home
+    * charging cars are assigned, randomly assign cars to the home POI, where no
+    * home charging is possible.
     *
     * @param amountOfEvsInArea
     *   Targeted amount of evs in area
@@ -223,7 +223,7 @@ object EvBuilderFromRandomModel extends LazyLogging {
     * @param homePoi
     *   Known home POI of the car
     * @param isHomeChargingPossible
-    *   Whether or not charging at home is possible
+    *   Whether charging at home is possible
     * @return
     *   An electric vehicle model
     */
