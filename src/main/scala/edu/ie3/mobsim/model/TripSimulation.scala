@@ -297,7 +297,7 @@ object TripSimulation extends LazyLogging {
       ev: ElectricVehicle,
   )
 
-  /** If the vehicles has intermediately been charged at a charging hub, resume
+  /** If the vehicle has intermediately been charged at a charging hub, resume
     * the last trip. By doing this, the trip properties are received from the
     * vehicle, reset there (CAUTION / ATTENTION / UWAGA: This method has side
     * effects!) and given back as new trip parameters
@@ -868,12 +868,12 @@ object TripSimulation extends LazyLogging {
 
     /* EV can be sufficiently charged if the next destination is home, home charging is possible and EV stays for at least 3 hours */
     val sufficientHomeChargingPossible: Boolean =
-      (plannedDestinationCategoricalLocation == PoiEnums.CategoricalLocationDictionary.HOME
+      plannedDestinationCategoricalLocation == PoiEnums.CategoricalLocationDictionary.HOME
         && ev.chargingAtHomePossible
         && plannedParkingTimeStart.until(
           plannedDepartureTime,
           ChronoUnit.MINUTES,
-        ) > 180)
+        ) > 180
 
     /* If state of charge is < 20% at end of trip and the EV cannot charge at home for at least 3 hours -> make stop at charging hub,
      *  or always, when SoC is < 5 % at end of trip */
