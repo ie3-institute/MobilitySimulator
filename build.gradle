@@ -12,6 +12,7 @@ plugins {
   id 'signing'
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
   id "com.github.johnrengelman.shadow" version "8.1.1"
+  id "kr.motd.sphinx" version "2.10.1" // documentation generation
 }
 
 ext {
