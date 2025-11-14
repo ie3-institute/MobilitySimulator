@@ -44,6 +44,7 @@ final case class EvType(
     consumption: SpecificEnergyDistance,
     acPower: Power,
     dcPower: Power,
+    cosPhiRated: Double,
 )
 
 object EvType {
@@ -81,6 +82,7 @@ object EvType {
           batCon,
           acPower,
           dcPower,
+          1.0,
         )
       }
   }
@@ -118,6 +120,7 @@ object EvType {
           .getValue
           .doubleValue()
       ),
+      evTypeInput.getCosPhiRated(),
     )
   }
 
