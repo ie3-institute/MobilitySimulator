@@ -1,6 +1,6 @@
 # Welcome to MobilitySimulator docs
 
-```{image} ../_static/ie3_logo.png
+```{image} ../_static/figures/ie3_logo.png
 :width: 25%
 :align: right
 :alt: logo of ie3
