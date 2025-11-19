@@ -19,7 +19,6 @@ extensions = [
     'sphinxcontrib.plantuml',
     'sphinx.ext.intersphinx',
     'hoverxref.extension',
-    'sphinxcontrib.bibtex'
 ]
 
 # Make sure the target is unique
