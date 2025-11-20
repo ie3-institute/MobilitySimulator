@@ -33,6 +33,7 @@ ext {
 apply from: scriptsLocation + 'tscfg.gradle' // config tasks
 apply from: scriptsLocation + 'pmd.gradle'
 apply from: scriptsLocation + 'spotless.gradle'
+apply from: scriptsLocation + 'documentation.gradle' // documentation tasks + configuration
 apply from: scriptsLocation + 'sonarqube.gradle' // sonarqube config
 apply from: scriptsLocation + 'scoverage.gradle' // scoverage scala code coverage
 apply from: scriptsLocation + 'uploadToMavenCentralPortal.gradle' // upload for deploy
