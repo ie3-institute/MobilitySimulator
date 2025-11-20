@@ -9,3 +9,5 @@
 A stochastic-based simulator for individual mobility.
 Based on several probability density functions, occurrences of private cars at defined points of interest within an area of interest are sampled.
 It is meant to be used in a co-simulation environment with [SIMONA](https://github.com/ie3-institute/simona), coupled with the help of [simonaAPI](https://github.com/ie3-institute/simonaAPI).
+
+More information are provided in the project's [documentation](http://mobilitysimulator.readthedocs.io/).

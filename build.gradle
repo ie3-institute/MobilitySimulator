@@ -12,6 +12,7 @@ plugins {
   id 'signing'
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
   id "com.github.johnrengelman.shadow" version "8.1.1"
+  id "kr.motd.sphinx" version "2.10.1" // documentation generation
 }
 
 ext {
@@ -32,6 +33,7 @@ ext {
 apply from: scriptsLocation + 'tscfg.gradle' // config tasks
 apply from: scriptsLocation + 'pmd.gradle'
 apply from: scriptsLocation + 'spotless.gradle'
+apply from: scriptsLocation + 'documentation.gradle' // documentation tasks + configuration
 apply from: scriptsLocation + 'sonarqube.gradle' // sonarqube config
 apply from: scriptsLocation + 'scoverage.gradle' // scoverage scala code coverage
 apply from: scriptsLocation + 'uploadToMavenCentralPortal.gradle' // upload for deploy
