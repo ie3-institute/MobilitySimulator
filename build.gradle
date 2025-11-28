@@ -58,7 +58,7 @@ dependencies {
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.11.0'
+  implementation 'com.github.ie3-institute:simonaAPI:0.12.0'
 
   implementation 'tech.units:indriya:2.2.3' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
