@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added basic readTheDocs structure for documentation [#422](https://github.com/ie3-institute/MobilitySimulator/issues/422)
 
 ### Changed
 - Only run CI tasks `Deploy` and `MavenCentral Staging` only for release branches [#403](https://github.com/ie3-institute/MobilitySimulator/issues/403)
