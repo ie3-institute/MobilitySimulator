@@ -210,7 +210,7 @@ object ChargingStation extends LazyLogging {
       cs.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
           Kilowatts(
-            ev.getPRatedAC
+            ev.getSRatedAC
               .min(
                 cs.evcsType
                   .getsRated()
