@@ -41,6 +41,7 @@ trait ElectricVehicleTestData {
     KilowattHoursPerKilometer(10d),
     Kilowatts(11d),
     Kilowatts(50d),
+    1.0,
   )
   protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
