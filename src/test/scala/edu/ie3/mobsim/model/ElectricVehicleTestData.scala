@@ -27,6 +27,8 @@ import org.locationtech.jts.geom.Coordinate
 import squants.Length
 import squants.energy.{KilowattHours, Kilowatts}
 import tech.units.indriya.quantity.Quantities
+import squants.Dimensionless
+import squants._
 
 import java.time.ZonedDateTime
 import java.util.UUID
