@@ -105,7 +105,7 @@ final case class ElectricVehicle(
   def getPRatedDC: ComparableQuantity[Power] = Quantities
     .getQuantity(evType.dcPower.toKilowatts, PowerSystemUnits.KILOWATT)
 
-  def getCosPhiRated: Double = evType.cosPhiRated
+  def getCosPhiRated: Double = evType.cosPhiRated.toEach
 
   def getStoredEnergy: ComparableQuantity[Energy] = storedEnergy
 
