@@ -27,6 +27,8 @@ import org.locationtech.jts.geom.Coordinate
 import squants.Length
 import squants.energy.{KilowattHours, Kilowatts}
 import tech.units.indriya.quantity.Quantities
+import squants.Dimensionless
+import squants._
 
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -41,6 +43,7 @@ trait ElectricVehicleTestData {
     KilowattHoursPerKilometer(10d),
     Kilowatts(11d),
     Kilowatts(50d),
+    Each(1.0),
   )
   protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
