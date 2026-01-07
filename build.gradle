@@ -75,7 +75,7 @@ dependencies {
   testImplementation "org.apache.pekko:pekko-actor-typed_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.5.23'
+  implementation 'ch.qos.logback:logback-classic:1.5.24'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.6" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */
