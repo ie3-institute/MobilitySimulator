@@ -1109,7 +1109,6 @@ object TripSimulation extends LazyLogging {
                 .multiply(1.0)
             )
             .to(KILOWATT)
-            .multiply(ev.getCosPhiRated)
         case ElectricCurrentType.DC =>
           ev.getPRatedDC
             .min(

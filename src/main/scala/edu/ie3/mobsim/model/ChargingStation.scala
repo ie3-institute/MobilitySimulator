@@ -219,7 +219,7 @@ object ChargingStation extends LazyLogging {
               )
               .to(KILOWATT)
               .getValue
-              .doubleValue() * ev.getCosPhiRated
+              .doubleValue()
           )
 
         case ElectricCurrentType.DC =>
