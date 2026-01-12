@@ -24,8 +24,9 @@ import edu.ie3.mobsim.utils.sq.KilowattHoursPerKilometer
 import edu.ie3.util.quantities.PowerSystemUnits
 import edu.ie3.util.quantities.QuantityUtils.*
 import org.locationtech.jts.geom.Coordinate
-import squants.Length
+import squants.Each
 import squants.energy.{KilowattHours, Kilowatts}
+import squants.space.Length
 import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
@@ -41,6 +42,7 @@ trait ElectricVehicleTestData {
     KilowattHoursPerKilometer(10d),
     Kilowatts(11d),
     Kilowatts(50d),
+    Each(1.0),
   )
   protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
