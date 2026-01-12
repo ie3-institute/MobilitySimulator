@@ -210,10 +210,12 @@ object ChargingStation extends LazyLogging {
       cs.evcsType.getElectricCurrentType match {
         case ElectricCurrentType.AC =>
           Kilowatts(
-            ev.getPRatedAC
+            ev.getSRatedAC
+              .multiply(ev.getCosPhiRated)
               .min(
                 cs.evcsType
                   .getsRated()
+                  .multiply(1.0)
               )
               .to(KILOWATT)
               .getValue
@@ -223,7 +225,7 @@ object ChargingStation extends LazyLogging {
         case ElectricCurrentType.DC =>
           Kilowatts(
             ev.getPRatedDC
-              .min(cs.evcsType.getsRated())
+              .min(cs.evcsType.getsRated().multiply(1.0))
               .to(KILOWATT)
               .getValue
               .doubleValue()

@@ -14,7 +14,7 @@ import edu.ie3.mobsim.utils.sq.{
   SpecificEnergyDistance,
 }
 import edu.ie3.util.quantities.PowerSystemUnits
-import squants.Energy
+import squants.{Dimensionless, Each, Energy}
 import squants.energy.{KilowattHours, Kilowatts, Power}
 
 import scala.io.Source
@@ -35,6 +35,8 @@ import scala.util.{Failure, Success, Try, Using}
   *   Possible AC charging power
   * @param dcPower
   *   Possible DC charging power
+  * @param cosPhiRated
+  *   Rated power dimensionless
   */
 final case class EvType(
     model: String,
@@ -44,6 +46,7 @@ final case class EvType(
     consumption: SpecificEnergyDistance,
     acPower: Power,
     dcPower: Power,
+    cosPhiRated: Dimensionless,
 )
 
 object EvType {
@@ -53,7 +56,7 @@ object EvType {
       csvSep: String = ",",
   ): Try[EvType] = {
     val entries = evString.trim.toLowerCase.split(csvSep)
-    if (entries.length != 7)
+    if (entries.length != 8)
       Failure(
         InitializationException(
           s"Received ${entries.length} attributes, but 7 are needed to parse an ev model."
@@ -72,6 +75,7 @@ object EvType {
         ) // Comes as kWh/km
         val acPower = Kilowatts(entries(5).toDouble)
         val dcPower = Kilowatts(entries(6).toDouble)
+        val cosPhi = Each(entries(7).toDouble)
 
         new EvType(
           model,
@@ -81,6 +85,7 @@ object EvType {
           batCon,
           acPower,
           dcPower,
+          cosPhi,
         )
       }
   }
@@ -118,6 +123,7 @@ object EvType {
           .getValue
           .doubleValue()
       ),
+      Each(evTypeInput.getCosPhiRated().doubleValue()),
     )
   }
 
