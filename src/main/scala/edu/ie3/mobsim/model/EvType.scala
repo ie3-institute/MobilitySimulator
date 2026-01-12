@@ -14,10 +14,8 @@ import edu.ie3.mobsim.utils.sq.{
   SpecificEnergyDistance,
 }
 import edu.ie3.util.quantities.PowerSystemUnits
-import squants.Energy
+import squants.{Dimensionless, Each, Energy}
 import squants.energy.{KilowattHours, Kilowatts, Power}
-import squants.Dimensionless
-import squants._
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try, Using}

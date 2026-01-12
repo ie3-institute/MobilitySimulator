@@ -24,11 +24,10 @@ import edu.ie3.mobsim.utils.sq.KilowattHoursPerKilometer
 import edu.ie3.util.quantities.PowerSystemUnits
 import edu.ie3.util.quantities.QuantityUtils.*
 import org.locationtech.jts.geom.Coordinate
-import squants.Length
+import squants.Each
 import squants.energy.{KilowattHours, Kilowatts}
+import squants.space.Length
 import tech.units.indriya.quantity.Quantities
-import squants.Dimensionless
-import squants._
 
 import java.time.ZonedDateTime
 import java.util.UUID
