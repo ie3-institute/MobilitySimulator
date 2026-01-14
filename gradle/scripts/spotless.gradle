@@ -30,7 +30,8 @@ spotless {
   /* Formats markdown files, just like the other misc files, but without trimming trailing white spaces (nested
    * enumerations) */
   format 'md', {
-    target '**/*.md', '!reports/**'
+    target '**/*.md'
+    targetExclude 'reports/**'
     leadingTabsToSpaces(2)
     endWithNewline()
   }
