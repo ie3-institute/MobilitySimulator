@@ -19,7 +19,7 @@ ext {
   javaVersion = JavaVersion.VERSION_21
 
   scalaVersion = '3'
-  scalaBinaryVersion = '3.7.4'
+  scalaBinaryVersion = '3.8.0'
 
   pekkoVersion = '1.4.0'
   slf4jVersion = '1.7.30'
