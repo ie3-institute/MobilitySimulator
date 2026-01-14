@@ -106,8 +106,8 @@ shadowJar {
 tasks.withType(ScalaCompile) {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
-    "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/src/",
-    "-P:scapegoat:disabledInspections:VariableShadowing",
+    "-P:scapegoat:dataDir:" + rootDir + "/reports/scapegoat/src/",
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
   ]
 }
 
@@ -115,7 +115,7 @@ tasks.withType(ScalaCompile) {
 compileTestScala {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
-    "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/testsrc/",
-    "-P:scapegoat:disabledInspections:VariableShadowing"
+    "-P:scapegoat:dataDir:" + rootDir + "/reports/scapegoat/testsrc/",
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
   ]
 }
