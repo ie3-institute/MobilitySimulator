@@ -31,6 +31,7 @@ spotless {
    * enumerations) */
   format 'md', {
     target '**/*.md'
+    targetExclude 'reports/**'
     leadingTabsToSpaces(2)
     endWithNewline()
   }
