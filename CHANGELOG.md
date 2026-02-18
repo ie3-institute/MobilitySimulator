@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix update of `gradle` [#442](https://github.com/ie3-institute/MobilitySimulator/issues/442)
 
 ### Fixed
+- Fixed shadowJar dependency [#452](https://github.com/ie3-institute/MobilitySimulator/issues/452)
 
 ## [1.0.0]
 

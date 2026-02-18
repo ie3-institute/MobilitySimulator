@@ -11,7 +11,7 @@ plugins {
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
   id 'signing'
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
-  id "com.github.johnrengelman.shadow" version "8.1.1"
+  id 'com.gradleup.shadow' version '9.3.1'
   id "kr.motd.sphinx" version "2.10.1" // documentation generation
 }
 
