@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed shadowJar dependency [#452](https://github.com/ie3-institute/MobilitySimulator/issues/452)
+- Fixed EvType error message and example input [#454](https://github.com/ie3-institute/MobilitySimulator/issues/454)
 
 ## [1.0.0]
 
