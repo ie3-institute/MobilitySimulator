@@ -51,15 +51,17 @@ final case class EvType(
 
 object EvType {
 
+  private val fieldCount: Int = 8
+
   private def apply(
       evString: String,
       csvSep: String = ",",
   ): Try[EvType] = {
     val entries = evString.trim.toLowerCase.split(csvSep)
-    if (entries.length != 8)
+    if (entries.length != fieldCount)
       Failure(
         InitializationException(
-          s"Received ${entries.length} attributes, but 7 are needed to parse an ev model."
+          s"Received ${entries.length} attributes, but $fieldCount are needed to parse an ev model."
         )
       )
     else
@@ -123,7 +125,7 @@ object EvType {
           .getValue
           .doubleValue()
       ),
-      Each(evTypeInput.getCosPhiRated().doubleValue()),
+      Each(evTypeInput.getCosPhiRated),
     )
   }
 

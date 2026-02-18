@@ -3,15 +3,15 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '8.1.0'//code format
-  id "de.undercouch.download" version "5.6.0" // downloads plugin
+  id 'com.diffplug.spotless' version '8.2.1'//code format
+  id "de.undercouch.download" version "5.7.0" // downloads plugin
   id "org.sonarqube" version "7.2.2.6593" // sonarqube
   id "org.scoverage" version "8.1" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.33" // run scalatest without specific spec task
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
   id 'signing'
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
-  id "com.github.johnrengelman.shadow" version "8.1.1"
+  id 'com.gradleup.shadow' version '9.3.1'
   id "kr.motd.sphinx" version "2.10.1" // documentation generation
 }
 
@@ -75,7 +75,7 @@ dependencies {
   testImplementation "org.apache.pekko:pekko-actor-typed_${scalaVersion}:${pekkoVersion}"
 
   /* Logging */
-  implementation 'ch.qos.logback:logback-classic:1.5.24'
+  implementation 'ch.qos.logback:logback-classic:1.5.32'
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.6" // pekko scala logging
 
   /* Scala compiler plugin for static code analysis */

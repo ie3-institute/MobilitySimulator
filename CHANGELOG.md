@@ -13,8 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Only run CI tasks `Deploy` and `MavenCentral Staging` only for release branches [#403](https://github.com/ie3-institute/MobilitySimulator/issues/403)
 - Some improvements and format changes [#412](https://github.com/ie3-institute/MobilitySimulator/issues/412)
+- Fix update of `gradle` [#442](https://github.com/ie3-institute/MobilitySimulator/issues/442)
 
 ### Fixed
+- Fixed shadowJar dependency [#452](https://github.com/ie3-institute/MobilitySimulator/issues/452)
+- Fixed EvType error message and example input [#454](https://github.com/ie3-institute/MobilitySimulator/issues/454)
 
 ## [1.0.0]
 
