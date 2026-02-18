@@ -125,7 +125,7 @@ object EvType {
           .getValue
           .doubleValue()
       ),
-      Each(evTypeInput.getCosPhiRated.doubleValue()),
+      Each(evTypeInput.getCosPhiRated),
     )
   }
 
