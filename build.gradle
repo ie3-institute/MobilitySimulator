@@ -83,7 +83,7 @@ dependencies {
   scalaCompilerPlugins("com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}")
 
   /* config */
-  implementation 'com.typesafe:config:1.4.5'
+  implementation 'com.typesafe:config:1.4.6'
   implementation "com.github.carueda:tscfg_${scalaVersion}:$tscfgVersion"
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 
