@@ -1,0 +1,23 @@
+ @startuml
+start
+switch (Determine Type of Day)
+case ()
+  :Weekday;
+case ()
+  :Saturday;
+case ()
+  :Sunday;
+endswitch
+    :Load Day Type Parameters;
+    repeat
+    :Initialise Trip Journal;
+      :Determine first Departure;
+    repeat
+    :Determine next Target State\nDetermine Driving Distance\nDetermine Driving Speed\nDetermine next Departure\nCalculate Parking Duration;
+    :Simulate Trip and\nadd to Trip Journal;
+    repeat while (Next Departure today) is (yes) not (no)
+repeat while (All vehicles simulated?) is (no) not (yes)
+: Continue with next Day;
+stop
+@enduml
+

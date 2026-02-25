@@ -1,0 +1,31 @@
+@startuml
+(*) --> "Initialise Simulation Parameter"
+if "Determine Type of Day" then
+    --> "Working Day"
+    --> "Load Day Type Parameters"
+else
+    --> "Saturday"
+
+    --> "Load Day Type Parameters"
+
+    --> "Initialise Trip Journal"
+
+    --> "Determine first Departure"
+
+    --> "Determine\n - next Target State\n - Driving Distance\n - Driving Speed\n - Parking Duration"
+
+
+    if "Last trip of this day" then
+        [yes] if "All vehicles simulated?" then
+            --> [yes] (*)
+        else
+             --> [no]  "Initialise Trip Journal"
+                    endif
+    else
+     --> [no] "Determine\n - next Target State\n - Driving Distance\n - Driving Speed\n - Parking Duration"
+    endif
+
+else
+    --> "Sunday"
+    --> "Load Day Type Parameters"
+@enduml
