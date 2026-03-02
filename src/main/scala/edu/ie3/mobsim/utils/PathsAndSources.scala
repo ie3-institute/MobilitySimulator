@@ -47,11 +47,10 @@ final case class PathsAndSources private (
   */
 object PathsAndSources extends LazyLogging {
 
-  private val basePath: Path = Paths.get("").toAbsolutePath
-
   def apply(
       simulationName: String,
       inputConfig: MobSimConfig.Mobsim.Input,
+      simonaOutputDir: Path,
       maybeOutputDir: Option[String],
   ): PathsAndSources = {
 
@@ -63,7 +62,7 @@ object PathsAndSources extends LazyLogging {
     val mobSimDirPath = Paths.get(mobSimDir)
     val mobSimInputDir =
       if (mobSimDirPath.isAbsolute) mobSimDirPath
-      else basePath.resolve(mobSimDir)
+      else simonaOutputDir.resolve(mobSimDir)
     val poiPath = {
       mobSimInputDir
         .resolve("poi")
@@ -99,16 +98,14 @@ object PathsAndSources extends LazyLogging {
     val outputDir = maybeOutputDir match {
       case Some(dir) =>
         if (Paths.get(dir).isAbsolute) dir
-        else basePath.resolve(dir).toString
+        else simonaOutputDir.resolve(dir).toString
       case None =>
-        determineRecentOutputDirectory(
-          basePath.resolve("output").resolve(simulationName).toString
-        )
+        simonaOutputDir.resolve(simulationName).toString
     }
 
     /* Build the actual sources */
     // TODO: Consider for hierarchic directory structure
-    val powerSystemModelDir = basePath.resolve(gridDir)
+    val powerSystemModelDir = simonaOutputDir.resolve(gridDir)
     val fileNamingStrategy = new FileNamingStrategy()
 
     val csvDataSource =
