@@ -9,14 +9,14 @@ package edu.ie3.mobsim
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
-import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
+import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast, MobSimConfig}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
   UninitializedException,
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
-import edu.ie3.mobsim.io.probabilities._
+import edu.ie3.mobsim.io.probabilities.*
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.builder.{
@@ -43,9 +43,9 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util
 import java.util.{Optional, UUID}
-import scala.collection.parallel.CollectionConverters._
-import scala.jdk.CollectionConverters._
-import scala.jdk.OptionConverters._
+import scala.collection.parallel.CollectionConverters.*
+import scala.jdk.CollectionConverters.*
+import scala.jdk.OptionConverters.*
 import scala.util.Random
 
 final class MobilitySimulator(
@@ -571,17 +571,10 @@ object MobilitySimulator
     val initTick = -1L
 
     logger.info("Starting setup...")
+    val setupData = getSetupData
 
     logger.debug("Parsing config")
-    val config = ArgsParser
-      .prepareConfig(getMainArgs)
-      .getOrElse(
-        throw InitializationException(
-          s"Unable to parse config from given args '${getMainArgs
-              .mkString("Array(", ", ", ")")}'. " +
-            s"They have to contain at least 'config=<config_location>'."
-        )
-      )
+    val config = MobSimConfig(setupData.config)
     ConfigFailFast.check(config)
 
     /* Setup paths received from SIMONA */
@@ -589,6 +582,7 @@ object MobilitySimulator
       PathsAndSources(
         config.mobsim.simulation.name,
         config.mobsim.input,
+        setupData.baseOutputDirectory,
         config.mobsim.output.outputDir,
       )
 
