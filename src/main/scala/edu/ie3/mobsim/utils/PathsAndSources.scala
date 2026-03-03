@@ -9,18 +9,12 @@ package edu.ie3.mobsim.utils
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.io.naming.FileNamingStrategy
 import edu.ie3.datamodel.io.source.csv.CsvDataSource
-import edu.ie3.datamodel.io.source.{
-  EnergyManagementSource,
-  RawGridSource,
-  SystemParticipantSource,
-  ThermalSource,
-  TypeSource,
-}
+import edu.ie3.datamodel.io.source.*
 import edu.ie3.mobsim.config.MobSimConfig
 import org.apache.commons.io.FilenameUtils
 
 import java.nio.file.{Files, Path, Paths}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 final case class PathsAndSources private (
     mobSimInputDir: String,
@@ -35,8 +29,6 @@ final case class PathsAndSources private (
     poiTransitionPath: String,
     tripDistancePath: String,
     outputDir: String,
-    rawGridSource: RawGridSource,
-    systemParticipantSource: SystemParticipantSource,
     colSep: String,
 )
 
@@ -46,6 +38,8 @@ final case class PathsAndSources private (
   * folder of the SIMONA run you are executing.
   */
 object PathsAndSources extends LazyLogging {
+
+  private val basePath: Path = Paths.get("").toAbsolutePath
 
   def apply(
       simulationName: String,
@@ -62,7 +56,7 @@ object PathsAndSources extends LazyLogging {
     val mobSimDirPath = Paths.get(mobSimDir)
     val mobSimInputDir =
       if (mobSimDirPath.isAbsolute) mobSimDirPath
-      else simonaOutputDir.resolve(mobSimDir)
+      else basePath.resolve(mobSimDir)
     val poiPath = {
       mobSimInputDir
         .resolve("poi")
@@ -103,33 +97,6 @@ object PathsAndSources extends LazyLogging {
         simonaOutputDir.resolve(simulationName).toString
     }
 
-    /* Build the actual sources */
-    // TODO: Consider for hierarchic directory structure
-    val powerSystemModelDir = simonaOutputDir.resolve(gridDir)
-    val fileNamingStrategy = new FileNamingStrategy()
-
-    val csvDataSource =
-      new CsvDataSource(gridColSep, powerSystemModelDir, fileNamingStrategy)
-    val csvTypeSource: TypeSource = new TypeSource(csvDataSource)
-
-    val csvThermalSource: ThermalSource =
-      new ThermalSource(csvTypeSource, csvDataSource)
-
-    val csvRawGridSource: RawGridSource =
-      new RawGridSource(csvTypeSource, csvDataSource)
-
-    val csvEnergyManagementSource: EnergyManagementSource =
-      new EnergyManagementSource(csvTypeSource, csvDataSource)
-
-    val csvSystemParticipantSource: SystemParticipantSource =
-      new SystemParticipantSource(
-        csvTypeSource,
-        csvThermalSource,
-        csvRawGridSource,
-        csvEnergyManagementSource,
-        csvDataSource,
-      )
-
     new PathsAndSources(
       mobSimInputDir.toString,
       poiPath,
@@ -143,8 +110,6 @@ object PathsAndSources extends LazyLogging {
       poiTransitionPath,
       tripDistancePath,
       outputDir,
-      csvRawGridSource,
-      csvSystemParticipantSource,
       inputConfig.mobility.source.colSep,
     )
 

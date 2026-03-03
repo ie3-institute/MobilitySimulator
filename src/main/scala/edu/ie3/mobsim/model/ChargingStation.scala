@@ -9,21 +9,22 @@ package edu.ie3.mobsim.model
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.io.source.{RawGridSource, SystemParticipantSource}
 import edu.ie3.datamodel.models.ElectricCurrentType
+import edu.ie3.datamodel.models.input.container.SystemParticipants
 import edu.ie3.datamodel.models.input.system.`type`.chargingpoint.ChargingPointType
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.io.geodata.PoiEnums
 import edu.ie3.util.quantities.PowerSystemUnits.{KILOWATT, KILOWATTHOUR}
 import edu.ie3.util.quantities.QuantityUtils.min
 import org.locationtech.jts.geom.Coordinate
-import squants.{Energy, Length, Time}
 import squants.energy.Kilowatts
 import squants.time.Minutes
+import squants.{Energy, Length, Time}
 
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 import scala.collection.immutable.Queue
 import scala.collection.parallel.CollectionConverters.ImmutableIterableIsParallelizable
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Random
 
 final case class ChargingStation(
@@ -37,23 +38,20 @@ final case class ChargingStation(
 
 object ChargingStation extends LazyLogging {
 
-  /** Load node and evcs input data using PSDM functions and use it to construct
+  /** Retrieves the charging stations provided by SIMONA and use it to construct
     * charging stations with needed information. The information contains among
     * others the uuid (same as in SIMONA) and the geographical location
     * (coordinates).
-    * @param gridSource
-    *   Source to obtain grid information from
-    * @param participantSource
-    *   Source to obtain participant information from
+    * @param systemParticipants
+    *   The system participants that are provided by SIMONA
     * @return
     *   A collection of available [[ChargingStation]]s
     */
-  def loadChargingStationsWithPSDM(
-      gridSource: RawGridSource,
-      participantSource: SystemParticipantSource,
+  def buildChargingStationsFromGrid(
+      systemParticipants: SystemParticipants
   ): Seq[ChargingStation] = {
 
-    val chargingStations = participantSource.getEvcs.asScala.toSeq
+    val chargingStations = systemParticipants.getEvcs.asScala.toSeq
       .map { evcs =>
         ChargingStation(
           evcs.getUuid,
