@@ -9,7 +9,7 @@ package edu.ie3.mobsim
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
-import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast, MobSimConfig}
+import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
   UninitializedException,
@@ -31,8 +31,10 @@ import edu.ie3.mobsim.model.{
   EvType,
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
-import edu.ie3.simona.api.data.connection.ExtDataConnection
-import edu.ie3.simona.api.data.connection.ExtEvDataConnection
+import edu.ie3.simona.api.data.connection.{
+  ExtDataConnection,
+  ExtEvDataConnection,
+}
 import edu.ie3.simona.api.data.model.ev.EvModel
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -596,9 +598,8 @@ object MobilitySimulator
     )
 
     /* Load charging stations in the grid */
-    val chargingStations = ChargingStation.loadChargingStationsWithPSDM(
-      pathsAndSources.rawGridSource,
-      pathsAndSources.systemParticipantSource,
+    val chargingStations = ChargingStation.buildChargingStationsFromGrid(
+      setupData.gridContainer.getSystemParticipants
     )
 
     /* Load all POIs in the area */
