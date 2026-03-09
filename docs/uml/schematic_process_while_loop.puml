@@ -8,8 +8,8 @@ case ()
 case ()
   :Sunday;
 endswitch
-    repeat
     :Load Day Type Parameters;
+    repeat
     :Initialise Trip Journal;
       :Determine first Departure;
     repeat
