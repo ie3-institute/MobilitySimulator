@@ -7,7 +7,7 @@
 package edu.ie3.mobsim
 
 import edu.ie3.simona.api.ExtLinkInterface
-import edu.ie3.simona.api.data.ExtSimAdapterData
+import edu.ie3.simona.api.data.SetupData
 import edu.ie3.simona.api.simulation.ExtSimulation
 
 class ExtLink extends ExtLinkInterface {
@@ -16,6 +16,7 @@ class ExtLink extends ExtLinkInterface {
   override def getExtSimulation: ExtSimulation = MobilitySimulator
 
   @Override
-  override def setup(extSimAdapterData: ExtSimAdapterData): Unit =
-    MobilitySimulator.setAdapterData(extSimAdapterData)
+  override def setup(setupData: SetupData): Unit = {
+    // no setup needed
+  }
 }

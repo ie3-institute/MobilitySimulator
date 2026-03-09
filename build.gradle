@@ -3,15 +3,15 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '8.2.1'//code format
+  id 'com.diffplug.spotless' version '8.3.0'//code format
   id "de.undercouch.download" version "5.7.0" // downloads plugin
-  id "org.sonarqube" version "7.2.2.6593" // sonarqube
+  id "org.sonarqube" version "7.2.3.7755" // sonarqube
   id "org.scoverage" version "8.1" // scala code coverage scoverage
   id "com.github.maiflai.scalatest" version "0.33" // run scalatest without specific spec task
   id 'maven-publish' // publish to a maven repo (local or mvn central, has to be defined)
   id 'signing'
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
-  id 'com.gradleup.shadow' version '9.3.1'
+  id 'com.gradleup.shadow' version '9.3.2'
   id "kr.motd.sphinx" version "2.10.1" // documentation generation
 }
 
@@ -60,7 +60,7 @@ dependencies {
     exclude group: 'com.github.ie3-institute'
   }
 
-  implementation 'com.github.ie3-institute:simonaAPI:0.12.0'
+  implementation 'com.github.ie3-institute:simonaAPI:0.13.0'
 
   implementation 'tech.units:indriya:2.2.3' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
@@ -83,7 +83,7 @@ dependencies {
   scalaCompilerPlugins("com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}")
 
   /* config */
-  implementation 'com.typesafe:config:1.4.5'
+  implementation 'com.typesafe:config:1.4.6'
   implementation "com.github.carueda:tscfg_${scalaVersion}:$tscfgVersion"
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
 

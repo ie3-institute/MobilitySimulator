@@ -30,6 +30,7 @@ class PathsAndSourcesSpec extends UnitSpec {
         PathsAndSources(
           "mySimulation",
           inputConfigRelative,
+          basePath,
           Some("relativePath/results"),
         )
 
@@ -55,6 +56,7 @@ class PathsAndSourcesSpec extends UnitSpec {
         PathsAndSources(
           "mySimulation",
           inputConfigAbsolute,
+          basePath,
           Some(absPath.resolve("results").toString),
         )
 

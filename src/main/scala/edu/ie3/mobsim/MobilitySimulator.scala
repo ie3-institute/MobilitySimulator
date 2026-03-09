@@ -9,14 +9,14 @@ package edu.ie3.mobsim
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
-import edu.ie3.mobsim.config.{ArgsParser, ConfigFailFast}
+import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
   UninitializedException,
 }
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
-import edu.ie3.mobsim.io.probabilities._
+import edu.ie3.mobsim.io.probabilities.*
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
 import edu.ie3.mobsim.model.builder.{
@@ -31,8 +31,10 @@ import edu.ie3.mobsim.model.{
   EvType,
 }
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
-import edu.ie3.simona.api.data.connection.ExtDataConnection
-import edu.ie3.simona.api.data.connection.ExtEvDataConnection
+import edu.ie3.simona.api.data.connection.{
+  ExtDataConnection,
+  ExtEvDataConnection,
+}
 import edu.ie3.simona.api.data.model.ev.EvModel
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -43,9 +45,9 @@ import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util
 import java.util.{Optional, UUID}
-import scala.collection.parallel.CollectionConverters._
-import scala.jdk.CollectionConverters._
-import scala.jdk.OptionConverters._
+import scala.collection.parallel.CollectionConverters.*
+import scala.jdk.CollectionConverters.*
+import scala.jdk.OptionConverters.*
 import scala.util.Random
 
 final class MobilitySimulator(
@@ -571,17 +573,10 @@ object MobilitySimulator
     val initTick = -1L
 
     logger.info("Starting setup...")
+    val setupData = getSetupData
 
     logger.debug("Parsing config")
-    val config = ArgsParser
-      .prepareConfig(getMainArgs)
-      .getOrElse(
-        throw InitializationException(
-          s"Unable to parse config from given args '${getMainArgs
-              .mkString("Array(", ", ", ")")}'. " +
-            s"They have to contain at least 'config=<config_location>'."
-        )
-      )
+    val config = MobSimConfig(setupData.config)
     ConfigFailFast.check(config)
 
     /* Setup paths received from SIMONA */
@@ -589,6 +584,7 @@ object MobilitySimulator
       PathsAndSources(
         config.mobsim.simulation.name,
         config.mobsim.input,
+        setupData.baseOutputDirectory,
         config.mobsim.output.outputDir,
       )
 
@@ -602,9 +598,8 @@ object MobilitySimulator
     )
 
     /* Load charging stations in the grid */
-    val chargingStations = ChargingStation.loadChargingStationsWithPSDM(
-      pathsAndSources.rawGridSource,
-      pathsAndSources.systemParticipantSource,
+    val chargingStations = ChargingStation.buildChargingStationsFromGrid(
+      setupData.gridContainer.getSystemParticipants
     )
 
     /* Load all POIs in the area */
