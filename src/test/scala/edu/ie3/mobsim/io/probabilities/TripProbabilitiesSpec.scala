@@ -12,10 +12,12 @@ import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
 import edu.ie3.mobsim.utils.PathsAndSources
 import edu.ie3.test.common.UnitSpec
 
-import java.nio.file.Paths
+import java.nio.file.{Path, Paths}
 
 class TripProbabilitiesSpec extends UnitSpec {
   protected val averageCarUsage = 1.0
+  protected val basePath: Path = Paths.get(".").toAbsolutePath
+
   "reads trip probabilities from files correctly" in {
 
     val gridConf = Grid("grid", CsvParams("/some/Path", ","))
@@ -24,7 +26,12 @@ class TripProbabilitiesSpec extends UnitSpec {
 
     val mobilityConf = Mobility(CsvParams("", mobSimPath.toString))
     val pathsAndSources =
-      PathsAndSources("testSim", Input(None, gridConf, mobilityConf), None)
+      PathsAndSources(
+        "testSim",
+        Input(None, gridConf, mobilityConf),
+        basePath,
+        None,
+      )
     val tripProbabilities =
       TripProbabilities.read(
         pathsAndSources,
