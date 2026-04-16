@@ -10,18 +10,31 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
-import edu.ie3.mobsim.exceptions.{InitializationException, UninitializedException}
-
-import scala.jdk.OptionConverters.*
+import edu.ie3.mobsim.exceptions.{
+  InitializationException,
+  UninitializedException,
+}
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities.*
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.builder.{EvBuilderFromEvInput, EvBuilderFromEvInputWithEvcsMapping, EvBuilderFromRandomModel}
-import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvMovement, EvType}
+import edu.ie3.mobsim.model.builder.{
+  EvBuilderFromEvInput,
+  EvBuilderFromEvInputWithEvcsMapping,
+  EvBuilderFromRandomModel,
+}
+import edu.ie3.mobsim.model.{
+  ChargingStation,
+  ElectricVehicle,
+  EvMovement,
+  EvType,
+}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
-import edu.ie3.simona.api.data.connection.{ExtDataConnection, ExtEvDataConnection}
+import edu.ie3.simona.api.data.connection.{
+  ExtDataConnection,
+  ExtEvDataConnection,
+}
 import edu.ie3.simona.api.data.model.ev.EvModel
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -31,10 +44,9 @@ import squants.space.{Kilometers, Meters}
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util
-import java.util.{Optional, OptionalLong, UUID}
+import java.util.{OptionalLong, UUID}
 import scala.collection.parallel.CollectionConverters.*
 import scala.jdk.CollectionConverters.*
-import scala.jdk.OptionConverters.*
 import scala.util.Random
 
 final class MobilitySimulator(
