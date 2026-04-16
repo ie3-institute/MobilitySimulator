@@ -10,31 +10,18 @@ import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
 import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
-import edu.ie3.mobsim.exceptions.{
-  InitializationException,
-  UninitializedException,
-}
+import edu.ie3.mobsim.exceptions.{InitializationException, UninitializedException}
+
+import scala.jdk.OptionConverters.*
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.{HomePoiMapping, PoiUtils, PointOfInterest}
 import edu.ie3.mobsim.io.probabilities.*
 import edu.ie3.mobsim.model.ChargingStation.chooseChargingStation
 import edu.ie3.mobsim.model.TripSimulation.simulateNextTrip
-import edu.ie3.mobsim.model.builder.{
-  EvBuilderFromEvInput,
-  EvBuilderFromEvInputWithEvcsMapping,
-  EvBuilderFromRandomModel,
-}
-import edu.ie3.mobsim.model.{
-  ChargingStation,
-  ElectricVehicle,
-  EvMovement,
-  EvType,
-}
+import edu.ie3.mobsim.model.builder.{EvBuilderFromEvInput, EvBuilderFromEvInputWithEvcsMapping, EvBuilderFromRandomModel}
+import edu.ie3.mobsim.model.{ChargingStation, ElectricVehicle, EvMovement, EvType}
 import edu.ie3.mobsim.utils.{IoUtils, PathsAndSources}
-import edu.ie3.simona.api.data.connection.{
-  ExtDataConnection,
-  ExtEvDataConnection,
-}
+import edu.ie3.simona.api.data.connection.{ExtDataConnection, ExtEvDataConnection}
 import edu.ie3.simona.api.data.model.ev.EvModel
 import edu.ie3.simona.api.simulation.ExtSimulation
 import edu.ie3.util.TimeUtil
@@ -44,7 +31,7 @@ import squants.space.{Kilometers, Meters}
 import java.time.temporal.ChronoUnit
 import java.time.{ZoneId, ZonedDateTime}
 import java.util
-import java.util.{Optional, UUID}
+import java.util.{Optional, OptionalLong, UUID}
 import scala.collection.parallel.CollectionConverters.*
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
@@ -75,7 +62,7 @@ final class MobilitySimulator(
     * @return
     *   Next time tick when simulation should be triggered again
     */
-  private def doActivity(tick: Long): Optional[java.lang.Long] = {
+  private def doActivity(tick: Long): OptionalLong = {
     /* Update current time */
     val currentTime = startTime.plusSeconds(tick)
 
@@ -121,9 +108,10 @@ final class MobilitySimulator(
       )
     }
 
-    timeUntilNextEvent.map { nextEvent =>
-      long2Long(tick + nextEvent)
-    }.toJava
+    timeUntilNextEvent match {
+      case Some(nextEvent) => OptionalLong.of(tick + nextEvent)
+      case None            => OptionalLong.empty()
+    }
   }
 
   /** Hand over EVs to SIMONA which arrive at their destination POI or depart
@@ -198,9 +186,14 @@ final class MobilitySimulator(
       MobilitySimulator
         .getTimeUntilNextEvent(electricVehicles, currentTime)
         .map(_ + tick)
+    val optionalNextEvent: OptionalLong = timeUntilNextEvent match {
+      case Some(t) => OptionalLong.of(t)
+      case None    => OptionalLong.empty()
+    }
+
     evDataConnection.provideArrivingEvs(
       EvMovement.buildMovementsMap(arrivals),
-      timeUntilNextEvent.map(long2Long).toJava,
+      optionalNextEvent,
     )
     logger.debug("Sent {} arriving EVs to SIMONA", arrivals.size)
   }
@@ -555,7 +548,7 @@ object MobilitySimulator
     * @return
     *   Next time tick when simulation should be triggered again
     */
-  override protected def doActivity(tick: Long): Optional[java.lang.Long] = {
+  override protected def doActivity(tick: Long): OptionalLong = {
     simulator
       .map(_.doActivity(tick))
       .getOrElse(
@@ -568,7 +561,7 @@ object MobilitySimulator
     * necessary data such as probabilities, EV models, etc. and creates all
     * objects such as EVs, POIs, and charging stations.
     */
-  override protected def initialize(): java.lang.Long = {
+  override protected def initialize(): Long = {
 
     val initTick = -1L
 
@@ -811,7 +804,7 @@ object MobilitySimulator
     // Also provide first tick to the data service
     evDataConnection.provideArrivingEvs(
       Map.empty[UUID, java.util.List[EvModel]].asJava,
-      Some(long2Long(firstEventTick)).toJava,
+      OptionalLong.of(firstEventTick),
     )
 
     logger.info("Finished setup!")
