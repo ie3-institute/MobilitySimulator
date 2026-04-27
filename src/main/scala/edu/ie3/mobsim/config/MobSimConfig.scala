@@ -7,17 +7,19 @@
 package edu.ie3.mobsim.config
 
 import com.typesafe.config.Config
+import edu.ie3.mobsim.config.MobSimConfig.Output
+import edu.ie3.mobsim.config.MobSimConfig.Simulation.Location
 import edu.ie3.mobsim.exceptions.IllegalConfigException
-import pureconfig.{ConfigConvert, *}
 import pureconfig.error.*
 import pureconfig.generic.*
 import pureconfig.generic.semiauto.deriveConvert
+import pureconfig.*
 
 import scala.deriving.Mirror
 
 final case class MobSimConfig(
     input: MobSimConfig.Input,
-    output: MobSimConfig.Output,
+    output: MobSimConfig.Output = Output(),
     simulation: MobSimConfig.Simulation,
 ) derives ConfigConvert
 
@@ -68,7 +70,7 @@ object MobSimConfig {
   ) derives ConfigConvert
 
   final case class Input(
-      homePoiMapping: Option[MobSimConfig.CsvParams],
+      homePoiMapping: Option[MobSimConfig.CsvParams] = None,
       mobility: MobSimConfig.CsvParams,
   ) derives ConfigConvert
 
@@ -79,7 +81,7 @@ object MobSimConfig {
 
   final case class Simulation(
       averageCarUsage: Double = 0.6,
-      location: MobSimConfig.Simulation.Location,
+      location: MobSimConfig.Simulation.Location = Location(),
       numberOfEv: Int,
       round15: Boolean = false,
       targetHomeChargingShare: Double,

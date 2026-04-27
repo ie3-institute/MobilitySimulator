@@ -16,8 +16,9 @@ class HomePoiMappingSpec extends UnitSpec {
   "Home Poi mapping is read correctly" in {
 
     val filePath = Path.of(this.getClass.getResource("poi_mapping.csv").toURI)
+
     val mappings =
-      HomePoiMapping.readPoiMapping(CsvParams(",", filePath.toFile.toString))
+      HomePoiMapping.readPoiMapping(CsvParams(",", filePath.getParent.toString))
 
     mappings.size shouldBe 2
     mappings match {
