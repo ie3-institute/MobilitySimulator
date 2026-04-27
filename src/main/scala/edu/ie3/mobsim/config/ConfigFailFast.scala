@@ -23,9 +23,9 @@ object ConfigFailFast {
 
   private def check(csvParams: CsvParams): Unit = {
     val permissibleSeparators = Seq(",", ";", "\t")
-    if (!permissibleSeparators.contains(csvParams.colSep))
+    if (!permissibleSeparators.contains(csvParams.csvSep))
       throw IllegalConfigException(
-        s"Received illegal column separator '${csvParams.colSep}'. It has to be one of '${permissibleSeparators
+        s"Received illegal column separator '${csvParams.csvSep}'. It has to be one of '${permissibleSeparators
             .mkString(", ")}'."
       )
   }

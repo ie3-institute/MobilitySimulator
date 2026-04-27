@@ -65,7 +65,7 @@ object MobSimConfig {
   // pure config end
 
   final case class CsvParams(
-      colSep: String,
+      csvSep: String,
       path: String,
   ) derives ConfigConvert
 

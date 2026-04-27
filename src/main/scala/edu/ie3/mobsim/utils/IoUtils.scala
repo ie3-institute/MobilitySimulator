@@ -280,12 +280,12 @@ object IoUtils {
 
   def readCaseClassSeq[T](using
       decoder: Map[String, String] => T,
-      folderPath: String,
+      folderPath: Path,
       fileName: String,
       csvSep: String,
   ): Seq[T] = {
     val source =
-      new CsvDataSource(csvSep, Path.of(folderPath), new FileNamingStrategy())
+      new CsvDataSource(csvSep, folderPath, new FileNamingStrategy())
     source
       .getSourceData(Path.of(fileName))
       .toScala(LazyList)

@@ -8,6 +8,7 @@ package edu.ie3.mobsim
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
+import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
@@ -659,7 +660,7 @@ object MobilitySimulator
 
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
-      config.input.mobility.colSep,
+      config.input.mobility.csvSep,
       config.simulation.averageCarUsage,
       config.simulation.round15,
     )

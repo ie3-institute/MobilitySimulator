@@ -10,6 +10,7 @@ import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.utils.IoUtils
 
+import java.nio.file.Path
 import java.util.UUID
 import scala.util.Try
 
@@ -47,9 +48,9 @@ object HomePoiMapping {
   def readPoiMapping(csvParams: CsvParams): Seq[HomePoiMapping] =
     IoUtils.readCaseClassSeq(using
       homePoiDecoder,
-      csvParams.path,
+      Path.of(csvParams.path),
       "poi_mapping.csv",
-      csvParams.colSep,
+      csvParams.csvSep,
     )
 
   def getMaps(

@@ -26,7 +26,7 @@ final case class PathsAndSources private (
     poiTransitionPath: String,
     tripDistancePath: String,
     outputDir: Path,
-    colSep: String,
+    csvSep: String,
 )
 
 /** Beware: Since the simulation is executed as a jar within SIMONA relative
@@ -50,12 +50,11 @@ object PathsAndSources extends LazyLogging {
     val mobSimInputDir =
       if (mobSimDirPath.isAbsolute) mobSimDirPath
       else simonaInputDir.resolve(mobSimDir)
-    val poiPath = {
+    val poiPath =
       mobSimInputDir
         .resolve("poi")
         .resolve("poi.csv")
         .toString
-    }
 
     val evModelPath =
       mobSimInputDir.resolve("ev_models")
@@ -94,7 +93,7 @@ object PathsAndSources extends LazyLogging {
       poiTransitionPath,
       tripDistancePath,
       simonaOutputDir.resolve(outputDirName),
-      inputConfig.mobility.colSep,
+      inputConfig.mobility.csvSep,
     )
 
   }
