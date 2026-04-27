@@ -23,6 +23,7 @@ import java.nio.file.{Files, Path, Paths}
 import java.time.ZonedDateTime
 import java.util.UUID
 import scala.jdk.CollectionConverters.*
+import scala.jdk.StreamConverters.StreamHasToScala
 
 final case class IoUtils private (
     movementWriter: BufferedCsvWriter,
@@ -177,7 +178,7 @@ final case class IoUtils private (
 object IoUtils {
 
   def apply(
-      outputPath: String,
+      outputPath: Path,
       movementFileName: String,
       evFileName: String,
       evPosFileName: String,
@@ -185,11 +186,11 @@ object IoUtils {
       writeMovements: Boolean,
       csvSep: String = ";",
   ): IoUtils = {
-    Files.createDirectories(Paths.get(outputPath))
+    Files.createDirectories(outputPath)
 
     /* Create writer for ev movements and write headline */
     val movementWriter = {
-      val filePath = Path.of(outputPath, movementFileName)
+      val filePath = outputPath.resolve(movementFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -210,7 +211,7 @@ object IoUtils {
 
     /* Create writer for evs and write headline */
     val evWriter = {
-      val filePath = Path.of(outputPath, evFileName)
+      val filePath = outputPath.resolve(evFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -233,7 +234,7 @@ object IoUtils {
 
     /* Create writer for ev positions and write headline */
     val evPosWriter = {
-      val filePath = Path.of(outputPath, evPosFileName)
+      val filePath = outputPath.resolve(evPosFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -250,7 +251,7 @@ object IoUtils {
 
     /* Create writer for points of interest and write headline */
     val poiWriter = {
-      val filePath = Path.of(outputPath, poiFileName)
+      val filePath = outputPath.resolve(poiFileName)
       new BufferedCsvWriter(
         filePath,
         Array(
@@ -277,79 +278,18 @@ object IoUtils {
     )
   }
 
-  def readEvInputs(csvParams: CsvParams): Seq[EvInput] = {
-    val namingStrategy = new FileNamingStrategy()
-
-    val csvDataSource = new CsvDataSource(
-      csvParams.colSep,
-      Path.of(csvParams.path),
-      namingStrategy,
-    )
-
-    val typeSource: TypeSource = new TypeSource(csvDataSource)
-
-    val thermalSource: ThermalSource = new ThermalSource(
-      typeSource,
-      csvDataSource,
-    )
-
-    val rawGridSource =
-      new RawGridSource(
-        typeSource,
-        csvDataSource,
-      )
-
-    val energyManagementSource: EnergyManagementSource =
-      new EnergyManagementSource(
-        typeSource,
-        csvDataSource,
-      )
-
-    val systemParticipantSource = new SystemParticipantSource(
-      typeSource,
-      thermalSource,
-      rawGridSource,
-      energyManagementSource,
-      csvDataSource,
-    )
-    val evs = systemParticipantSource.getEvs
-    if (evs.isEmpty) {
-      throw new IOException(s"No evs parsed at ${csvParams.path}!")
-    }
-    evs.asScala.toSeq
-  }
-
-  private def getProjectRootDir: String = {
-    System.getProperty("user.dir")
-  }
-
-  private def getAbsolutePath(folderPath: String): Path = {
-    val path = Paths.get(folderPath)
-    if (!path.isAbsolute) Paths.get(getProjectRootDir, path.toString)
-    else path
-  }
-
-  def readCaseClassSeq[T](implicit
+  def readCaseClassSeq[T](using
       decoder: Map[String, String] => T,
       folderPath: String,
+      fileName: String,
       csvSep: String,
   ): Seq[T] = {
-    val absolutePath: Path = getAbsolutePath(folderPath)
-
-    val reader = new BufferedReader(new FileReader(absolutePath.toFile))
-    val headline = reader.readLine.split(csvSep).zipWithIndex
-
-    val lines = reader.lines.toList.asScala.toSeq
-    reader.close()
-
-    lines
-      .map { row =>
-        val cells = row.split(csvSep)
-
-        headline.map { case (field, index) =>
-          (field, cells(index))
-        }.toMap
-      }
+    val source =
+      new CsvDataSource(csvSep, Path.of(folderPath), new FileNamingStrategy())
+    source
+      .getSourceData(Path.of(fileName))
+      .toScala(LazyList)
+      .map(_.asScala.toMap)
       .map(decoder)
   }
 

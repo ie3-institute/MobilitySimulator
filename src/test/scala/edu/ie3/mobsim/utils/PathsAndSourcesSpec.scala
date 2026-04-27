@@ -6,9 +6,7 @@
 
 package edu.ie3.mobsim.utils
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
+import edu.ie3.mobsim.config.MobSimConfig.{CsvParams, Input}
 import edu.ie3.test.common.UnitSpec
 
 import java.nio.file.Paths
@@ -22,8 +20,7 @@ class PathsAndSourcesSpec extends UnitSpec {
 
       val inputConfigRelative = Input(
         None,
-        Grid("myGrid", CsvParams(",", "relativePath/grid")),
-        Mobility(CsvParams(",", "relativePath/mobility")),
+        CsvParams(",", "relativePath/mobility"),
       )
 
       val actualRelative =
@@ -31,7 +28,8 @@ class PathsAndSourcesSpec extends UnitSpec {
           "mySimulation",
           inputConfigRelative,
           basePath,
-          Some("relativePath/results"),
+          basePath,
+          "relativePath/results",
         )
 
       val relPath = basePath.resolve("relativePath")
@@ -39,7 +37,7 @@ class PathsAndSourcesSpec extends UnitSpec {
       actualRelative.mobSimInputDir shouldBe relPath
         .resolve("mobility")
         .toString
-      actualRelative.outputDir shouldBe relPath.resolve("results").toString
+      actualRelative.outputDir shouldBe relPath.resolve("results")
     }
 
     "using absolute paths" in {
@@ -48,8 +46,7 @@ class PathsAndSourcesSpec extends UnitSpec {
 
       val inputConfigAbsolute = Input(
         None,
-        Grid("myGrid", CsvParams(",", absPath.resolve("grid").toString)),
-        Mobility(CsvParams(",", absPath.resolve("mobility").toString)),
+        CsvParams(",", absPath.resolve("mobility").toString),
       )
 
       val actualAbsolute =
@@ -57,13 +54,14 @@ class PathsAndSourcesSpec extends UnitSpec {
           "mySimulation",
           inputConfigAbsolute,
           basePath,
-          Some(absPath.resolve("results").toString),
+          basePath,
+          absPath.resolve("results").toString,
         )
 
       actualAbsolute.mobSimInputDir shouldBe absPath
         .resolve("mobility")
         .toString
-      actualAbsolute.outputDir shouldBe absPath.resolve("results").toString
+      actualAbsolute.outputDir shouldBe absPath.resolve("results")
     }
 
   }

@@ -8,7 +8,6 @@ package edu.ie3.mobsim
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.EvInputSource
 import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
@@ -579,18 +578,20 @@ object MobilitySimulator
 
     logger.info("Starting setup...")
     val setupData = getSetupData
+    val fullConf = setupData.config
 
     logger.debug("Parsing config")
-    val config = MobSimConfig(setupData.config)
+    val config = MobSimConfig(fullConf)
     ConfigFailFast.check(config)
 
     /* Setup paths received from SIMONA */
     val pathsAndSources =
       PathsAndSources(
-        config.mobsim.simulation.name,
-        config.mobsim.input,
+        fullConf.getString("simona.simulationName"),
+        config.input,
+        setupData.baseInputDirectory,
         setupData.baseOutputDirectory,
-        config.mobsim.output.outputDir,
+        config.output.outputDir,
       )
 
     val ioUtils = IoUtils(
@@ -599,7 +600,7 @@ object MobilitySimulator
       "evs.csv",
       "positions.csv",
       "pois.csv",
-      config.mobsim.output.writeMovements,
+      config.output.writeMovements,
     )
 
     /* Load charging stations in the grid */
@@ -609,24 +610,18 @@ object MobilitySimulator
 
     /* Load all POIs in the area */
     val maxDistanceFromPoi = Meters(
-      config.mobsim.simulation.location.maxDistanceToChargingStation
+      config.simulation.location.maxDistanceToChargingStation
     )
     val maxDistanceFromHomePoi = Meters(
-      config.mobsim.simulation.location.maxDistanceToHomeChargingStation
+      config.simulation.location.maxDistanceToHomeChargingStation
     )
     val thresholdChargingHubDistance = Kilometers(
-      config.mobsim.simulation.location.chargingHubThresholdDistance
+      config.simulation.location.chargingHubThresholdDistance
     )
 
     /* in case we defined an explicit home poi to evcs mapping we don't need to assign
     nearest charging stations to home pois by their distance */
-    val assignHomeNearestChargingStations =
-      config.mobsim.input.evInputSource match {
-        case Some(EvInputSource(homePoiMapping, _))
-            if homePoiMapping.isDefined =>
-          false
-        case _ => true
-      }
+    val assignHomeNearestChargingStations = config.input.homePoiMapping.isEmpty
 
     val pois = PoiUtils.loadPOIs(
       chargingStations,
@@ -644,7 +639,7 @@ object MobilitySimulator
 
     /* Setup simulation start time */
     val startTime = TimeUtil.withDefaults
-      .toZonedDateTime(config.mobsim.simulation.startDate)
+      .toZonedDateTime(fullConf.getString("simona.time.startDateTime"))
       .withZoneSameInstant(ZoneId.of("UTC"))
 
     /* Initialize all EV objects in the area */
@@ -653,9 +648,9 @@ object MobilitySimulator
         pathsAndSources.evInputModelPath,
         pathsAndSources.evSegmentPath,
       )
-    val numberOfEvsInArea = config.mobsim.simulation.numberOfEv
+    val numberOfEvsInArea = config.simulation.numberOfEv
     val targetShareOfHomeCharging =
-      config.mobsim.simulation.targetHomeChargingShare
+      config.simulation.targetHomeChargingShare
     val start = System.currentTimeMillis()
     logger.info(
       s"Creating evs with a targeted home charging share of ${"%.2f"
@@ -664,9 +659,9 @@ object MobilitySimulator
 
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
-      config.mobsim.input.mobility.source.colSep,
-      config.mobsim.simulation.averageCarUsage,
-      config.mobsim.simulation.round15,
+      config.input.mobility.colSep,
+      config.simulation.averageCarUsage,
+      config.simulation.round15,
     )
 
     val homePOIsWithSizes = poisWithSizes
@@ -685,63 +680,61 @@ object MobilitySimulator
       ),
     )
 
-    val (evs, evcsDirectHomePoiMapping) =
-      config.mobsim.input.evInputSource match {
-        case Some(csvParams) =>
-          val evInputs =
-            IoUtils.readEvInputs(
-              csvParams.source
+    val (evs, evcsDirectHomePoiMapping) = {
+      val evInputs =
+        setupData.gridContainer.getSystemParticipants.getEvs.asScala.toSeq
+
+      if evInputs.nonEmpty then {
+        config.input.homePoiMapping match {
+          case Some(mappingSource) =>
+            val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
+            val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
+
+            (
+              EvBuilderFromEvInputWithEvcsMapping.build(
+                evInputs,
+                homePOIsWithSizes,
+                workPoiPdf,
+                chargingStations,
+                startTime,
+                tripProbabilities.firstDepartureOfDay,
+                ev2poi,
+                poi2evcs,
+              ),
+              poi2evcs,
             )
 
-          csvParams.homePoiMapping match {
-            case Some(mappingSource) =>
-              val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
-              val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
+          case None =>
+            (
+              EvBuilderFromEvInput.build(
+                evInputs,
+                homePOIsWithSizes,
+                workPoiPdf,
+                chargingStations,
+                startTime,
+                targetShareOfHomeCharging,
+                tripProbabilities.firstDepartureOfDay,
+              ),
+              Map.empty[UUID, UUID],
+            )
+        }
 
-              (
-                EvBuilderFromEvInputWithEvcsMapping.build(
-                  evInputs,
-                  homePOIsWithSizes,
-                  workPoiPdf,
-                  chargingStations,
-                  startTime,
-                  tripProbabilities.firstDepartureOfDay,
-                  ev2poi,
-                  poi2evcs,
-                ),
-                poi2evcs,
-              )
-
-            case None =>
-              (
-                EvBuilderFromEvInput.build(
-                  evInputs,
-                  homePOIsWithSizes,
-                  workPoiPdf,
-                  chargingStations,
-                  startTime,
-                  targetShareOfHomeCharging,
-                  tripProbabilities.firstDepartureOfDay,
-                ),
-                Map.empty[UUID, UUID],
-              )
-          }
-
-        case None =>
-          (
-            EvBuilderFromRandomModel.build(
-              numberOfEvsInArea,
-              homePOIsWithSizes,
-              workPoiPdf,
-              chargingStations,
-              startTime,
-              targetShareOfHomeCharging,
-              evModelPdf,
-              tripProbabilities.firstDepartureOfDay,
-            ),
-            Map.empty[UUID, UUID],
-          )
+      } else {
+        (
+          EvBuilderFromRandomModel.build(
+            numberOfEvsInArea,
+            homePOIsWithSizes,
+            workPoiPdf,
+            chargingStations,
+            startTime,
+            targetShareOfHomeCharging,
+            evModelPdf,
+            tripProbabilities.firstDepartureOfDay,
+          ),
+          Map.empty[UUID, UUID],
+        )
       }
+    }
 
     ioUtils.writePois(pois, evcsDirectHomePoiMapping)
 
@@ -800,7 +793,7 @@ object MobilitySimulator
       tripProbabilities,
       maxDistanceFromPoi,
       thresholdChargingHubDistance,
-      config.mobsim.simulation.round15,
+      config.simulation.round15,
     )
     simulator = Some(mobSim)
 

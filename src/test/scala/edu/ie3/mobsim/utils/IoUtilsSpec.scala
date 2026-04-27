@@ -198,16 +198,6 @@ class IoUtilsSpec extends UnitSpec with IoUtilsTestData with PoiTestData {
           parts(3) shouldBe firstEv.destinationPoi.toString
         }
     }
-
-    "read ev inputs successfully" in {
-      val path = Path.of(getClass.getResource("ev_input_data").toURI)
-      val csvParams = CsvParams(
-        ",",
-        path.toString,
-      )
-      val evInputs = IoUtils.readEvInputs(csvParams)
-      evInputs should have size 1
-    }
   }
 }
 object IoUtilsSpec {

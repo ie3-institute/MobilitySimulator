@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only run CI tasks `Deploy` and `MavenCentral Staging` only for release branches [#403](https://github.com/ie3-institute/MobilitySimulator/issues/403)
 - Some improvements and format changes [#412](https://github.com/ie3-institute/MobilitySimulator/issues/412)
 - Fix update of `gradle` [#442](https://github.com/ie3-institute/MobilitySimulator/issues/442)
+- Replaced configuration with information provided by `simonaAPI` [#475](https://github.com/ie3-institute/MobilitySimulator/issues/475)
+- Switched config framework to `pureconfig` [#476](https://github.com/ie3-institute/MobilitySimulator/issues/476)
 
 ### Fixed
 - Fixed shadowJar dependency [#452](https://github.com/ie3-institute/MobilitySimulator/issues/452)
