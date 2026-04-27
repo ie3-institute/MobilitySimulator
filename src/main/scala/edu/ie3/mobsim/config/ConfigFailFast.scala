@@ -6,41 +6,36 @@
 
 package edu.ie3.mobsim.config
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Simulation.Location
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.{Input, Simulation}
+import edu.ie3.mobsim.config.MobSimConfig.Simulation.Location
+import edu.ie3.mobsim.config.MobSimConfig.{CsvParams, Input, Simulation}
 import edu.ie3.mobsim.exceptions.IllegalConfigException
 
 object ConfigFailFast {
   def check(mobSimConfig: MobSimConfig): Unit = {
-    check(mobSimConfig.mobsim.input)
-    check(mobSimConfig.mobsim.simulation)
+    check(mobSimConfig.input)
+    check(mobSimConfig.simulation)
   }
 
-  private def check(config: MobSimConfig.Mobsim.Input): Unit = config match {
-    case Input(_, Grid(_, gridSource), Mobility(mobilitySource)) =>
-      check(gridSource)
+  private def check(config: MobSimConfig.Input): Unit = config match {
+    case Input(_, mobilitySource: CsvParams) =>
       check(mobilitySource)
   }
 
   private def check(csvParams: CsvParams): Unit = {
     val permissibleSeparators = Seq(",", ";", "\t")
-    if (!permissibleSeparators.contains(csvParams.colSep))
+    if (!permissibleSeparators.contains(csvParams.csvSep))
       throw IllegalConfigException(
-        s"Received illegal column separator '${csvParams.colSep}'. It has to be one of '${permissibleSeparators
+        s"Received illegal column separator '${csvParams.csvSep}'. It has to be one of '${permissibleSeparators
             .mkString(", ")}'."
       )
   }
 
-  private def check(config: MobSimConfig.Mobsim.Simulation): Unit =
+  private def check(config: MobSimConfig.Simulation): Unit =
     config match {
       case Simulation(
             averageCarUsage,
             location,
-            _,
             numberOfEv,
-            _,
             _,
             targetHomeChargingShare,
           ) =>
@@ -59,7 +54,7 @@ object ConfigFailFast {
           )
     }
 
-  private def check(config: MobSimConfig.Mobsim.Simulation.Location): Unit =
+  private def check(config: MobSimConfig.Simulation.Location): Unit =
     config match {
       case Location(
             chargingHubThresholdDistance,

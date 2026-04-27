@@ -10,6 +10,7 @@ import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.utils.IoUtils
 
+import java.nio.file.Path
 import java.util.UUID
 import scala.util.Try
 
@@ -27,7 +28,7 @@ object HomePoiMapping {
     evs.foldLeft("")((str, uuid) => str + uuid.toString + " ").strip()
   }
 
-  implicit val uuids: String => Seq[UUID] = (s: String) => {
+  val uuids: String => Seq[UUID] = (s: String) => {
     val triedUuids = s.split(" ").map(uuid => Try(UUID.fromString(uuid))).toSeq
     triedUuids.partitionMap(_.toEither) match {
       case (Nil, uuids) => uuids
@@ -36,8 +37,8 @@ object HomePoiMapping {
     }
   }
 
-  implicit val homePoiDecoder: Map[String, String] => HomePoiMapping =
-    row =>
+  private val homePoiDecoder: Map[String, String] => HomePoiMapping =
+    (row: Map[String, String]) =>
       HomePoiMapping(
         UUID.fromString(row("poi")),
         UUID.fromString(row("evcs")),
@@ -45,10 +46,11 @@ object HomePoiMapping {
       )
 
   def readPoiMapping(csvParams: CsvParams): Seq[HomePoiMapping] =
-    IoUtils.readCaseClassSeq(
+    IoUtils.readCaseClassSeq(using
       homePoiDecoder,
-      csvParams.path,
-      csvParams.colSep,
+      Path.of(csvParams.path),
+      "poi_mapping.csv",
+      csvParams.csvSep,
     )
 
   def getMaps(

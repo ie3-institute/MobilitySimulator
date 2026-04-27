@@ -7,52 +7,47 @@
 package edu.ie3.mobsim.config
 
 import edu.ie3.mobsim.config.MobSimConfig.CsvParams
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Simulation.Location
+import edu.ie3.mobsim.config.MobSimConfig.Simulation.Location
 import edu.ie3.mobsim.exceptions.IllegalConfigException
 import edu.ie3.test.common.UnitSpec
 
 class ConfigFailFastSpec extends UnitSpec {
 
   private def createValidMobSimConfig(
-      gridSource: CsvParams = CsvParams(path = "poi.csv", colSep = ","),
+      gridSource: CsvParams = CsvParams(path = "poi.csv", csvSep = ","),
       mobilitySource: CsvParams =
-        CsvParams(path = "departure.csv", colSep = ","),
+        CsvParams(path = "departure.csv", csvSep = ","),
       averageCarUsage: Double = 0.6,
       numberOfEv: Int = 10,
       targetHomeChargingShare: Double = 0.5,
   ): MobSimConfig = {
     MobSimConfig(
-      mobsim = MobSimConfig.Mobsim(
-        input = MobSimConfig.Mobsim.Input(
-          evInputSource = None,
-          grid = MobSimConfig.Mobsim.Input.Grid("gridName", gridSource),
-          mobility = MobSimConfig.Mobsim.Input.Mobility(mobilitySource),
+      input = MobSimConfig.Input(
+        homePoiMapping = None,
+        mobility = mobilitySource,
+      ),
+      output = MobSimConfig.Output(
+        outputDir = "output",
+        writeMovements = true,
+      ),
+      simulation = MobSimConfig.Simulation(
+        averageCarUsage = averageCarUsage,
+        location = MobSimConfig.Simulation.Location(
+          maxDistanceToChargingStation = 500.0,
+          maxDistanceToHomeChargingStation = 30.0,
+          chargingHubThresholdDistance = 50.0,
         ),
-        output = MobSimConfig.Mobsim.Output(
-          outputDir = Some("output"),
-          writeMovements = true,
-        ),
-        simulation = MobSimConfig.Mobsim.Simulation(
-          name = "testSimulation",
-          startDate = "2025-01-01",
-          averageCarUsage = averageCarUsage,
-          location = MobSimConfig.Mobsim.Simulation.Location(
-            maxDistanceToChargingStation = 500.0,
-            maxDistanceToHomeChargingStation = 30.0,
-            chargingHubThresholdDistance = 50.0,
-          ),
-          numberOfEv = numberOfEv,
-          targetHomeChargingShare = targetHomeChargingShare,
-          round15 = false,
-        ),
-      )
+        numberOfEv = numberOfEv,
+        targetHomeChargingShare = targetHomeChargingShare,
+        round15 = false,
+      ),
     )
   }
 
   "ConfigFailFast" should {
 
     "throw an exception when the column separator in CsvParams is not permissible" in {
-      val invalidCsvParams = CsvParams(path = "departure.csv", colSep = "|")
+      val invalidCsvParams = CsvParams(path = "departure.csv", csvSep = "|")
       val invalidMobSimConfig =
         createValidMobSimConfig(mobilitySource = invalidCsvParams)
 
@@ -63,7 +58,7 @@ class ConfigFailFastSpec extends UnitSpec {
     }
 
     "not throw an exception when the column separator in CsvParams is permissible" in {
-      val validCsvParams = CsvParams(path = "departure.csv", colSep = ",")
+      val validCsvParams = CsvParams(path = "departure.csv", csvSep = ",")
       val validMobSimConfig =
         createValidMobSimConfig(mobilitySource = validCsvParams)
 
@@ -105,14 +100,14 @@ class ConfigFailFastSpec extends UnitSpec {
     }
 
     "throw an exception when the charging hub threshold distance is negative" in {
-      val invalidMobSimConfig = createValidMobSimConfig().copy(
-        mobsim = createValidMobSimConfig().mobsim.copy(
-          simulation = createValidMobSimConfig().mobsim.simulation.copy(
-            location = Location(
-              chargingHubThresholdDistance = -1.0,
-              maxDistanceToChargingStation = 500.0,
-              maxDistanceToHomeChargingStation = 30.0,
-            )
+      val baseConfig = createValidMobSimConfig()
+
+      val invalidMobSimConfig = baseConfig.copy(
+        simulation = baseConfig.simulation.copy(
+          location = Location(
+            chargingHubThresholdDistance = -1.0,
+            maxDistanceToChargingStation = 500.0,
+            maxDistanceToHomeChargingStation = 30.0,
           )
         )
       )
@@ -126,14 +121,14 @@ class ConfigFailFastSpec extends UnitSpec {
     }
 
     "throw an exception when maxDistanceToChargingStation is negative" in {
-      val invalidMobSimConfig = createValidMobSimConfig().copy(
-        mobsim = createValidMobSimConfig().mobsim.copy(
-          simulation = createValidMobSimConfig().mobsim.simulation.copy(
-            location = Location(
-              chargingHubThresholdDistance = 50.0,
-              maxDistanceToChargingStation = -10.0,
-              maxDistanceToHomeChargingStation = 30.0,
-            )
+      val baseConfig = createValidMobSimConfig()
+
+      val invalidMobSimConfig = baseConfig.copy(
+        simulation = baseConfig.simulation.copy(
+          location = Location(
+            chargingHubThresholdDistance = 50.0,
+            maxDistanceToChargingStation = -10.0,
+            maxDistanceToHomeChargingStation = 30.0,
           )
         )
       )
@@ -146,14 +141,14 @@ class ConfigFailFastSpec extends UnitSpec {
     }
 
     "throw an exception when maxDistanceToHomeChargingStation is negative" in {
-      val invalidMobSimConfig = createValidMobSimConfig().copy(
-        mobsim = createValidMobSimConfig().mobsim.copy(
-          simulation = createValidMobSimConfig().mobsim.simulation.copy(
-            location = Location(
-              chargingHubThresholdDistance = 50.0,
-              maxDistanceToChargingStation = 500.0,
-              maxDistanceToHomeChargingStation = -5.0,
-            )
+      val baseConfig = createValidMobSimConfig()
+
+      val invalidMobSimConfig = baseConfig.copy(
+        simulation = baseConfig.simulation.copy(
+          location = Location(
+            chargingHubThresholdDistance = 50.0,
+            maxDistanceToChargingStation = 500.0,
+            maxDistanceToHomeChargingStation = -5.0,
           )
         )
       )
