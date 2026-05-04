@@ -7,9 +7,6 @@
 package edu.ie3.mobsim.utils
 
 import com.typesafe.scalalogging.LazyLogging
-import edu.ie3.datamodel.io.naming.FileNamingStrategy
-import edu.ie3.datamodel.io.source.csv.CsvDataSource
-import edu.ie3.datamodel.io.source.*
 import edu.ie3.mobsim.config.MobSimConfig
 import org.apache.commons.io.FilenameUtils
 
@@ -28,8 +25,8 @@ final case class PathsAndSources private (
     parkingTimePath: String,
     poiTransitionPath: String,
     tripDistancePath: String,
-    outputDir: String,
-    colSep: String,
+    outputDir: Path,
+    csvSep: String,
 )
 
 /** Beware: Since the simulation is executed as a jar within SIMONA relative
@@ -39,31 +36,25 @@ final case class PathsAndSources private (
   */
 object PathsAndSources extends LazyLogging {
 
-  private val basePath: Path = Paths.get("").toAbsolutePath
-
   def apply(
       simulationName: String,
-      inputConfig: MobSimConfig.Mobsim.Input,
+      inputConfig: MobSimConfig.Input,
+      simonaInputDir: Path,
       simonaOutputDir: Path,
-      maybeOutputDir: Option[String],
+      outputDirName: String,
   ): PathsAndSources = {
-
-    val gridDir = harmonizeFileSeparators(inputConfig.grid.source.path)
-    val mobSimDir = harmonizeFileSeparators(inputConfig.mobility.source.path)
-    val gridColSep = inputConfig.grid.source.colSep
+    val mobSimDir = harmonizeFileSeparators(inputConfig.mobility.path)
 
     /* Build the different directory paths */
     val mobSimDirPath = Paths.get(mobSimDir)
     val mobSimInputDir =
       if (mobSimDirPath.isAbsolute) mobSimDirPath
-      else basePath.resolve(mobSimDir)
-    val poiPath = {
+      else simonaInputDir.resolve(mobSimDir)
+    val poiPath =
       mobSimInputDir
         .resolve("poi")
-        .resolve(inputConfig.grid.name)
         .resolve("poi.csv")
         .toString
-    }
 
     val evModelPath =
       mobSimInputDir.resolve("ev_models")
@@ -89,14 +80,6 @@ object PathsAndSources extends LazyLogging {
     val tripDistancePath =
       probabilitiesPath.resolve("trip_distance.csv").toString
 
-    val outputDir = maybeOutputDir match {
-      case Some(dir) =>
-        if (Paths.get(dir).isAbsolute) dir
-        else simonaOutputDir.resolve(dir).toString
-      case None =>
-        simonaOutputDir.resolve(simulationName).toString
-    }
-
     new PathsAndSources(
       mobSimInputDir.toString,
       poiPath,
@@ -109,8 +92,8 @@ object PathsAndSources extends LazyLogging {
       parkingTimePath,
       poiTransitionPath,
       tripDistancePath,
-      outputDir,
-      inputConfig.mobility.source.colSep,
+      simonaOutputDir.resolve(outputDirName),
+      inputConfig.mobility.csvSep,
     )
 
   }

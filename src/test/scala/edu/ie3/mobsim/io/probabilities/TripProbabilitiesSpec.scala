@@ -6,9 +6,7 @@
 
 package edu.ie3.mobsim.io.probabilities
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input
-import edu.ie3.mobsim.config.MobSimConfig.Mobsim.Input.{Grid, Mobility}
+import edu.ie3.mobsim.config.MobSimConfig.{CsvParams, Input}
 import edu.ie3.mobsim.utils.PathsAndSources
 import edu.ie3.test.common.UnitSpec
 
@@ -20,17 +18,17 @@ class TripProbabilitiesSpec extends UnitSpec {
 
   "reads trip probabilities from files correctly" in {
 
-    val gridConf = Grid("grid", CsvParams("/some/Path", ","))
     val mobSimPath =
       Paths.get("input", "mobilitySimulator")
 
-    val mobilityConf = Mobility(CsvParams("", mobSimPath.toString))
+    val mobilityConf = CsvParams("", mobSimPath.toString)
     val pathsAndSources =
       PathsAndSources(
         "testSim",
-        Input(None, gridConf, mobilityConf),
+        Input(None, mobilityConf),
         basePath,
-        None,
+        basePath,
+        "mobSim",
       )
     val tripProbabilities =
       TripProbabilities.read(

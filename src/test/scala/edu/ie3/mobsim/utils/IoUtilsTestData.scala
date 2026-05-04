@@ -20,7 +20,7 @@ trait IoUtilsTestData extends ChargingStationTestData {
     Files.createTempDirectory("io-utils-test").toFile
 
   protected val ioUtils: IoUtils = IoUtils(
-    outputFileDir.getPath,
+    outputFileDir.toPath,
     "movements.csv",
     "evs.csv",
     "positions.csv",
