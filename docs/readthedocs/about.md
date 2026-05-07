@@ -1,4 +1,4 @@
-## About MobilitySimulator
+# About MobilitySimulator
 
 MobilitySimulator is a simulation tool of vehicle movements. MobilitySimulator is being developed
 at the [Institute of Energy Systems, Energy Efficiency and Energy Economics](https://ie3.etit.tu-dortmund.de) at
