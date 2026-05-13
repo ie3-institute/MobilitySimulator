@@ -24,7 +24,7 @@ consists of a set of trips $f_i \in F$. Based on this set $F$ new trips are gene
 represent the traffic patterns. This allows the creation of a realistic usage profile for e-mobility. The trip set $F$ is sorted by vehicle
 type first and chronologically second (as described by the trip counter $i$), with trips $f_i$ represented as tuples of the parameters
 
-![Monte Carlo Simulation Sequence](images/MonteCarlo_flowchart.png)
+![Monte Carlo Simulation Sequence](images/Montecarlo_flowchart.png)
 
 The above images shows the methodology used for generating and simulating trip parameters using Monte Carlo Approach.
 Initially, the type of day used for simulation is determined along with vehicle travel journals will
