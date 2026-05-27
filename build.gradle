@@ -3,7 +3,7 @@ plugins {
   id 'java' // java support
   id 'scala' // scala support
   id 'pmd' // code check, working on source code
-  id 'com.diffplug.spotless' version '8.4.0'//code format
+  id 'com.diffplug.spotless' version '8.5.1'//code format
   id "de.undercouch.download" version "5.7.0" // downloads plugin
   id "org.sonarqube" version "7.3.0.8198" // sonarqube
   id "org.scoverage" version "8.1" // scala code coverage scoverage
@@ -60,7 +60,7 @@ dependencies {
 
   implementation 'com.github.ie3-institute:simonaAPI:0.14.0'
 
-  implementation 'tech.units:indriya:2.2.3' // Physical units
+  implementation 'tech.units:indriya:2.2.4' // Physical units
   implementation "org.typelevel:squants_${scalaVersion}:1.8.3"
   implementation 'org.locationtech.jts.io:jts-io-common:1.20.0' // Location specific stuff
   implementation 'commons-io:commons-io:2.22.0' // I/O functionalities
@@ -81,7 +81,7 @@ dependencies {
   scalaCompilerPlugins("com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}")
 
   /* config */
-  implementation 'com.typesafe:config:1.4.7'
+  implementation 'com.typesafe:config:1.4.8'
   implementation "com.github.scopt:scopt_${scalaVersion}:4.1.0" // cmd args parser
   implementation "com.github.pureconfig:pureconfig-core_${scalaVersion}:0.17.10"
   implementation "com.github.pureconfig:pureconfig-generic-scala3_${scalaVersion}:0.17.10"
