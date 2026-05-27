@@ -24,7 +24,7 @@ extensions = [
 # Make sure the target is unique
 autosectionlabel_prefix_document = True
 
-myst_enable_extensions = ["dollarmath", "amsmath"]
+myst_enable_extensions = ["dollarmath", "amsmath", "html_image"]
 
 templates_path = ['_templates']
 exclude_trees = ['.build']
