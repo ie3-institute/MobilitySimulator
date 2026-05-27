@@ -35,7 +35,7 @@ is then used to calculate travel duration and arrival time for the next destinat
 vehicle stays at the destination, it will be checked if the day has passed after this duration. If not, the next trip is simulated
 based on the updated departure time until the final trip of the day has been simulated.
 
-<img src="docs/readthedocs/images/Trip_journal_image.png" alt="Monte Carlo Simulation Sequence" width="600" height="150">
+<img src="docs/readthedocs/images/Trip_journal_image.png" alt="Trip Journal" width="600" height="150">
 
 The above figure shows the structure of trip journal that is modelled for the simulation which is based on vehicle journeys.
 Trip origins and destinations are categorised according to their purpose which helps with better understanding different mobility 
