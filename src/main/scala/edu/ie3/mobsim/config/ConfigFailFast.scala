@@ -7,7 +7,7 @@
 package edu.ie3.mobsim.config
 
 import edu.ie3.mobsim.config.MobSimConfig.Simulation.Location
-import edu.ie3.mobsim.config.MobSimConfig.{CsvParams, Input, Simulation}
+import edu.ie3.mobsim.config.MobSimConfig.{Input, Simulation}
 import edu.ie3.mobsim.exceptions.IllegalConfigException
 
 object ConfigFailFast {
@@ -17,17 +17,13 @@ object ConfigFailFast {
   }
 
   private def check(config: MobSimConfig.Input): Unit = config match {
-    case Input(_, mobilitySource: CsvParams) =>
-      check(mobilitySource)
-  }
-
-  private def check(csvParams: CsvParams): Unit = {
-    val permissibleSeparators = Seq(",", ";", "\t")
-    if (!permissibleSeparators.contains(csvParams.csvSep))
-      throw IllegalConfigException(
-        s"Received illegal column separator '${csvParams.csvSep}'. It has to be one of '${permissibleSeparators
-            .mkString(", ")}'."
-      )
+    case Input(_, csvSep, _, _) =>
+      val permissibleSeparators = Seq(",", ";", "\t")
+      if (!permissibleSeparators.contains(csvSep))
+        throw IllegalConfigException(
+          s"Received illegal column separator '$csvSep'. It has to be one of '${permissibleSeparators
+              .mkString(", ")}'."
+        )
   }
 
   private def check(config: MobSimConfig.Simulation): Unit =

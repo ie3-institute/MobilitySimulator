@@ -143,9 +143,10 @@ object EvType {
   def getEvInputModelsWithProbabilities(
       modelFilePath: String,
       probabilityFilePath: String,
+      csvSep: String,
   ): ProbabilityDensityFunction[EvType] = {
     val models = getFromFile(modelFilePath)
-    getEvInputModelsWithProbabilities(models, probabilityFilePath)
+    getEvInputModelsWithProbabilities(models, probabilityFilePath, csvSep)
   }
 
   def getFromFile(
@@ -189,8 +190,10 @@ object EvType {
   def getEvInputModelsWithProbabilities(
       modelList: Seq[EvType],
       probabilityFilePath: String,
+      csvSep: String,
   ): ProbabilityDensityFunction[EvType] = {
-    val segmentProbabilities = getEvSegmentProbabilities(probabilityFilePath)
+    val segmentProbabilities =
+      getEvSegmentProbabilities(probabilityFilePath, csvSep)
 
     /* Determine the amount of cars per segment */
     val segmentAppearances = modelList.groupBy(_.segment).map {
@@ -221,7 +224,7 @@ object EvType {
     */
   private def getEvSegmentProbabilities(
       filePath: String,
-      csvSep: String = ",",
+      csvSep: String,
   ): Map[String, Double] =
     Using(Source.fromFile(filePath)) { bufferedSource =>
       val segmentProbabilities = bufferedSource

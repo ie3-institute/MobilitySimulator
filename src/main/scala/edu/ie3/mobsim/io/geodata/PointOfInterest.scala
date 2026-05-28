@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.Coordinate
 import squants.Length
 import squants.space.Kilometers
 
+import java.nio.file.Path
 import java.util.UUID
 import scala.collection.parallel.CollectionConverters.seqIsParallelizable
 import scala.collection.parallel.ParSeq
@@ -23,7 +24,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.io.Source
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.{Try, Using}
 
 /** A point of special interest (POI)
@@ -68,14 +69,14 @@ case object PointOfInterest {
   private val columns = Seq(uuid, id, size, lat, lon, categoricalLocation)
 
   def getFromFile(
-      filePath: String,
+      filePath: Path,
       csvSep: String,
       evcs: Seq[ChargingStation],
       maxDistanceFromPoi: Length,
       maxDistanceFromHomePoi: Length,
       assignHomeNearestChargingStations: Boolean,
   ): Try[Seq[PointOfInterest]] =
-    Using(Source.fromFile(filePath).bufferedReader()) { reader =>
+    Using(Source.fromFile(filePath.toFile).bufferedReader()) { reader =>
       /* Determine order of headline */
       val header = reader.readLine().trim.toLowerCase.split(csvSep)
       val colToIndex = assessHeadLine(header)

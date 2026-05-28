@@ -8,7 +8,6 @@ package edu.ie3.mobsim
 
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.datamodel.models.input.system.`type`.evcslocation.EvcsLocationType
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.{ConfigFailFast, MobSimConfig}
 import edu.ie3.mobsim.exceptions.{
   InitializationException,
@@ -622,11 +621,12 @@ object MobilitySimulator
 
     /* in case we defined an explicit home poi to evcs mapping we don't need to assign
     nearest charging stations to home pois by their distance */
-    val assignHomeNearestChargingStations = config.input.homePoiMapping.isEmpty
+    val assignHomeNearestChargingStations = !config.input.useHomePoiMapping
 
     val pois = PoiUtils.loadPOIs(
       chargingStations,
       pathsAndSources.poiPath,
+      pathsAndSources.csvSep,
       maxDistanceFromPoi,
       maxDistanceFromHomePoi,
       assignHomeNearestChargingStations,
@@ -648,6 +648,7 @@ object MobilitySimulator
       EvType.getEvInputModelsWithProbabilities(
         pathsAndSources.evInputModelPath,
         pathsAndSources.evSegmentPath,
+        pathsAndSources.csvSep,
       )
     val numberOfEvsInArea = config.simulation.numberOfEv
     val targetShareOfHomeCharging =
@@ -660,7 +661,7 @@ object MobilitySimulator
 
     val tripProbabilities = TripProbabilities.read(
       pathsAndSources,
-      config.input.mobility.csvSep,
+      pathsAndSources.csvSep,
       config.simulation.averageCarUsage,
       config.simulation.round15,
     )
@@ -686,38 +687,41 @@ object MobilitySimulator
         setupData.gridContainer.getSystemParticipants.getEvs.asScala.toSeq
 
       if evInputs.nonEmpty then {
-        config.input.homePoiMapping match {
-          case Some(mappingSource) =>
-            val mappingEntries = HomePoiMapping.readPoiMapping(mappingSource)
-            val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
+        if config.input.useHomePoiMapping then {
+          val mappingEntries = HomePoiMapping.readPoiMapping(
+            pathsAndSources.homePoiMappingPath,
+            pathsAndSources.csvSep,
+          )
 
-            (
-              EvBuilderFromEvInputWithEvcsMapping.build(
-                evInputs,
-                homePOIsWithSizes,
-                workPoiPdf,
-                chargingStations,
-                startTime,
-                tripProbabilities.firstDepartureOfDay,
-                ev2poi,
-                poi2evcs,
-              ),
+          val (ev2poi, poi2evcs) = HomePoiMapping.getMaps(mappingEntries)
+
+          (
+            EvBuilderFromEvInputWithEvcsMapping.build(
+              evInputs,
+              homePOIsWithSizes,
+              workPoiPdf,
+              chargingStations,
+              startTime,
+              tripProbabilities.firstDepartureOfDay,
+              ev2poi,
               poi2evcs,
-            )
+            ),
+            poi2evcs,
+          )
 
-          case None =>
-            (
-              EvBuilderFromEvInput.build(
-                evInputs,
-                homePOIsWithSizes,
-                workPoiPdf,
-                chargingStations,
-                startTime,
-                targetShareOfHomeCharging,
-                tripProbabilities.firstDepartureOfDay,
-              ),
-              Map.empty[UUID, UUID],
-            )
+        } else {
+          (
+            EvBuilderFromEvInput.build(
+              evInputs,
+              homePOIsWithSizes,
+              workPoiPdf,
+              chargingStations,
+              startTime,
+              targetShareOfHomeCharging,
+              tripProbabilities.firstDepartureOfDay,
+            ),
+            Map.empty[UUID, UUID],
+          )
         }
 
       } else {

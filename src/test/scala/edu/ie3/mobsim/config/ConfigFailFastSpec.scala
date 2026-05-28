@@ -6,7 +6,6 @@
 
 package edu.ie3.mobsim.config
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.config.MobSimConfig.Simulation.Location
 import edu.ie3.mobsim.exceptions.IllegalConfigException
 import edu.ie3.test.common.UnitSpec
@@ -14,17 +13,18 @@ import edu.ie3.test.common.UnitSpec
 class ConfigFailFastSpec extends UnitSpec {
 
   private def createValidMobSimConfig(
-      gridSource: CsvParams = CsvParams(path = "poi.csv", csvSep = ","),
-      mobilitySource: CsvParams =
-        CsvParams(path = "departure.csv", csvSep = ","),
+      inputDir: String = "departure.csv",
+      csvSep: String = ",",
       averageCarUsage: Double = 0.6,
       numberOfEv: Int = 10,
       targetHomeChargingShare: Double = 0.5,
   ): MobSimConfig = {
     MobSimConfig(
       input = MobSimConfig.Input(
-        homePoiMapping = None,
-        mobility = mobilitySource,
+        inputDir,
+        csvSep,
+        hierarchic = true,
+        useHomePoiMapping = false,
       ),
       output = MobSimConfig.Output(
         outputDir = "output",
@@ -47,9 +47,8 @@ class ConfigFailFastSpec extends UnitSpec {
   "ConfigFailFast" should {
 
     "throw an exception when the column separator in CsvParams is not permissible" in {
-      val invalidCsvParams = CsvParams(path = "departure.csv", csvSep = "|")
       val invalidMobSimConfig =
-        createValidMobSimConfig(mobilitySource = invalidCsvParams)
+        createValidMobSimConfig(inputDir = "departure.csv", csvSep = "|")
 
       val exception = intercept[IllegalConfigException] {
         ConfigFailFast.check(invalidMobSimConfig)
@@ -58,9 +57,8 @@ class ConfigFailFastSpec extends UnitSpec {
     }
 
     "not throw an exception when the column separator in CsvParams is permissible" in {
-      val validCsvParams = CsvParams(path = "departure.csv", csvSep = ",")
       val validMobSimConfig =
-        createValidMobSimConfig(mobilitySource = validCsvParams)
+        createValidMobSimConfig(inputDir = "departure.csv", csvSep = ",")
 
       noException should be thrownBy ConfigFailFast.check(validMobSimConfig)
     }
