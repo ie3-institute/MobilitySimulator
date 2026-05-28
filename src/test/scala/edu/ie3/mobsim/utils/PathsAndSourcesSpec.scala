@@ -6,7 +6,7 @@
 
 package edu.ie3.mobsim.utils
 
-import edu.ie3.mobsim.config.MobSimConfig.{CsvParams, Input}
+import edu.ie3.mobsim.config.MobSimConfig.Input
 import edu.ie3.test.common.UnitSpec
 
 import java.nio.file.Paths
@@ -18,10 +18,7 @@ class PathsAndSourcesSpec extends UnitSpec {
 
     "using relative paths" in {
 
-      val inputConfigRelative = Input(
-        None,
-        CsvParams(",", "relativePath/mobility"),
-      )
+      val inputConfigRelative = Input("relativePath/mobility", ",")
 
       val actualRelative =
         PathsAndSources(
@@ -44,10 +41,7 @@ class PathsAndSourcesSpec extends UnitSpec {
 
       val absPath = basePath.resolve("absolutePath")
 
-      val inputConfigAbsolute = Input(
-        None,
-        CsvParams(",", absPath.resolve("mobility").toString),
-      )
+      val inputConfigAbsolute = Input(absPath.resolve("mobility").toString, ",")
 
       val actualAbsolute =
         PathsAndSources(

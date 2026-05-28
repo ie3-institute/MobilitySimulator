@@ -6,7 +6,6 @@
 
 package edu.ie3.mobsim.io.geodata
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.test.common.UnitSpec
 
 import java.nio.file.Path
@@ -18,7 +17,7 @@ class HomePoiMappingSpec extends UnitSpec {
     val filePath = Path.of(this.getClass.getResource("poi_mapping.csv").toURI)
 
     val mappings =
-      HomePoiMapping.readPoiMapping(CsvParams(",", filePath.getParent.toString))
+      HomePoiMapping.readPoiMapping(filePath, ",")
 
     mappings.size shouldBe 2
     mappings match {

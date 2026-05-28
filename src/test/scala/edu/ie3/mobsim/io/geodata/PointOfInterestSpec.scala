@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.Coordinate
 import squants.Length
 import squants.space.Meters
 
+import java.nio.file.Path
 import java.util.UUID
 import scala.util.{Failure, Success}
 
@@ -227,7 +228,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
 
   "Parsing a whole csv" should {
     "provide correct results" in {
-      val testFileName = this.getClass.getResource("poi.csv").getFile
+      val testFileName = Path.of(this.getClass.getResource("poi.csv").getFile)
       PointOfInterest.getFromFile(
         testFileName,
         ",",

@@ -6,7 +6,7 @@
 
 package edu.ie3.mobsim.io.probabilities
 
-import edu.ie3.mobsim.config.MobSimConfig.{CsvParams, Input}
+import edu.ie3.mobsim.config.MobSimConfig.Input
 import edu.ie3.mobsim.utils.PathsAndSources
 import edu.ie3.test.common.UnitSpec
 
@@ -21,11 +21,10 @@ class TripProbabilitiesSpec extends UnitSpec {
     val mobSimPath =
       Paths.get("input", "mobilitySimulator")
 
-    val mobilityConf = CsvParams("", mobSimPath.toString)
     val pathsAndSources =
       PathsAndSources(
         "testSim",
-        Input(None, mobilityConf),
+        Input(mobSimPath.toString, ""),
         basePath,
         basePath,
         "mobSim",

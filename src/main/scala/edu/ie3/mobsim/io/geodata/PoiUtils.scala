@@ -13,6 +13,7 @@ import edu.ie3.mobsim.io.probabilities.ProbabilityDensityFunction
 import edu.ie3.mobsim.model.ChargingStation
 import squants.Length
 
+import java.nio.file.Path
 import scala.collection.immutable.{SortedMap, TreeSet}
 import scala.util.{Failure, Success}
 
@@ -29,7 +30,8 @@ object PoiUtils extends LazyLogging {
     */
   def loadPOIs(
       chargingStations: Seq[ChargingStation],
-      poiPath: String,
+      poiPath: Path,
+      csvSep: String,
       maxDistanceFromPoi: Length,
       maxDistanceFromHomePoi: Length,
       assignHomeNearestChargingStations: Boolean,
@@ -38,7 +40,7 @@ object PoiUtils extends LazyLogging {
     PointOfInterest
       .getFromFile(
         poiPath,
-        ",",
+        csvSep,
         chargingStations,
         maxDistanceFromPoi,
         maxDistanceFromHomePoi,

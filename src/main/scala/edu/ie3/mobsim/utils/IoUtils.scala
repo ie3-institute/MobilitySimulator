@@ -11,7 +11,6 @@ import edu.ie3.datamodel.io.naming.FileNamingStrategy
 import edu.ie3.datamodel.io.source.*
 import edu.ie3.datamodel.io.source.csv.*
 import edu.ie3.datamodel.models.input.system.EvInput
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.io.geodata.PointOfInterest
 import edu.ie3.mobsim.model.ElectricVehicle
@@ -280,14 +279,26 @@ object IoUtils {
 
   def readCaseClassSeq[T](using
       decoder: Map[String, String] => T,
+      fullPath: Path,
+      csvSep: String,
+  ): Seq[T] =
+    readCaseClassSeq(using
+      decoder,
+      fullPath.getParent,
+      fullPath.getFileName,
+      csvSep,
+    )
+
+  def readCaseClassSeq[T](using
+      decoder: Map[String, String] => T,
       folderPath: Path,
-      fileName: String,
+      fileName: Path,
       csvSep: String,
   ): Seq[T] = {
     val source =
       new CsvDataSource(csvSep, folderPath, new FileNamingStrategy())
     source
-      .getSourceData(Path.of(fileName))
+      .getSourceData(fileName)
       .toScala(LazyList)
       .map(_.asScala.toMap)
       .map(decoder)

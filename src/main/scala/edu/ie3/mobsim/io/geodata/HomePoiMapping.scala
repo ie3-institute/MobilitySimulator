@@ -6,7 +6,6 @@
 
 package edu.ie3.mobsim.io.geodata
 
-import edu.ie3.mobsim.config.MobSimConfig.CsvParams
 import edu.ie3.mobsim.exceptions.SourceException
 import edu.ie3.mobsim.utils.IoUtils
 
@@ -45,13 +44,8 @@ object HomePoiMapping {
         uuids(row("evs")),
       )
 
-  def readPoiMapping(csvParams: CsvParams): Seq[HomePoiMapping] =
-    IoUtils.readCaseClassSeq(using
-      homePoiDecoder,
-      Path.of(csvParams.path),
-      "poi_mapping.csv",
-      csvParams.csvSep,
-    )
+  def readPoiMapping(path: Path, csvSep: String): Seq[HomePoiMapping] =
+    IoUtils.readCaseClassSeq(using homePoiDecoder, path, csvSep)
 
   def getMaps(
       mappingEntries: Seq[HomePoiMapping]

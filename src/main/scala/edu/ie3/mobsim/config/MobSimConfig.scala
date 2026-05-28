@@ -64,14 +64,11 @@ object MobSimConfig {
 
   // pure config end
 
-  final case class CsvParams(
-      csvSep: String,
-      path: String,
-  ) derives ConfigConvert
-
   final case class Input(
-      homePoiMapping: Option[MobSimConfig.CsvParams] = None,
-      mobility: MobSimConfig.CsvParams,
+      inputDir: String = "mobSim",
+      csvSep: String = ",",
+      hierarchic: Boolean = true,
+      useHomePoiMapping: Boolean = false,
   ) derives ConfigConvert
 
   final case class Output(
