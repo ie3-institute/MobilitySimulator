@@ -94,6 +94,11 @@ dependencies {
 group = 'com.github.ie3-institute'
 description = 'MobilitySimulator'
 
+java {
+  sourceCompatibility = javaVersion
+  targetCompatibility = javaVersion
+}
+
 shadowJar {
   zip64 = true
 }
@@ -104,6 +109,7 @@ shadowJar {
 // see https://docs.gradle.org/current/userguide/scala_plugin.html#sec:configure_scala_classpath for details
 tasks.withType(ScalaCompile) {
   scalaCompileOptions.additionalParameters = [
+    '-Xunchecked-java-output-version:' + javaVersion.majorVersion,
     "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
@@ -113,6 +119,7 @@ tasks.withType(ScalaCompile) {
 // separate scapegoat report for test classes
 compileTestScala {
   scalaCompileOptions.additionalParameters = [
+    '-Xunchecked-java-output-version:' + javaVersion.majorVersion,
     "-Xplugin:" + configurations.scalaCompilerPlugins.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/reports/scapegoat/testsrc/",
     "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
