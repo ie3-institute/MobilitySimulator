@@ -8,5 +8,5 @@ package edu.ie3.mobsim.exceptions
 
 case class UninitializedException(
     msg: String = "",
-    cause: Throwable = None.orNull,
+    cause: Throwable = null,
 ) extends Exception(msg, cause)
