@@ -8,5 +8,5 @@ package edu.ie3.mobsim.exceptions
 
 final case class IllegalConfigException(
     msg: String = "",
-    cause: Throwable = None.orNull,
+    cause: Throwable = null,
 ) extends Exception(msg, cause)

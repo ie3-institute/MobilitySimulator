@@ -6,5 +6,5 @@
 
 package edu.ie3.mobsim.exceptions
 
-case class TripException(msg: String = "", cause: Throwable = None.orNull)
+case class TripException(msg: String = "", cause: Throwable = null)
     extends Exception(msg, cause)
