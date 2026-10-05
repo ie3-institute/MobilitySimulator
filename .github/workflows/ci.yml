@@ -19,9 +19,15 @@ on:
     branches:
       - main
       - dev
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 jobs:
   buildAndTest:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -47,19 +53,21 @@ jobs:
           else
             BRANCH_NAME="${{ github.ref_name }}"
           fi
+
           if [[ "$BRANCH_NAME" == refs/heads/* ]]; then
             BRANCH_NAME="${BRANCH_NAME#refs/heads/}"
           fi
-          
+
           export BRANCH_NAME
-          
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          
+
+          echo "BRANCH_NAME=$BRANCH_NAME" >> "$GITHUB_ENV"
+
           ./gradlew checkBranchName -PbranchName="$BRANCH_NAME" --warning-mode=none
-          
+
           bash scripts/branch_type.sh
+
       - name: Version Check
-        if: ${{ github.event_name == 'pull_request' }}
+        if: github.event_name == 'pull_request'
         env:
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
         run: bash scripts/run-version-check.sh
@@ -68,50 +76,58 @@ jobs:
         run: ./gradlew --refresh-dependencies clean assemble spotlessCheck
 
       - name: Run Tests
-        run: ./gradlew pmdMain pmdTest test reportScoverage checkScoverage
-      - name: Build Scala-Docs
-        run: ./gradlew scaladoc
+        run: ./gradlew pmdMain pmdTest spotbugsMain spotbugsTest test jacocoTestReport jacocoTestCoverageVerification
+
+      - name: Build Java-Docs
+        run: ./gradlew javadoc
 
       - name: SonarQube
         run: |
           ./gradlew sonar \
           -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
           -Dsonar.host.url=${{ vars.SONAR_HOST_URL }} \
-          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.token="${{ secrets.SONAR_TOKEN }}" \
           -Dsonar.qualitygate.wait=true
 
-      #Deployment
-      - name: Deploy
-        if: startsWith(github.ref, 'refs/heads/rel')
-        env:
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVENCENTRAL_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVENCENTRAL_SIGNINGPASS }}
-          ORG_GRADLE_PROJECT_mavenCentralUser: ${{ github.actor == 'sebastian-peter' && secrets.MAVENCENTRAL_USER ||
-            github.actor == 'danielfeismann' && secrets.MAVENCENTRAL_DANIEL_USER }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ github.actor == 'sebastian-peter' && secrets.MAVENCENTRAL_PASS ||
-            github.actor == 'danielfeismann' && secrets.MAVENCENTRAL_DANIEL_PASS }}
+  deployAndStaging:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'rel/') &&
+      (github.actor == 'sebastian-peter' || github.actor == 'danielfeismann')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
 
+    env:
+      ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVENCENTRAL_SIGNINGKEY }}
+      ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVENCENTRAL_SIGNINGPASS }}
+      ORG_GRADLE_PROJECT_mavenCentralUser: ${{ (github.actor == 'sebastian-peter' && secrets.MAVENCENTRAL_USER) || (github.actor == 'danielfeismann' && secrets.MAVENCENTRAL_DANIEL_USER) }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ (github.actor == 'sebastian-peter' && secrets.MAVENCENTRAL_PASS) || (github.actor == 'danielfeismann' && secrets.MAVENCENTRAL_DANIEL_PASS) }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Deploy
         run: |
           echo "Using MavenCentral Token of GitHub Actor: ${{ github.actor }}"
-          if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
-            currentVersion=$(./gradlew -q currentVersion)
-          fi
-          
+          currentVersion="$(./gradlew -q currentVersion)"
           echo "currentVersion=$currentVersion"
+          ./gradlew publish -PdeployVersion="$currentVersion"
 
-          ./gradlew publish -PdeployVersion=$currentVersion
-
-
-      #MavenCentral Staging
       - name: MavenCentral Staging
-        if: startsWith(github.ref, 'refs/heads/rel')
-        env:
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVENCENTRAL_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVENCENTRAL_SIGNINGPASS }}
-          ORG_GRADLE_PROJECT_mavenCentralUser: ${{ github.actor == 'sebastian-peter' && secrets.MAVENCENTRAL_USER ||
-            github.actor == 'danielfeismann' && secrets.MAVENCENTRAL_DANIEL_USER }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ github.actor == 'sebastian-peter' && secrets.MAVENCENTRAL_PASS ||
-            github.actor == 'danielfeismann' && secrets.MAVENCENTRAL_DANIEL_PASS }}
-
         run: |
           ./gradlew stagingAtMavenCentralPortal
