@@ -6,11 +6,11 @@
 
 package edu.ie3.mobsim
 
-import edu.ie3.simona.api.ExtLinkInterface
+import edu.ie3.simona.api.ExtSimulationProvider
 import edu.ie3.simona.api.data.SetupData
 import edu.ie3.simona.api.simulation.ExtSimulation
 
-class ExtLink extends ExtLinkInterface {
+class ExtLink extends ExtSimulationProvider {
 
   @Override
   override def getExtSimulation: ExtSimulation = MobilitySimulator
