@@ -85,7 +85,8 @@ class ProbabilityDensityFunctionSpec extends UnitSpec {
         )
 
         val noOfSamples = 10000
-        val samplesToPortion = (0 to noOfSamples)
+        val samplesToPortion = Range
+          .inclusive(0, noOfSamples)
           .map(_ => pdf.sample())
           .groupBy(sample => sample)
           .map { case (k, v) =>
