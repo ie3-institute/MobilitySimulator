@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switched config framework to `pureconfig` [#476](https://github.com/ie3-institute/MobilitySimulator/issues/476)
 - Harmonized input path settings [#488](https://github.com/ie3-institute/MobilitySimulator/issues/488)
 - Adapted to changes in `simonaAPI` version `0.16.0` [#539](https://github.com/ie3-institute/MobilitySimulator/issues/539)
+- Updated ci.yml and get_versions.sh [#541](https://github.com/ie3-institute/simonaAPI/issues/541)
 
 ### Fixed
 - Fixed shadowJar dependency [#452](https://github.com/ie3-institute/MobilitySimulator/issues/452)
