@@ -178,14 +178,14 @@ class ElectricVehicleSpec extends UnitSpec with TripSimulationTestData {
       "update charging price memory correctly" in {
         val evNoQueue: ElectricVehicle = ev1
         val queue: Queue[Double] =
-          (1 to 10).map { x => x.doubleValue() }.to(Queue)
+          Range.inclusive(1, 10).map { x => x.doubleValue() }.to(Queue)
 
         var updatedEv: ElectricVehicle =
           evNoQueue.updateChargingPricesMemory(queue)
         updatedEv.chargingPricesMemory shouldBe queue
 
         val secondQueue: Queue[Double] =
-          (1 to 25).map { x => x.doubleValue() }.to(Queue)
+          Range.inclusive(1, 25).map { x => x.doubleValue() }.to(Queue)
 
         updatedEv = updatedEv.updateChargingPricesMemory(secondQueue)
         updatedEv.chargingPricesMemory shouldBe secondQueue.drop(5)
