@@ -24,7 +24,7 @@ ext {
   pekkoVersion = '1.7.1'
   slf4jVersion = '1.7.30'
   log4j2Version = '2.14.1'
-  scapegoatVersion = '3.4.0'
+  scapegoatVersion = '3.4.1'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator // location of script plugins
 }
