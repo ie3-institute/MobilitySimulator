@@ -1,34 +1,60 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-REPO_URL=$(git config --get remote.origin.url)
+REPO_URL="$(git config --get remote.origin.url)"
 export REPO_URL
-echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
+
+if [[ -n "${GITHUB_ENV:-}" ]]; then
+  echo "REPO_URL=$REPO_URL" >> "$GITHUB_ENV"
+fi
+
+VERSION_FILE="${VERSION_FILE:-version.properties}"
+
+parse_version() {
+  local source="$1"
+  local props major minor patch
+
+  props="$(tr -d '\r')"
+  major="$(sed -n 's/^version\.major=//p' <<< "$props")"
+  minor="$(sed -n 's/^version\.minor=//p' <<< "$props")"
+  patch="$(sed -n 's/^version\.patch=//p' <<< "$props")"
+
+  if [[ ! "$major.$minor.$patch" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "ERROR: Invalid version in $VERSION_FILE of $source: '$major.$minor.$patch'" >&2
+    exit 1
+  fi
+
+  echo "$major.$minor.$patch"
+}
+
+write_env() {
+  local key="$1"
+  local value="$2"
+
+  echo "$key=$value"
+  echo "export $key=$value" >> versions.env
+
+  if [[ -n "${GITHUB_ENV:-}" ]]; then
+    echo "$key=$value" >> "$GITHUB_ENV"
+  fi
+}
 
 echo "Fetching current version of PR..."
-PR_VERSION=$(./gradlew -q currentVersion)
-echo "PR_VERSION=$PR_VERSION"
-echo "export PR_VERSION=$PR_VERSION" >> versions.env
-echo "PR_VERSION=$PR_VERSION" >> "$GITHUB_ENV"
+PR_VERSION="$(parse_version "PR" < "$VERSION_FILE")"
+write_env "PR_VERSION" "$PR_VERSION"
 
 get_branch_version() {
-    local BRANCH_NAME=$1
-    local DIR_NAME="${BRANCH_NAME}-branch"
+  local branch_name="$1"
+  local branch_version
 
-    git clone --depth 1 --branch "$BRANCH_NAME" "$REPO_URL" "$DIR_NAME"
-    cd "$DIR_NAME"
+  git fetch --quiet origin "+refs/heads/$branch_name:refs/remotes/origin/$branch_name"
 
-    echo "Fetching version from $BRANCH_NAME branch..."
-    BRANCH_VERSION=$(./gradlew -q currentVersion)
-    cd ..
+  echo "Fetching version from $branch_name branch..."
+  branch_version="$(git show "origin/$branch_name:$VERSION_FILE" | parse_version "$branch_name")"
 
-    echo "${BRANCH_NAME^^}_VERSION=$BRANCH_VERSION"
-    echo "export ${BRANCH_NAME^^}_VERSION=$BRANCH_VERSION" >> versions.env
-    echo "${BRANCH_NAME^^}_VERSION=$BRANCH_VERSION" >> "$GITHUB_ENV"
-
-    rm -rf "$DIR_NAME"
+  write_env "${branch_name^^}_VERSION" "$branch_version"
 }
 
 get_branch_version "main"
