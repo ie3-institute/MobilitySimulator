@@ -67,7 +67,7 @@ dependencies {
 
   /* CORE Scala */
   implementation "org.scala-lang:scala3-library_3:${scalaBinaryVersion}"
-  implementation "org.scala-lang.modules:scala-parallel-collections_${scalaVersion}:1.2.0"
+  implementation "org.scala-lang.modules:scala-parallel-collections_${scalaVersion}:1.3.0"
 
   /* CORE pekko */
   testImplementation "org.apache.pekko:pekko-actor-typed_${scalaVersion}:${pekkoVersion}"
