@@ -170,13 +170,19 @@ case object PointOfInterest {
     */
   private def prepareChargingStations(
       chargingStations: Seq[ChargingStation]
-  ): Map[EvcsLocationType, Seq[ChargingStation]] =
+  ): Map[EvcsLocationType, Seq[ChargingStation]] = {
+    val excludeLocationTypes = Set(
+      EvcsLocationType.CHARGING_HUB_HIGHWAY,
+      EvcsLocationType.CHARGING_HUB_TOWN,
+    )
     chargingStations
-      .filterNot { evcs =>
-        evcs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY ||
-        evcs.evcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN
+      .flatMap { evcs =>
+        evcs.evcsLocationTypes.diff(excludeLocationTypes).map(_ -> evcs)
       }
-      .groupBy(_.evcsLocationType)
+      .groupMap { case (locationType, evcs) => locationType } {
+        case (locationType, evcs) => evcs
+      }
+  }
 
   /** Parse Points of Interest of type home. First, all distances between POI
     * coordinates and charging stations are calculated asynchronously, filtered

@@ -32,11 +32,30 @@ final case class ChargingStation(
     id: String,
     geoPosition: Coordinate,
     evcsType: ChargingPointType,
-    evcsLocationType: EvcsLocationType,
+    evcsLocationTypes: Set[EvcsLocationType],
     chargingPoints: Int,
 )
 
 object ChargingStation extends LazyLogging {
+
+  /** Creates a charging station with a single location type.
+    */
+  def apply(
+      uuid: UUID,
+      id: String,
+      geoPosition: Coordinate,
+      evcsType: ChargingPointType,
+      evcsLocationType: EvcsLocationType,
+      chargingPoints: Int,
+  ): ChargingStation =
+    ChargingStation(
+      uuid,
+      id,
+      geoPosition,
+      evcsType,
+      Set(evcsLocationType),
+      chargingPoints,
+    )
 
   /** Retrieves the charging stations provided by SIMONA and use it to construct
     * charging stations with needed information. The information contains among
@@ -58,7 +77,7 @@ object ChargingStation extends LazyLogging {
           evcs.getId,
           evcs.getNode.getGeoPosition.getCoordinate,
           evcsType = evcs.getType,
-          evcs.getLocationType,
+          evcs.getLocationTypes.asScala.toSet,
           chargingPoints = evcs.getChargingPoints,
         )
       }

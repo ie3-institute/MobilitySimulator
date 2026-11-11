@@ -759,18 +759,20 @@ object MobilitySimulator
       ) => {
         (
           totalNumberOfChargingPoints._1 + cs.chargingPoints,
-          if (cs.evcsLocationType == EvcsLocationType.HOME)
+          if (cs.evcsLocationTypes.contains(EvcsLocationType.HOME))
             totalNumberOfChargingPoints._2 + cs.chargingPoints
           else totalNumberOfChargingPoints._2,
           if (
-            cs.evcsLocationType == EvcsLocationType.WORK || cs.evcsLocationType == EvcsLocationType.STREET
-            || cs.evcsLocationType == EvcsLocationType.CUSTOMER_PARKING
+            cs.evcsLocationTypes.contains(EvcsLocationType.WORK)
+            || cs.evcsLocationTypes.contains(EvcsLocationType.STREET)
+            || cs.evcsLocationTypes.contains(EvcsLocationType.CUSTOMER_PARKING)
           )
             totalNumberOfChargingPoints._3 + cs.chargingPoints
           else totalNumberOfChargingPoints._3,
           if (
-            cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_TOWN
-            || cs.evcsLocationType == EvcsLocationType.CHARGING_HUB_HIGHWAY
+            cs.evcsLocationTypes.contains(EvcsLocationType.CHARGING_HUB_TOWN)
+            || cs.evcsLocationTypes
+              .contains(EvcsLocationType.CHARGING_HUB_HIGHWAY)
           )
             totalNumberOfChargingPoints._4 + cs.chargingPoints
           else totalNumberOfChargingPoints._4,
