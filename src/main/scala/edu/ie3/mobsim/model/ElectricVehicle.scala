@@ -24,7 +24,7 @@ import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.measure.quantity.{Energy, Length, Power}
+import javax.measure.quantity.{Dimensionless, Energy, Length, Power}
 import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
@@ -192,6 +192,9 @@ final case class ElectricVehicle(
   override def toString: String =
     s"EV(id=$id, eStorage=${evType.capacity}, storedEnergy=$storedEnergy, AC=${evType.acPower}, DC=${evType.dcPower}, departureTime=$departureTime)"
 
+  def getEtaCharging(): ComparableQuantity[Dimensionless] = ???
+
+  def getEtaDischarging(): ComparableQuantity[Dimensionless] = ???
 }
 
 case object ElectricVehicle extends LazyLogging {
