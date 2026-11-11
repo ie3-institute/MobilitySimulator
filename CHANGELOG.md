@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed shadowJar dependency [#452](https://github.com/ie3-institute/MobilitySimulator/issues/452)
 - Fixed EvType error message and example input [#454](https://github.com/ie3-institute/MobilitySimulator/issues/454)
 - Fixed wrong input paths [#460](https://github.com/ie3-institute/MobilitySimulator/issues/460)
+- Exclude `shadowJar`-Files from maven-release process [#561](https://github.com/ie3-institute/MobilitySimulator/issues/561)
 
 ## [1.0.0]
 
