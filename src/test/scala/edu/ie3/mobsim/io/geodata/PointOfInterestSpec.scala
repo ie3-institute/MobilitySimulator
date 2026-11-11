@@ -12,6 +12,7 @@ import edu.ie3.mobsim.io.geodata.PoiEnums.CategoricalLocationDictionary
 import edu.ie3.mobsim.model.ChargingStation
 import edu.ie3.test.common.UnitSpec
 import org.locationtech.jts.geom.Coordinate
+import org.scalatest.OptionValues.*
 import squants.Length
 import squants.space.Meters
 
@@ -23,7 +24,7 @@ class PointOfInterestSpec extends UnitSpec with PoiTestData {
   "Creating a point of interest" when {
     val coordinate = new Coordinate(7.4116481, 51.4843282)
     val locationToChargingStations =
-      Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationType)
+      Seq(cs0, cs1, cs2, cs3).groupBy(_.evcsLocationTypes.headOption.value)
 
     "assess the headline of a file correctly" should {
       val assessHeadLine =
