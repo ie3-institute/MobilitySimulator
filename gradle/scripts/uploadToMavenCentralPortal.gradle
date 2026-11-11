@@ -32,31 +32,31 @@ if (project.hasProperty('mavenCentralUser') && project.hasProperty('mavenCentral
                 pom {
                     description = 'Stochastic-based simulator for individual mobility @ the Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3) @ TU Dortmund University'
                     name = 'MobilitySimulator'
-                    url = 'https:github.com/ie3-institute/MobilitySimulator'
+                    url = 'https://github.com/ie3-institute/MobilitySimulator'
                     organization {
                         name = 'Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University'
-                        url = 'https:www.ie3.tu-dortmund.de/'
+                        url = 'https://www.ie3.tu-dortmund.de/'
                     }
                     issueManagement {
                         system = 'GitHub'
-                        url = 'https:github.com/ie3-institute/MobilitySimulator/issues'
+                        url = 'https://github.com/ie3-institute/MobilitySimulator/issues'
                     }
                     licenses {
                         license {
                             name = 'BSD 3-Clause License'
-                            url = 'https:github.com/ie3-institute/MobilitySimulator/blob/master/LICENSE'
+                            url = 'https://github.com/ie3-institute/MobilitySimulator/blob/master/LICENSE'
                         }
                     }
                     developers {
                         developer {
                             organization = "Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University"
-                            organizationUrl = "https:ie3.etit.tu-dortmund.de"
+                            organizationUrl = "https://ie3.etit.tu-dortmund.de"
                         }
                     }
                     scm {
                         connection = 'scm:git:git:github.com/ie3-institute/MobilitySimulator.git'
                         developerConnection = 'scm:git:ssh:github.com:ie3-institute/MobilitySimulator.git'
-                        url = 'https:github.com/ie3-institute/MobilitySimulator'
+                        url = 'https://github.com/ie3-institute/MobilitySimulator'
                     }
                 }
 
@@ -64,6 +64,13 @@ if (project.hasProperty('mavenCentralUser') && project.hasProperty('mavenCentral
                 groupId = 'com.github.ie3-institute'
                 artifactId = 'MobilitySimulator'
                 version = versionString
+
+                // exclude the shadow (fat) jar variant from the publication
+                afterEvaluate {
+                    components.java.withVariantsFromConfiguration(configurations.shadowRuntimeElements) {
+                        skip()
+                    }
+                }
 
                 from components.java
                 artifact sourcesJar
