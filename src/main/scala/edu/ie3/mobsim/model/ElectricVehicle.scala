@@ -192,12 +192,15 @@ final case class ElectricVehicle(
   override def toString: String =
     s"EV(id=$id, eStorage=${evType.capacity}, storedEnergy=$storedEnergy, AC=${evType.acPower}, DC=${evType.dcPower}, departureTime=$departureTime)"
 
-  def getEtaCharging(): ComparableQuantity[Dimensionless] = ???
+  def getEtaCharging: ComparableQuantity[Dimensionless] =
+    Quantities.getQuantity(evType.etaCharging.toEach, PowerSystemUnits.PU)
 
-  def getEtaDischarging(): ComparableQuantity[Dimensionless] = ???
+  def getEtaDischarging: ComparableQuantity[Dimensionless] =
+    Quantities.getQuantity(evType.etaDischarging.toEach, PowerSystemUnits.PU)
+
 }
 
-case object ElectricVehicle extends LazyLogging {
+object ElectricVehicle extends LazyLogging {
 
   /** Determine probability density functions for home POI separated by the
     * possible to charge at home or not
