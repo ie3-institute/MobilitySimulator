@@ -24,7 +24,7 @@ import tech.units.indriya.quantity.Quantities
 
 import java.time.ZonedDateTime
 import java.util.UUID
-import javax.measure.quantity.{Energy, Length, Power}
+import javax.measure.quantity.{Dimensionless, Energy, Length, Power}
 import scala.collection.immutable.Queue
 import scala.util.{Failure, Success, Try}
 
@@ -192,9 +192,15 @@ final case class ElectricVehicle(
   override def toString: String =
     s"EV(id=$id, eStorage=${evType.capacity}, storedEnergy=$storedEnergy, AC=${evType.acPower}, DC=${evType.dcPower}, departureTime=$departureTime)"
 
+  def getEtaCharging: ComparableQuantity[Dimensionless] =
+    Quantities.getQuantity(evType.etaCharging.toEach, PowerSystemUnits.PU)
+
+  def getEtaDischarging: ComparableQuantity[Dimensionless] =
+    Quantities.getQuantity(evType.etaDischarging.toEach, PowerSystemUnits.PU)
+
 }
 
-case object ElectricVehicle extends LazyLogging {
+object ElectricVehicle extends LazyLogging {
 
   /** Determine probability density functions for home POI separated by the
     * possible to charge at home or not

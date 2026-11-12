@@ -37,6 +37,10 @@ import scala.util.{Failure, Success, Try, Using}
   *   Possible DC charging power
   * @param cosPhiRated
   *   Rated power dimensionless
+  * @param etaCharging
+  *   The efficiency of charging operations.
+  * @param etaDischarging
+  *   The efficiency of discharging (V2G) operations.
   */
 final case class EvType(
     model: String,
@@ -47,6 +51,8 @@ final case class EvType(
     acPower: Power,
     dcPower: Power,
     cosPhiRated: Dimensionless,
+    etaCharging: Dimensionless,
+    etaDischarging: Dimensionless,
 )
 
 object EvType {
@@ -78,6 +84,8 @@ object EvType {
         val acPower = Kilowatts(entries(5).toDouble)
         val dcPower = Kilowatts(entries(6).toDouble)
         val cosPhi = Each(entries(7).toDouble)
+        val efficiencyCharging = Each(1d)
+        val efficiencyDischarging = Each(1d)
 
         new EvType(
           model,
@@ -88,6 +96,8 @@ object EvType {
           acPower,
           dcPower,
           cosPhi,
+          efficiencyCharging,
+          efficiencyDischarging,
         )
       }
   }
@@ -126,6 +136,20 @@ object EvType {
           .doubleValue()
       ),
       Each(evTypeInput.getCosPhiRated),
+      Each(
+        evTypeInput
+          .getEtaCharging()
+          .to(PowerSystemUnits.PU)
+          .getValue
+          .doubleValue()
+      ),
+      Each(
+        evTypeInput
+          .getEtaDischarging()
+          .to(PowerSystemUnits.PU)
+          .getValue
+          .doubleValue()
+      ),
     )
   }
 
