@@ -43,6 +43,8 @@ trait ElectricVehicleTestData {
     Kilowatts(11d),
     Kilowatts(50d),
     Each(1.0),
+    Each(1.0),
+    Each(1.0),
   )
   protected val givenModelPdf: ProbabilityDensityFunction[EvType] =
     ProbabilityDensityFunction(Map(givenModel -> 1.0))
@@ -130,14 +132,14 @@ trait ElectricVehicleTestData {
     11d.asKiloVoltAmpere,
     0.9,
     11d.asKiloWatt,
+    1d.asPu,
+    1d.asPu,
   )
 
   protected val evInput = new EvInput(
     UUID.randomUUID(),
     "test-ev-input",
-    node,
     ReactivePowerCharacteristic.parse("cosPhiFixed:{(0.0, 0.95)}"),
-    null,
     evInputType,
   )
 }
